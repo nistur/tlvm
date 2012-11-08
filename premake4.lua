@@ -4,6 +4,8 @@ configurations { "Debug", "Release" }
 includedirs { "include" }
 files { "include/**.h" }
 
+defines { "TMPL_BUILD" }
+
 configuration "Debug"
 defines { "DEBUG" }
 flags { "Symbols" }
@@ -20,6 +22,11 @@ targetdir "build/release"
 project "template"
 kind "StaticLib"
 files { "src/**.c", "src/**.cpp" }
+
+project "template-dynamic"
+kind "SharedLib"
+files { "src/**.c", "src/**.cpp" }
+targetname "template"
 
 project "tests"
 kind "ConsoleApp"
