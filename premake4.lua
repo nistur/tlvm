@@ -1,7 +1,7 @@
 solution "template"
 language "C++"
 configurations { "Debug", "Release" }
-includedirs { "include" }
+includedirs { "include", "src/include" }
 files { "include/**.h" }
 
 defines { "TMPL_BUILD" }

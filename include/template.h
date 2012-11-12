@@ -28,7 +28,7 @@ typedef struct _tmplContext tmplContext;
 
 TMPL_EXPORT tmplContext* tmplInitContext     ();
 TMPL_EXPORT tmplReturn   tmplTerminateContext(tmplContext** context);
-
+TMPL_EXPORT const char*  tmplError();
 
 #ifdef __cplusplus
 }

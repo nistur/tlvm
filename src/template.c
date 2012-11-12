@@ -1,19 +1,13 @@
-#include "template.h"
-
-#include <stdlib.h>
-
-struct _tmplContext
-{
-};
+#include "tmpl.h"
 
 tmplReturn tmplClearContext(tmplContext* context)
 {
-    return TMPL_SUCCESS;
+    tmplReturn(SUCCESS);
 }
 
 tmplContext* tmplInitContext()
 {
-    tmplContext* context = (tmplContext*)malloc(sizeof(tmplContext));
+    tmplContext* context = tmplMalloc(tmplContext);
     if(tmplClearContext(context) != TMPL_SUCCESS)
 	tmplTerminateContext(&context);
     return context;
@@ -22,9 +16,14 @@ tmplContext* tmplInitContext()
 tmplReturn tmplTerminateContext(tmplContext** context)
 {
     if(*context == 0)
-	return TMPL_NO_CONTEXT;
+	tmplReturn(NO_CONTEXT);
 
-    free(*context);
+    tmplFree(*context);
     *context = 0;
-    return TMPL_SUCCESS;
+    tmplReturn(SUCCESS);
+}
+
+const char* tmplError()
+{
+    return g_tmplErrors[g_tmplError];
 }
