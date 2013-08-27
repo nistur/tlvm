@@ -1,10 +1,10 @@
-solution "template"
+solution "tlvm"
 language "C++"
 configurations { "Debug", "Release" }
 includedirs { "include", "src/include" }
 files { "include/**.h" }
 
-defines { "TMPL_BUILD" }
+defines { "TLVM_BUILD" }
 
 configuration "Debug"
 defines { "DEBUG" }
@@ -19,19 +19,19 @@ flags { "OptimizeSpeed",
 	"NoFramePointer" }
 targetdir "build/release"
 
-project "template"
+project "tlvm"
 kind "StaticLib"
 files { "src/**.c", "src/**.cpp" }
 
-project "template-dynamic"
+project "tlvm-dynamic"
 kind "SharedLib"
 files { "src/**.c", "src/**.cpp" }
-targetname "template"
+targetname "tlvm"
 
 project "tests"
 kind "ConsoleApp"
 files { "tests/**.cpp" }
-links { "template" }
+links { "tlvm" }
 configuration "Debug"
 postbuildcommands("build/debug/tests")
 configuration "Release"

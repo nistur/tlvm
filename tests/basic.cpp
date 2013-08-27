@@ -1,5 +1,5 @@
-#include "tmpl-tests.h"
-#include "template.h"
+#include "tlvm-tests.h"
+#include "tlvm.h"
 
 TEST(InitTerminate, Basic, 0.0f,
      // initialisation
@@ -8,15 +8,15 @@ TEST(InitTerminate, Basic, 0.0f,
      },
      // cleanup
      {
-	 tmplTerminateContext(&m_data.context);
+	 tlvmTerminateContext(&m_data.context);
      },
      // test
      {
-	 ASSERT(m_data.context = tmplInitContext());
-	 ASSERT(tmplTerminateContext(&m_data.context) == TMPL_SUCCESS);
+	 ASSERT(m_data.context = tlvmInitContext());
+	 ASSERT(tlvmTerminateContext(&m_data.context) == TLVM_SUCCESS);
      },
      // data
      {
-	 tmplContext* context;
+	 tlvmContext* context;
      }
     );
