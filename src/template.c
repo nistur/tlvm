@@ -1,4 +1,4 @@
-#include "tmpl.h"
+#include "tmpl_internal.h"
 
 tmplReturn tmplClearContext(tmplContext* context)
 {
