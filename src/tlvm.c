@@ -49,7 +49,7 @@ tlvmReturn tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmByte 
         tlvmReturnCode(NO_CONTEXT);
     if(memory == NULL)
         tlvmReturnCode(NO_MEMORY);
-    if(size == 0)
+    if(size <= 0)
         tlvmReturnCode(INVALID_INPUT);
 
     context->m_Memory = memory;
