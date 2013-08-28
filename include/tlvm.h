@@ -32,6 +32,7 @@ typedef struct _tlvmContext tlvmContext;
 #define TLVM_INVALID_INPUT       3
 #define TLVM_UNKNOWN_INSTRUCTION 4
 #define TLVM_EXIT                5
+#define TLVM_UNIMPLEMENTED      -1
 
 #include "tlvm_alu.h"
 #include "tlvm_fpu.h"

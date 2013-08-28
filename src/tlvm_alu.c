@@ -2,5 +2,5 @@
 
 tlvmReturn tlvmAddALU(tlvmContext* context)
 {
-	tlvmReturnCode(SUCCESS);
+	tlvmReturnCode(UNIMPLEMENTED);
 }

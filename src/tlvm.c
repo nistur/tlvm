@@ -96,5 +96,7 @@ tlvmReturn tlvmRun(tlvmContext* context)
 
 const char* tlvmError()
 {
+    if(g_tlvmError == -1)
+        return "UNIMPLEMENTED";
     return g_tlvmErrors[g_tlvmError];
 }

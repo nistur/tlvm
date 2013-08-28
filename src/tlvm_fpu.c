@@ -2,5 +2,5 @@
 
 tlvmReturn tlvmAddFPU(tlvmContext* context)
 {
-	tlvmReturnCode(SUCCESS);
+	tlvmReturnCode(UNIMPLEMENTED);
 }
