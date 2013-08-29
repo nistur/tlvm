@@ -1,7 +1,7 @@
 #include "tlvm.h"
 
-tlvmReturn g_tlvmError;
-const char* g_tlvmErrors[] = 
+tlvmReturn g_tlvmStatus;
+const char* g_tlvmStatusMessages[] = 
 {
     "Success",
     "Null context",

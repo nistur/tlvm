@@ -54,16 +54,16 @@ struct _tlvmContext
 /***************************************
  * Error handling
  ***************************************/
-extern tlvmReturn  g_tlvmError;
-extern const char* g_tlvmErrors[];
+extern tlvmReturn  g_tlvmStatus;
+extern const char* g_tlvmStatusMessages[];
 #define tlvmReturnCode(x)				\
     {						\
-	g_tlvmError = TLVM_##x;			\
+	g_tlvmStatus = TLVM_##x;			\
 	return TLVM_##x;			\
     }
 #define tlvmReturn() \
     {  \
-    	return g_tlvmError; \
+    	return g_tlvmStatus; \
     }
 
 

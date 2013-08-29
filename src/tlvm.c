@@ -94,14 +94,14 @@ tlvmReturn tlvmStep(tlvmContext* context)
 tlvmReturn tlvmRun(tlvmContext* context)
 {
     while(tlvmStep(context) == TLVM_SUCCESS){}
-    if(g_tlvmError != TLVM_EXIT)
+    if(g_tlvmStatus != TLVM_EXIT)
         tlvmReturn();
     tlvmReturnCode(SUCCESS);
 }
 
 const char* tlvmError()
 {
-    if(g_tlvmError == -1)
+    if(g_tlvmStatus == -1)
         return "UNIMPLEMENTED";
-    return g_tlvmErrors[g_tlvmError];
+    return g_tlvmStatusMessages[g_tlvmStatus];
 }
