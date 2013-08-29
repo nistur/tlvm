@@ -46,9 +46,11 @@ struct _tlvmContext
  ***************************************/
 #include <stdlib.h>
 #include <string.h>
-#define tlvmMallocArray(x, n)   (x*)malloc(sizeof(x) * n)
-#define tlvmMalloc(x)           (x*)malloc(sizeof(x))
-#define tlvmFree(x)             free(x)
+void* tlvmMallocInternal(int size);
+void  tlvmFreeInternal(void* ptr);
+#define tlvmMallocArray(x, n)   (x*)tlvmMallocInternal(sizeof(x) * n)
+#define tlvmMalloc(x)           (x*)tlvmMallocInternal(sizeof(x))
+#define tlvmFree(x)             if(x) { tlvmFreeInternal(x); x = 0; }
 #define tlvmMemcpy(dst, src, s) memcpy(dst, src, sizeof(*src)*s);
 
 /***************************************

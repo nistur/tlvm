@@ -80,30 +80,3 @@ TEST(LoadBootloader, Basic, 0.0f,
       tlvmByte     bootloader[256];
      }
     );
-
-TEST(NOOP, Basic, 0.0f,
-     // initialisation
-     {
-      tlvmInitContext(&m_data.context);
-      m_data.bootloader[0] = 0x0; // NOOP
-      m_data.bootloader[1] = 0xFF; // nothing, unknown instruction
-     },
-     // cleanup
-     {
-      tlvmTerminateContext(&m_data.context);
-     },
-     // test
-     {
-          // reload the program so each time we start from 0x0
-          tlvmLoadBootloader(m_data.context, m_data.bootloader);
-
-          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS);
-          ASSERT(tlvmStep(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
-          ASSERT(tlvmRun(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
-     },
-     // data
-     {
-      tlvmContext* context;
-      tlvmByte     bootloader[255];
-     }
-    );

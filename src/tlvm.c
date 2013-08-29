@@ -105,3 +105,15 @@ const char* tlvmError()
         return "UNIMPLEMENTED";
     return g_tlvmStatusMessages[g_tlvmStatus];
 }
+
+void* tlvmMallocInternal(int size)
+{
+    void* rtn = malloc(size);
+    memset(rtn, 0, size);
+    return rtn;
+}
+
+void  tlvmFreeInternal(void* ptr)
+{
+    free(ptr);
+}

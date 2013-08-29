@@ -1,5 +1,6 @@
 #include "tlvm-tests.h"
 #include "tlvm.h"
+#include "tlvm_instructions.h"
 
 TEST(InitTerminate, ALU, 0.0f,
      // initialisation
@@ -18,5 +19,31 @@ TEST(InitTerminate, ALU, 0.0f,
      // data
      {
       tlvmContext* context;
+     }
+    );
+
+TEST(ADI, ALU, 0.0f,
+     // initialisation
+     {
+      tlvmInitContext(&m_data.context);
+      tlvmAddALU(m_data.context);
+      m_data.bootloader[0] = TLVM_ADI;
+      m_data.bootloader[1] = 99;
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+          // reload the program so each time we start from 0x0
+          tlvmLoadBootloader(m_data.context, m_data.bootloader);
+
+          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS); // run the first instruction
+     },
+     // data
+     {
+      tlvmContext* context;
+      tlvmByte     bootloader[255];
      }
     );

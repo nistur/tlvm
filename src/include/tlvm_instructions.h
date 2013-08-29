@@ -29,6 +29,14 @@
  *********************************************/
  #define TLVM_ADD_B       0x80 // add register B to A
  #define TLVM_ADD_C       0x81 // add register C to A
+ #define TLVM_ADD_D       0x82 // add register D to A
+ #define TLVM_ADD_E       0x83 // add register E to A
+ #define TLVM_ADD_H       0x84 // add register H to A
+ #define TLVM_ADD_L       0x85 // add register L to A
+ #define TLVM_ADD_M       0x86 // add (HL) to A
+ #define TLVM_ADD_A       0x87 // add register A to A
+
+ #define TLVM_ADI         0xC6 // add immediate to A
 
 
 /*********************************************
@@ -43,5 +51,6 @@ tlvmReturn tlvmANI (tlvmContext* context);
  * ALU instructions
  *********************************************/
  tlvmReturn tlvmADD(tlvmContext* context);
+ tlvmReturn tlvmADI(tlvmContext* context);
 
 #endif/*__TLVM_INSTRUCTIONS_H__*/
