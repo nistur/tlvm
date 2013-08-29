@@ -6,12 +6,19 @@
  * Core instruction opcodes
  *********************************************/
 #define TLVM_NOOP         0x00
+#define TLVM_MOV_B        0x70
+#define TLVM_MOV_C        0x71
+#define TLVM_MOV_D        0x72
+#define TLVM_MOV_E        0x73
+#define TLVM_MOV_H        0x74
+#define TLVM_MOV_L        0x75
+#define TLVM_MOV_A        0x77
 
 /*********************************************
  * ALU instruction opcodes
  *********************************************/
- #define TLVM_ADD_RM      0x40 // add from register to memory
- #define TLVM_ADD_MR      0x41 // add from memory to register
+ #define TLVM_ADD_B       0x80 // add register B to A
+ #define TLVM_ADD_C       0x81 // add register C to A
 
 /*********************************************
  * FPU instruction opcodes
@@ -24,15 +31,11 @@
  * Core instructions
  *********************************************/
 tlvmReturn tlvmNOOP(tlvmContext* context);
+tlvmReturn tlvmMOV (tlvmContext* context);
 
 /*********************************************
  * ALU instructions
  *********************************************/
  tlvmReturn tlvmADD(tlvmContext* context);
-
-/*********************************************
- * FPU instructions
- *********************************************/
- tlvmReturn tlvmADDF(tlvmContext* context);
 
 #endif/*__TLVM_INSTRUCTIONS_H__*/

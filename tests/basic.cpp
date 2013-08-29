@@ -22,7 +22,7 @@ TEST(InitTerminate, Basic, 0.0f,
      }
     );
 
-TEST(SetRegisters, Basic, 0.0f,
+TEST(SetMemory, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -40,7 +40,7 @@ TEST(SetRegisters, Basic, 0.0f,
           ASSERT(tlvmSetMemoryBuffer(m_data.context, NULL, 255) == TLVM_NO_MEMORY);
 
           // zero size
-          ASSERT(tlvmSetMemoryBuffer(m_data.context, m_data.memory, NULL) == TLVM_INVALID_INPUT);
+          ASSERT(tlvmSetMemoryBuffer(m_data.context, m_data.memory, 0) == TLVM_INVALID_INPUT);
 
           // valid input
           ASSERT(tlvmSetMemoryBuffer(m_data.context, m_data.memory, 255) == TLVM_SUCCESS);
@@ -53,7 +53,7 @@ TEST(SetRegisters, Basic, 0.0f,
      }
     );
 
-TEST(LoadProgram, Basic, 0.0f,
+TEST(LoadBootloader, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -65,22 +65,19 @@ TEST(LoadProgram, Basic, 0.0f,
      // test
      {
           // no context
-          ASSERT(tlvmLoadProgram(NULL, m_data.program, 255) == TLVM_NO_CONTEXT);
+          ASSERT(tlvmLoadBootloader(NULL, m_data.bootloader) == TLVM_NO_CONTEXT);
 
           // no buffer
-          ASSERT(tlvmLoadProgram(m_data.context, NULL, 255) == TLVM_INVALID_INPUT);
-
-          // zero size
-          ASSERT(tlvmLoadProgram(m_data.context, m_data.program, NULL) == TLVM_INVALID_INPUT);
+          ASSERT(tlvmLoadBootloader(m_data.context, NULL) == TLVM_INVALID_INPUT);
 
           // valid input
-          ASSERT(tlvmLoadProgram(m_data.context, m_data.program, 255) == TLVM_SUCCESS);
+          ASSERT(tlvmLoadBootloader(m_data.context, m_data.bootloader) == TLVM_SUCCESS);
       
      },
      // data
      {
       tlvmContext* context;
-      tlvmByte     program[255];
+      tlvmByte     bootloader[256];
      }
     );
 
@@ -88,8 +85,8 @@ TEST(NOOP, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      m_data.program[0] = 0x0; // NOOP
-      m_data.program[1] = 0xFF; // nothing, unknown instruction
+      m_data.bootloader[0] = 0x0; // NOOP
+      m_data.bootloader[1] = 0xFF; // nothing, unknown instruction
      },
      // cleanup
      {
@@ -98,7 +95,7 @@ TEST(NOOP, Basic, 0.0f,
      // test
      {
           // reload the program so each time we start from 0x0
-          tlvmLoadProgram(m_data.context, m_data.program, 255);
+          tlvmLoadBootloader(m_data.context, m_data.bootloader);
 
           ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS);
           ASSERT(tlvmStep(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
@@ -107,6 +104,6 @@ TEST(NOOP, Basic, 0.0f,
      // data
      {
       tlvmContext* context;
-      tlvmByte     program[255];
+      tlvmByte     bootloader[255];
      }
     );

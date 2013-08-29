@@ -7,11 +7,14 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
 
     context->m_Program = NULL;
     context->m_ProgramCounter = 0;
+    context->m_Bootloader = NULL;
 
     memset(context->m_InstructionSet, 0, sizeof(tlvmInstruction*) * TLVM_OPCODE_MAX);
 
     tlvmReturnCode(SUCCESS);
 }
+
+tlvmReturn tlvmInitCore(tlvmContext* context);
 
 tlvmReturn tlvmInitContext(tlvmContext** context)
 {
@@ -25,7 +28,8 @@ tlvmReturn tlvmInitContext(tlvmContext** context)
        tlvmReturn();
     }
 
-    (*context)->m_InstructionSet[TLVM_NOOP] = tlvmNOOP;
+    if(tlvmInitCore(*context) != TLVM_SUCCESS)
+        tlvmReturn();
 
     tlvmReturnCode(SUCCESS);
 }
@@ -43,7 +47,7 @@ tlvmReturn tlvmTerminateContext(tlvmContext** context)
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmByte size)
+tlvmReturn tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmShort size)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -58,14 +62,15 @@ tlvmReturn tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmByte 
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmLoadProgram(tlvmContext* context, tlvmByte* program, tlvmUInt size)
+tlvmReturn tlvmLoadBootloader(tlvmContext* context, tlvmByte* bootloader)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
-    if(program == NULL || size == 0)
+    if(bootloader == NULL)
         tlvmReturnCode(INVALID_INPUT)
-    context->m_Program = tlvmMallocArray(tlvmByte, size);
-    tlvmMemcpy(context->m_Program, program, size);
+    context->m_Bootloader = tlvmMallocArray(tlvmByte, 256);
+    tlvmMemcpy(context->m_Bootloader, bootloader, 256);
+    context->m_Program = context->m_Bootloader;
 
     context->m_ProgramCounter = 0;
 

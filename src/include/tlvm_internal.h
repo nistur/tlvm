@@ -26,7 +26,7 @@ typedef tlvmReturn(*tlvmInstruction)(tlvmContext*);
 struct _tlvmContext
 {
 	tlvmByte* m_Memory;
-	tlvmByte  m_MemorySize;
+	tlvmShort m_MemorySize;
 
 	// instrution set
 	tlvmInstruction m_InstructionSet[TLVM_OPCODE_MAX];
@@ -34,6 +34,8 @@ struct _tlvmContext
 	// program
 	tlvmByte* m_Program;
 	tlvmByte  m_ProgramCounter;
+
+	tlvmByte* m_Bootloader;
 
 	// registers
 	tlvmByte  m_Registers[8];

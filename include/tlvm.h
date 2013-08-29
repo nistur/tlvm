@@ -21,8 +21,8 @@ extern "C" {
 
 typedef int tlvmReturn;
 
-typedef unsigned char tlvmByte;
-typedef unsigned int  tlvmUInt;
+typedef unsigned char  tlvmByte;
+typedef unsigned short tlvmShort;
 
 typedef struct _tlvmContext tlvmContext;
 
@@ -54,23 +54,22 @@ TLVM_EXPORT tlvmReturn   tlvmTerminateContext(tlvmContext** context);
  * Note: the context will not own the memory and lifetime should
  *   be handled manually
  */
-TLVM_EXPORT tlvmReturn   tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmByte size);
+TLVM_EXPORT tlvmReturn   tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* memory, tlvmShort size);
 
-/* tlvmLoadProgram
+/* tlvmLoadBootloader
  *     Loads the program into tlvm memory
  *   parameters:
  *     context: the CPU context
- *     program: buffer containing the compiled tlvm program
- *     size: the size of the tlvm program
+ *     bootloader: buffer containing the compiled tlvm program
  *   return:
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - NULL context passed
- *     TLVM_INVALID_INPUT - NULL program or zero program size specified
+ *     TLVM_INVALID_INPUT - NULL program passed
  *
- * Note: tlvmLoadProgram will copy the program into application memory,
+ * Note: tlvmLoadProgram will copy the booloader program into application memory,
  *   so the original program can be safely destroyed.
  */
-TLVM_EXPORT tlvmReturn   tlvmLoadProgram      (tlvmContext* context, tlvmByte* program, tlvmUInt size);
+TLVM_EXPORT tlvmReturn   tlvmLoadBootloader   (tlvmContext* context, tlvmByte* bootloader);
 
 TLVM_EXPORT tlvmReturn   tlvmStep             (tlvmContext* context);
 
