@@ -6,6 +6,15 @@
 
 #include "tlvm_instructions.h"
 
+#define TLVM_REG_F 0x0
+#define TLVM_REG_A 0x1
+#define TLVM_REG_C 0x2
+#define TLVM_REG_B 0x3
+#define TLVM_REG_E 0x4
+#define TLVM_REG_D 0x5
+#define TLVM_REG_L 0x6
+#define TLVM_REG_H 0x7
+
 #define TLVM_OPCODE_MAX (256)
 
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*);
@@ -25,6 +34,9 @@ struct _tlvmContext
 	// program
 	tlvmByte* m_Program;
 	tlvmByte  m_ProgramCounter;
+
+	// registers
+	tlvmByte  m_Registers[8];
 };
 
 /***************************************

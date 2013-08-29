@@ -35,7 +35,6 @@ typedef struct _tlvmContext tlvmContext;
 #define TLVM_UNIMPLEMENTED      -1
 
 #include "tlvm_alu.h"
-#include "tlvm_fpu.h"
 
 TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context);
 TLVM_EXPORT tlvmReturn   tlvmTerminateContext(tlvmContext** context);
