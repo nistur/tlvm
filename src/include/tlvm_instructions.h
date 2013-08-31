@@ -159,30 +159,40 @@
  #define TLVM_INR_M        0x34
  #define TLVM_INR_A        0x3C
 
+ #define TLVM_DCR_B        0x05
+ #define TLVM_DCR_C        0x0D
+ #define TLVM_DCR_D        0x15
+ #define TLVM_DCR_E        0x1D
+ #define TLVM_DCR_H        0x25
+ #define TLVM_DCR_L        0x2D
+ #define TLVM_DCR_M        0x35
+ #define TLVM_DCR_A        0x3D
+
 
 /*********************************************
  * Core instructions
  *********************************************/
-tlvmReturn tlvmNOP  (tlvmContext* context);
-tlvmReturn tlvmHLT  (tlvmContext* context);
-tlvmReturn tlvmLXI  (tlvmContext* context);
-tlvmReturn tlvmSTAX (tlvmContext* context);
-tlvmReturn tlvmMVI  (tlvmContext* context);
-tlvmReturn tlvmLDAX (tlvmContext* context);
-tlvmReturn tlvmSHLD (tlvmContext* context);
-tlvmReturn tlvmLDA  (tlvmContext* context);
-tlvmReturn tlvmMOV  (tlvmContext* context);
-tlvmReturn tlvmANA  (tlvmContext* context);
-tlvmReturn tlvmANI  (tlvmContext* context);
+tlvmReturn tlvmNOP  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmHLT  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmLXI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSTAX (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmMVI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmLDAX (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSHLD (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmLDA  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmMOV  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmANA  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmANI  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
  *********************************************/
-tlvmReturn tlvmADD  (tlvmContext* context);
-tlvmReturn tlvmADI  (tlvmContext* context);
+tlvmReturn tlvmADD  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmADI  (tlvmContext* context, tlvmByte* cycles);
 
-tlvmReturn tlvmSUB  (tlvmContext* context);
+tlvmReturn tlvmSUB  (tlvmContext* context, tlvmByte* cycles);
 
-tlvmReturn tlvmINR  (tlvmContext* context);
+tlvmReturn tlvmINR  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);
 
 #endif/*__TLVM_INSTRUCTIONS_H__*/

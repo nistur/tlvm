@@ -14,7 +14,6 @@ TEST(InitTerminate, ALU, 0.0f,
      // test
      {
           ASSERT(tlvmAddALU(m_data.context) == TLVM_SUCCESS);
-      
      },
      // data
      {
@@ -39,7 +38,9 @@ TEST(ADI, ALU, 0.0f,
           // reload the program so each time we start from 0x0
           tlvmLoadBootloader(m_data.context, m_data.bootloader);
 
-          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS); // run the first instruction
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
+          ASSERT(cycle == 2);
      },
      // data
      {

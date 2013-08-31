@@ -18,8 +18,11 @@ TEST(NOP, Core, 0.0f,
           // reload the program so each time we start from 0x0
           tlvmLoadBootloader(m_data.context, m_data.bootloader);
 
-          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS);
-          ASSERT(tlvmStep(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS);
+          ASSERT(cycle == 1);
+          
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_UNKNOWN_INSTRUCTION);
           ASSERT(tlvmRun(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
      },
      // data
@@ -54,14 +57,16 @@ TEST(LXI, Core, 0.0f,
      {
           // reload the program so each time we start from 0x0
           tlvmLoadBootloader(m_data.context, m_data.bootloader);
-          tlvmStep(m_data.context); // we're going to assume that the ADI works, as it's tested in ALU
+          tlvmStep(m_data.context, NULL); // we're going to assume that the ADI works, as it's tested in ALU
 
-          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS);
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS);
+          ASSERT(cycle == 3);
 
-          tlvmStep(m_data.context); // Assume MOV works
+          tlvmStep(m_data.context, NULL); // Assume MOV works
           ASSERT(m_data.memory[10] == 99); // HL should be set to 0x0000 so it should write the value into the beginning
 
-          tlvmStep(m_data.context); // we're going to assume that the ANI works
+          tlvmStep(m_data.context, NULL); // we're going to assume that the ANI works
      },
      // data
      {
@@ -91,12 +96,14 @@ TEST(MOV, Core, 0.0f,
      {
           // reload the program so each time we start from 0x0
           tlvmLoadBootloader(m_data.context, m_data.bootloader);
-          tlvmStep(m_data.context); // we're going to assume that the ADI works, as it's tested in ALU
+          tlvmStep(m_data.context, NULL); // we're going to assume that the ADI works, as it's tested in ALU
 
-          ASSERT(tlvmStep(m_data.context) == TLVM_SUCCESS); // check that the MOV command was successful
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // check that the MOV command was successful
+          ASSERT(cycle == 1);
           ASSERT(m_data.memory[0] == 99); // HL should be set to 0x0000 so it should write the value into the beginning
 
-          tlvmStep(m_data.context); // we're going to assume that the ANI works
+          tlvmStep(m_data.context, NULL); // we're going to assume that the ANI works
      },
      // data
      {

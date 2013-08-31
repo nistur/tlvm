@@ -19,7 +19,7 @@
 
 #define TLVM_GET_16BIT(a, b) ((tlvmShort)context->m_Registers[a]) << 8 | (tlvmShort)context->m_Registers[b]
 
-typedef tlvmReturn(*tlvmInstruction)(tlvmContext*);
+typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
 
 /***************************************
  * Library context

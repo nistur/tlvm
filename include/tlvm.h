@@ -71,7 +71,7 @@ TLVM_EXPORT tlvmReturn   tlvmSetMemoryBuffer(tlvmContext* context, tlvmByte* mem
  */
 TLVM_EXPORT tlvmReturn   tlvmLoadBootloader   (tlvmContext* context, tlvmByte* bootloader);
 
-TLVM_EXPORT tlvmReturn   tlvmStep             (tlvmContext* context);
+TLVM_EXPORT tlvmReturn   tlvmStep             (tlvmContext* context, tlvmByte* cycles);
 
 TLVM_EXPORT tlvmReturn   tlvmRun              (tlvmContext* context);
 

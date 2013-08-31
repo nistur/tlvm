@@ -77,7 +77,7 @@ tlvmReturn tlvmLoadBootloader(tlvmContext* context, tlvmByte* bootloader)
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmStep(tlvmContext* context)
+tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -87,13 +87,14 @@ tlvmReturn tlvmStep(tlvmContext* context)
     tlvmByte opcode = context->m_Program[context->m_ProgramCounter];
     if(context->m_InstructionSet[opcode] == NULL)
         tlvmReturnCode(UNKNOWN_INSTRUCTION);
-    context->m_InstructionSet[opcode](context);
+    context->m_InstructionSet[opcode](context, cycles);
     tlvmReturn();
 }
 
 tlvmReturn tlvmRun(tlvmContext* context)
 {
-    while(tlvmStep(context) == TLVM_SUCCESS){}
+    tlvmByte empty;
+    while(tlvmStep(context, &empty) == TLVM_SUCCESS){}
     if(g_tlvmStatus != TLVM_EXIT)
         tlvmReturn();
     tlvmReturnCode(SUCCESS);

@@ -107,27 +107,31 @@ tlvmReturn tlvmInitCore(tlvmContext* context)
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmNOP(tlvmContext* context)
+tlvmReturn tlvmNOP(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
     
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmHLT(tlvmContext* context)
+tlvmReturn tlvmHLT(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
     
     tlvmReturnCode(EXIT);
 }
 
-tlvmReturn tlvmLXI(tlvmContext* context)
+tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -157,11 +161,13 @@ tlvmReturn tlvmLXI(tlvmContext* context)
     // size of instruction    = 1
     // size of operand        = 2
     context->m_ProgramCounter += 3;
+    if(cycles)
+    	*cycles =3;
     
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmSTAX(tlvmContext* context)
+tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -182,11 +188,13 @@ tlvmReturn tlvmSTAX(tlvmContext* context)
     
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
     
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmMVI(tlvmContext* context)
+tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -226,11 +234,13 @@ tlvmReturn tlvmMVI(tlvmContext* context)
 	// size of instruction    = 1
 	// size of operand        = 1
 	context->m_ProgramCounter += 2;
+    if(cycles)
+    	*cycles =2;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmSHLD(tlvmContext* context)
+tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -245,11 +255,13 @@ tlvmReturn tlvmSHLD(tlvmContext* context)
 	// size of instruction    = 1
 	// size of operand        = 2
 	context->m_ProgramCounter += 3;
+    if(cycles)
+    	*cycles =3;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmLDA(tlvmContext* context)
+tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -264,11 +276,13 @@ tlvmReturn tlvmLDA(tlvmContext* context)
 	// size of instruction    = 1
 	// size of operand        = 1
 	context->m_ProgramCounter += 2;
+    if(cycles)
+    	*cycles =3;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmLDAX(tlvmContext* context)
+tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -290,11 +304,13 @@ tlvmReturn tlvmLDAX(tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmMOV(tlvmContext* context)
+tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -346,11 +362,13 @@ tlvmReturn tlvmMOV(tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmANA(tlvmContext* context)
+tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -397,11 +415,13 @@ tlvmReturn tlvmANA(tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmANI(tlvmContext* context)
+tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -413,6 +433,8 @@ tlvmReturn tlvmANI(tlvmContext* context)
 	// size of instruction    = 1
 	// size of operand        = 1
 	context->m_ProgramCounter += 2;
+    if(cycles)
+    	*cycles =2;
 
 	tlvmReturnCode(SUCCESS);
 }

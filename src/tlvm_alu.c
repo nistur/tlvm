@@ -32,6 +32,15 @@ tlvmReturn tlvmAddALU(tlvmContext* context)
 	context->m_InstructionSet[TLVM_INR_M] = tlvmINR;
 	context->m_InstructionSet[TLVM_INR_A] = tlvmINR;
 
+	context->m_InstructionSet[TLVM_DCR_B] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_C] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_D] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_E] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_H] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_L] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_M] = tlvmDCR;
+	context->m_InstructionSet[TLVM_DCR_A] = tlvmDCR;
+
 	context->m_InstructionSet[TLVM_ADI] = tlvmADI;
 
 	char t = 0;
@@ -44,7 +53,7 @@ tlvmReturn tlvmAddALU(tlvmContext* context)
 /*********************************************
  * INSTRUCTIONS
  *********************************************/
-tlvmReturn tlvmADD(tlvmContext* context)
+tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -92,11 +101,13 @@ tlvmReturn tlvmADD(tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+	if(cycles)
+		*cycles = 1;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmADI(tlvmContext* context)
+tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -108,11 +119,13 @@ tlvmReturn tlvmADI(tlvmContext* context)
 	// size of instruction    = 1
 	// size of operand        = 1
 	context->m_ProgramCounter += 2;
+	if(cycles)
+		*cycles = 2;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmSUB (tlvmContext* context)
+tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -160,11 +173,13 @@ tlvmReturn tlvmSUB (tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+	if(cycles)
+		*cycles = 1;
 
 	tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmINR(tlvmContext* context)
+tlvmReturn tlvmINR(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -201,6 +216,51 @@ tlvmReturn tlvmINR(tlvmContext* context)
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
+	if(cycles)
+		*cycles = 1;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmDCR(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+
+	switch(opcode)
+	{
+	case TLVM_DCR_B:
+		context->m_Registers[TLVM_REG_B]--;
+	break;
+	case TLVM_DCR_C:
+		context->m_Registers[TLVM_REG_C]--;
+	break;
+	case TLVM_DCR_D:
+		context->m_Registers[TLVM_REG_D]--;
+	break;
+	case TLVM_DCR_E:
+		context->m_Registers[TLVM_REG_E]--;
+	break;
+	case TLVM_DCR_H:
+		context->m_Registers[TLVM_REG_H]--;
+	break;
+	case TLVM_DCR_L:
+		context->m_Registers[TLVM_REG_L]--;
+	break;
+	case TLVM_DCR_M:
+		context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)]--;
+	break;
+	case TLVM_DCR_A:
+		context->m_Registers[TLVM_REG_A]--;
+	break;
+	}
+
+	// size of instruction    = 1
+	context->m_ProgramCounter += 1;
+	if(cycles)
+		*cycles = 1;
 
 	tlvmReturnCode(SUCCESS);
 }
