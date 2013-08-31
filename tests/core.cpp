@@ -1,13 +1,11 @@
 #include "tlvm-tests.h"
-#include "tlvm.h"
-#include "tlvm_instructions.h"
+#include "tlvm_internal.h"
 
 TEST(NOP, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
       m_data.bootloader[0] = TLVM_NOP;
-      m_data.bootloader[1] = 0xFF; // nothing, unknown instruction
      },
      // cleanup
      {
@@ -21,9 +19,6 @@ TEST(NOP, Core, 0.0f,
           tlvmByte cycle = 0;
           ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS);
           ASSERT(cycle == 1);
-          
-          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_UNKNOWN_INSTRUCTION);
-          ASSERT(tlvmRun(m_data.context) == TLVM_UNKNOWN_INSTRUCTION);
      },
      // data
      {
@@ -76,17 +71,28 @@ TEST(LXI, Core, 0.0f,
      }
     );
 
+#define _TEST_MOV(from, to) \
+{ \
+  m_data.bootloader[0] = TLVM_MVI_##from; \
+  m_data.bootloader[1] = TLVM_REG_##to; \
+  m_data.bootloader[2] = TLVM_MOV_##to##from; \
+  m_data.bootloader[3] = TLVM_MVI_##to; \
+  m_data.bootloader[4] = 0; \
+  tlvmLoadBootloader(m_data.context, m_data.bootloader); \
+  tlvmStep(m_data.context, NULL); \
+  tlvmByte cycle = 0; \
+  ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); \
+  ASSERT(cycle == 1); \
+  ASSERT(((_tlvmContext*)m_data.context)->m_Registers[TLVM_REG_##to] == TLVM_REG_##to); \
+  tlvmStep(m_data.context, NULL); \
+}
+
 TEST(MOV, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
       tlvmSetMemoryBuffer(m_data.context, m_data.memory, 255);
       tlvmAddALU(m_data.context);
-      m_data.bootloader[0] = TLVM_ADI;
-      m_data.bootloader[1] = 99;
-      m_data.bootloader[2] = TLVM_MOV_MA;
-      m_data.bootloader[3] = TLVM_ANI;
-      m_data.bootloader[4] = 0;
      },
      // cleanup
      {
@@ -94,16 +100,47 @@ TEST(MOV, Core, 0.0f,
      },
      // test
      {
-          // reload the program so each time we start from 0x0
-          tlvmLoadBootloader(m_data.context, m_data.bootloader);
-          tlvmStep(m_data.context, NULL); // we're going to assume that the ADI works, as it's tested in ALU
+        _TEST_MOV(A,A);
+        _TEST_MOV(A,B);
+        _TEST_MOV(A,C);
+        _TEST_MOV(A,D);
+        _TEST_MOV(A,H);
+        _TEST_MOV(A,L);
 
-          tlvmByte cycle = 0;
-          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // check that the MOV command was successful
-          ASSERT(cycle == 1);
-          ASSERT(m_data.memory[0] == 99); // HL should be set to 0x0000 so it should write the value into the beginning
+        _TEST_MOV(B,A);
+        _TEST_MOV(B,B);
+        _TEST_MOV(B,C);
+        _TEST_MOV(B,D);
+        _TEST_MOV(B,H);
+        _TEST_MOV(B,L);
 
-          tlvmStep(m_data.context, NULL); // we're going to assume that the ANI works
+        _TEST_MOV(C,A);
+        _TEST_MOV(C,B);
+        _TEST_MOV(C,C);
+        _TEST_MOV(C,D);
+        _TEST_MOV(C,H);
+        _TEST_MOV(C,L);
+
+        _TEST_MOV(D,A);
+        _TEST_MOV(D,B);
+        _TEST_MOV(D,C);
+        _TEST_MOV(D,D);
+        _TEST_MOV(D,H);
+        _TEST_MOV(D,L);
+
+        _TEST_MOV(H,A);
+        _TEST_MOV(H,B);
+        _TEST_MOV(H,C);
+        _TEST_MOV(H,D);
+        _TEST_MOV(H,H);
+        _TEST_MOV(H,L);
+
+        _TEST_MOV(L,A);
+        _TEST_MOV(L,B);
+        _TEST_MOV(L,C);
+        _TEST_MOV(L,D);
+        _TEST_MOV(L,H);
+        _TEST_MOV(L,L);
      },
      // data
      {

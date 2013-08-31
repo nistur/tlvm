@@ -76,6 +76,15 @@ tlvmReturn tlvmInitCore(tlvmContext* context)
     context->m_InstructionSet[TLVM_MOV_HM]  = tlvmMOV;
     context->m_InstructionSet[TLVM_MOV_HA]  = tlvmMOV;
     
+    context->m_InstructionSet[TLVM_MOV_LB]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LC]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LD]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LE]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LH]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LL]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LM]  = tlvmMOV;
+    context->m_InstructionSet[TLVM_MOV_LA]  = tlvmMOV;
+    
     context->m_InstructionSet[TLVM_MOV_MB]  = tlvmMOV;
     context->m_InstructionSet[TLVM_MOV_MC]  = tlvmMOV;
     context->m_InstructionSet[TLVM_MOV_MD]  = tlvmMOV;
@@ -310,6 +319,7 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 	tlvmReturnCode(SUCCESS);
 }
 
+#define TEST_MOV(x) ((opcode & x) == x)
 tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
@@ -320,38 +330,38 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	tlvmByte* dst = NULL;
 	tlvmByte* src = NULL;
 
-	if( (opcode & TLVM_MOV_TO_A) && (opcode & TLVM_MOV_HI) )
+	if( (TEST_MOV(TLVM_MOV_TO_A)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_A];
-	else if( (opcode & TLVM_MOV_TO_M) && !(opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_M)) && !(opcode & TLVM_MOV_HI) )
 		dst = &context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)];
-	else if( (opcode & TLVM_MOV_TO_L) && (opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_L)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_L];
-	else if( (opcode & TLVM_MOV_TO_H) && !(opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_H)) && !(opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_H];
-	else if( (opcode & TLVM_MOV_TO_E) && (opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_E)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_E];
-	else if( (opcode & TLVM_MOV_TO_D) && !(opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_D)) && !(opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_D];
-	else if( (opcode & TLVM_MOV_TO_C) && (opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_C)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_C];
-	else if( (opcode & TLVM_MOV_TO_B) && !(opcode & TLVM_MOV_HI) )
+	else if( (TEST_MOV(TLVM_MOV_TO_B)) && !(opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_B];
 
-	if( (opcode & TLVM_MOV_FROM_A) )
+	if( (TEST_MOV(TLVM_MOV_FROM_A)) )
 		src = &context->m_Registers[TLVM_REG_A];
-	else if( (opcode & TLVM_MOV_FROM_M) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_M)) )
 		src = &context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)];
-	else if( (opcode & TLVM_MOV_FROM_L) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_L)) )
 		src = &context->m_Registers[TLVM_REG_L];
-	else if( (opcode & TLVM_MOV_FROM_H) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_H)) )
 		src = &context->m_Registers[TLVM_REG_H];
-	else if( (opcode & TLVM_MOV_FROM_E) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_E)) )
 		src = &context->m_Registers[TLVM_REG_E];
-	else if( (opcode & TLVM_MOV_FROM_D) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_D)) )
 		src = &context->m_Registers[TLVM_REG_D];
-	else if( (opcode & TLVM_MOV_FROM_C) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_C)) )
 		src = &context->m_Registers[TLVM_REG_C];
-	else if( (opcode & TLVM_MOV_FROM_B) )
+	else if( (TEST_MOV(TLVM_MOV_FROM_B)) )
 		src = &context->m_Registers[TLVM_REG_B];
 
 
