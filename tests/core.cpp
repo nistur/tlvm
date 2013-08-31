@@ -42,7 +42,7 @@ TEST(LXI, Core, 0.0f,
       m_data.bootloader[2] = TLVM_LXI_H; // set HL to 10
       m_data.bootloader[3] = pAddr[0];
       m_data.bootloader[4] = pAddr[1];
-      m_data.bootloader[5] = TLVM_MOV_A; // write A to (HL)
+      m_data.bootloader[5] = TLVM_MOV_MA; // write A to (HL)
       m_data.bootloader[6] = TLVM_ANI; // AND A with 0 (clearing it)
       m_data.bootloader[7] = 0;
      },
@@ -79,7 +79,7 @@ TEST(MOV, Core, 0.0f,
       tlvmAddALU(m_data.context);
       m_data.bootloader[0] = TLVM_ADI;
       m_data.bootloader[1] = 99;
-      m_data.bootloader[2] = TLVM_MOV_A;
+      m_data.bootloader[2] = TLVM_MOV_MA;
       m_data.bootloader[3] = TLVM_ANI;
       m_data.bootloader[4] = 0;
      },

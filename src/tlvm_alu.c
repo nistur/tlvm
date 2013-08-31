@@ -23,6 +23,15 @@ tlvmReturn tlvmAddALU(tlvmContext* context)
 	context->m_InstructionSet[TLVM_SUB_M] = tlvmSUB;
 	context->m_InstructionSet[TLVM_SUB_A] = tlvmSUB;
 
+	context->m_InstructionSet[TLVM_INR_B] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_C] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_D] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_E] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_H] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_L] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_M] = tlvmINR;
+	context->m_InstructionSet[TLVM_INR_A] = tlvmINR;
+
 	context->m_InstructionSet[TLVM_ADI] = tlvmADI;
 
 	char t = 0;
@@ -148,6 +157,47 @@ tlvmReturn tlvmSUB (tlvmContext* context)
 
 	// add src to dst
 	context->m_Registers[TLVM_REG_A] -= *src;
+
+	// size of instruction    = 1
+	context->m_ProgramCounter += 1;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmINR(tlvmContext* context)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+
+	switch(opcode)
+	{
+	case TLVM_INR_B:
+		context->m_Registers[TLVM_REG_B]++;
+	break;
+	case TLVM_INR_C:
+		context->m_Registers[TLVM_REG_C]++;
+	break;
+	case TLVM_INR_D:
+		context->m_Registers[TLVM_REG_D]++;
+	break;
+	case TLVM_INR_E:
+		context->m_Registers[TLVM_REG_E]++;
+	break;
+	case TLVM_INR_H:
+		context->m_Registers[TLVM_REG_H]++;
+	break;
+	case TLVM_INR_L:
+		context->m_Registers[TLVM_REG_L]++;
+	break;
+	case TLVM_INR_M:
+		context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)]++;
+	break;
+	case TLVM_INR_A:
+		context->m_Registers[TLVM_REG_A]++;
+	break;
+	}
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
