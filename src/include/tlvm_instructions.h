@@ -189,6 +189,19 @@
  #define TLVM_DCR_M        0x35
  #define TLVM_DCR_A        0x3D
 
+ #define TLVM_PUSH_B       0xC5
+ #define TLVM_PUSH_D       0xD5
+ #define TLVM_PUSH_H       0xE5
+ #define TLVM_PUSH_PSW     0xF5
+
+ #define TLVM_POP_B        0xC1
+ #define TLVM_POP_D        0xD1
+ #define TLVM_POP_H        0xE1
+ #define TLVM_POP_PSW      0xF1
+
+ #define TLVM_SPHL         0xF9
+ #define TLVM_XTHL         0xE3
+
 
 /*********************************************
  * Core instructions
@@ -208,6 +221,10 @@ tlvmReturn tlvmORA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmORI  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXRA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXRI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmPUSH (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
