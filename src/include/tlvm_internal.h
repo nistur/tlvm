@@ -15,34 +15,60 @@
 #define TLVM_REG_L 0x6
 #define TLVM_REG_H 0x7
 
+#define TLVM_FLAG_S 	(1<<7) // 
+#define TLVM_FLAG_Z 	(1<<6) // Zero
+#define TLVM_FLAG_A 	(1<<4) // 
+#define TLVM_FLAG_P 	(1<<2) // Parity
+#define TLVM_FLAG_C 	(1<<0) // Carry
+#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_A | TLVM_FLAG_P | TLVM_FLAG_C)
+#define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
+
+#define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
+#define TLVM_FLAG_SET(x) context->m_Registers[TLVM_REG_F] |= TLVM_FLAG_##x
+#define TLVM_FLAG_UNSET(x) context->m_Registers[TLVM_REG_F] &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
+
 #define TLVM_OPCODE_MAX (256)
 
 #define TLVM_GET_16BIT(a, b) ((tlvmShort)context->m_Registers[a]) << 8 | (tlvmShort)context->m_Registers[b]
+#define TLVM_GET_OP(v, n) \
+	tlvmByte v = 0;\
+	tlvmByte* v##addr = tlvmGetMemory(context, context->m_ProgramCounter+n, TLVM_FLAG_READ); \
+	if(v##addr != NULL) \
+		v = *v##addr;
 
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
+
+tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
 /***************************************
  * Library context
  * - holds current state
  ***************************************/
+typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
+
 struct _tlvmContext
 {
-	tlvmByte* m_Memory;
-	tlvmShort m_MemorySize;
+	tlvmMemoryBuffer* m_Memory;
 
 	// instrution set
 	tlvmInstruction m_InstructionSet[TLVM_OPCODE_MAX];
 
-	// program
-	tlvmByte* m_Program;
-	tlvmByte  m_ProgramCounter;
+	tlvmShort  m_ProgramCounter;
 
-	tlvmByte* m_Bootloader;
+	tlvmShort  m_StackPointer;
 
 	// registers
 	tlvmByte  m_Registers[8];
 };
 
+struct _tlvmMemoryBuffer
+{
+	tlvmMemoryBuffer* m_Next;
+	tlvmShort         m_Start;
+	tlvmShort         m_End;
+	tlvmByte*         m_Buffer;
+	tlvmByte		  m_Flags;
+};
 /***************************************
  * Some basic memory management wrappers
  ***************************************/

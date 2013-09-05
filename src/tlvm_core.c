@@ -113,6 +113,28 @@ tlvmReturn tlvmInitCore(tlvmContext* context)
     
     context->m_InstructionSet[TLVM_ANI]    = tlvmANI;
     
+    context->m_InstructionSet[TLVM_ORA_B]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_C]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_D]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_E]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_H]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_L]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_M]  = tlvmORA;
+    context->m_InstructionSet[TLVM_ORA_A]  = tlvmORA;
+    
+    context->m_InstructionSet[TLVM_ORI]    = tlvmORI;
+    
+    context->m_InstructionSet[TLVM_XRA_B]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_C]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_D]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_E]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_H]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_L]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_M]  = tlvmXRA;
+    context->m_InstructionSet[TLVM_XRA_A]  = tlvmXRA;
+   
+    context->m_InstructionSet[TLVM_XRI]    = tlvmXRI;
+    
     tlvmReturnCode(SUCCESS);
 }
 
@@ -145,9 +167,10 @@ tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
     
-    tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
-    tlvmByte opLow  = context->m_Program[context->m_ProgramCounter+1];
-    tlvmByte opHigh = context->m_Program[context->m_ProgramCounter+2];
+	TLVM_GET_OP(opcode, 0);
+	TLVM_GET_OP(opLow,  1);
+	TLVM_GET_OP(opHigh, 2);
+
     switch(opcode)
     {
     case TLVM_LXI_B:
@@ -163,7 +186,7 @@ tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
         context->m_Registers[TLVM_REG_L] = opLow;
 	break;
     case TLVM_LXI_SP:
-        tlvmReturnCode(UNIMPLEMENTED); // stack pointer
+        context->m_StackPointer = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
 	break;
     }
     
@@ -181,7 +204,7 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
     
-    tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+	TLVM_GET_OP(opcode, 0);
 
     tlvmShort addr = 0;
     switch(opcode)
@@ -193,7 +216,10 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
     	addr = TLVM_GET_16BIT(TLVM_REG_B, TLVM_REG_C);
 	break;
     }
-    context->m_Memory[addr] = context->m_Registers[TLVM_REG_A];
+    tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
+    if(dst == NULL)
+    	tlvmReturnCode(INVALID_INPUT);
+    *dst = context->m_Registers[TLVM_REG_A];
     
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
@@ -208,8 +234,9 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
-	tlvmByte operand  = context->m_Program[context->m_ProgramCounter+1];
+	TLVM_GET_OP(opcode,  0);
+	TLVM_GET_OP(operand, 1);
+
 	switch(opcode)
 	{
 	case TLVM_MVI_B:
@@ -231,7 +258,13 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 		context->m_Registers[TLVM_REG_L] = operand;
 	break;
 	case TLVM_MVI_M:
-		context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)] = operand;
+		{
+			tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+			tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
+			if(dst == NULL)
+				tlvmReturnCode(INVALID_INPUT);
+			*dst = operand;
+		}
 	break;
 	case TLVM_MVI_A:
 		context->m_Registers[TLVM_REG_A] = operand;
@@ -254,12 +287,17 @@ tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-    tlvmShort opLow  = context->m_Program[context->m_ProgramCounter+1];
-    tlvmByte opHigh = context->m_Program[context->m_ProgramCounter+2];
 
-    tlvmShort addr = opHigh << 8 | opLow;
-    context->m_Memory[addr+0] = context->m_Registers[TLVM_REG_L];
-    context->m_Memory[addr+1] = context->m_Registers[TLVM_REG_H];
+	TLVM_GET_OP(opLow, 1);
+	TLVM_GET_OP(opHigh, 2);
+
+    tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
+    tlvmByte* dstLo = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
+    tlvmByte* dstHi = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
+    if(dstLo == NULL || dstHi == NULL)
+    	tlvmReturnCode(INVALID_INPUT);
+    *dstLo = context->m_Registers[TLVM_REG_L];
+    *dstHi = context->m_Registers[TLVM_REG_H];
 
 	// size of instruction    = 1
 	// size of operand        = 2
@@ -275,12 +313,15 @@ tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-    tlvmShort opLow  = context->m_Program[context->m_ProgramCounter+1];
-    tlvmByte opHigh = context->m_Program[context->m_ProgramCounter+2];
+	TLVM_GET_OP(opLow, 1);
+	TLVM_GET_OP(opHigh, 2);
 
-    tlvmShort addr = opHigh << 8 | opLow;
+    tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
 
-    context->m_Registers[TLVM_REG_A] = context->m_Memory[addr];
+    tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
+    if(src == NULL)
+    	tlvmReturnCode(INVALID_INPUT);
+    context->m_Registers[TLVM_REG_A] = *src;
 
 	// size of instruction    = 1
 	// size of operand        = 1
@@ -296,7 +337,7 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+	TLVM_GET_OP(opcode, 0);
 	tlvmShort addr = 0;
 	switch(opcode)
 	{
@@ -309,7 +350,12 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 	default:
 		tlvmReturnCode(INVALID_INPUT);
 	}
-	context->m_Registers[TLVM_REG_A] = context->m_Memory[addr];
+
+	tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
+	if(src == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+
+	context->m_Registers[TLVM_REG_A] = *src;
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
@@ -325,7 +371,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+	TLVM_GET_OP(opcode, 0);
 
 	tlvmByte* dst = NULL;
 	tlvmByte* src = NULL;
@@ -333,7 +379,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	if( (TEST_MOV(TLVM_MOV_TO_A)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_A];
 	else if( (TEST_MOV(TLVM_MOV_TO_M)) && !(opcode & TLVM_MOV_HI) )
-		dst = &context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)];
+		dst = tlvmGetMemory(context, TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L), TLVM_FLAG_WRITE);
 	else if( (TEST_MOV(TLVM_MOV_TO_L)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_L];
 	else if( (TEST_MOV(TLVM_MOV_TO_H)) && !(opcode & TLVM_MOV_HI) )
@@ -350,7 +396,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	if( (TEST_MOV(TLVM_MOV_FROM_A)) )
 		src = &context->m_Registers[TLVM_REG_A];
 	else if( (TEST_MOV(TLVM_MOV_FROM_M)) )
-		src = &context->m_Memory[TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L)];
+		src = tlvmGetMemory(context, TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L), TLVM_FLAG_READ);
 	else if( (TEST_MOV(TLVM_MOV_FROM_L)) )
 		src = &context->m_Registers[TLVM_REG_L];
 	else if( (TEST_MOV(TLVM_MOV_FROM_H)) )
@@ -383,7 +429,7 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-	tlvmByte opcode = context->m_Program[context->m_ProgramCounter+0];
+	TLVM_GET_OP(opcode, 0);
 
 	tlvmByte* src = NULL;
 
@@ -410,7 +456,7 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 	case TLVM_ANA_M:
 		{
 			tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
-			src = &context->m_Memory[addr];
+			src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
 		}
 	break;
 	case TLVM_ANA_A:
@@ -436,9 +482,151 @@ tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
-	tlvmByte operand = context->m_Program[context->m_ProgramCounter+1];
+	TLVM_GET_OP(operand, 1);
 
 	context->m_Registers[TLVM_REG_A] &= operand;
+
+	// size of instruction    = 1
+	// size of operand        = 1
+	context->m_ProgramCounter += 2;
+    if(cycles)
+    	*cycles =2;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(opcode, 0);
+
+	tlvmByte* src = NULL;
+
+	switch(opcode)
+	{
+	case TLVM_ORA_B:
+		src = &context->m_Registers[TLVM_REG_B];
+	break;
+	case TLVM_ORA_C:
+		src = &context->m_Registers[TLVM_REG_C];
+	break;
+	case TLVM_ORA_D:
+		src = &context->m_Registers[TLVM_REG_D];
+	break;
+	case TLVM_ORA_E:
+		src = &context->m_Registers[TLVM_REG_E];
+	break;
+	case TLVM_ORA_H:
+		src = &context->m_Registers[TLVM_REG_H];
+	break;
+	case TLVM_ORA_L:
+		src = &context->m_Registers[TLVM_REG_L];
+	break;
+	case TLVM_ORA_M:
+		{
+			tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+			src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
+		}
+	break;
+	case TLVM_ORA_A:
+		src = &context->m_Registers[TLVM_REG_A];
+	break;
+	}
+
+	if(src == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+
+	context->m_Registers[TLVM_REG_A] |= *src;
+
+	// size of instruction    = 1
+	context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmORI(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(operand, 0);
+
+	context->m_Registers[TLVM_REG_A] |= operand;
+
+	// size of instruction    = 1
+	// size of operand        = 1
+	context->m_ProgramCounter += 2;
+    if(cycles)
+    	*cycles =2;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(opcode, 0);
+
+	tlvmByte* src = NULL;
+
+	switch(opcode)
+	{
+	case TLVM_XRA_B:
+		src = &context->m_Registers[TLVM_REG_B];
+	break;
+	case TLVM_XRA_C:
+		src = &context->m_Registers[TLVM_REG_C];
+	break;
+	case TLVM_XRA_D:
+		src = &context->m_Registers[TLVM_REG_D];
+	break;
+	case TLVM_XRA_E:
+		src = &context->m_Registers[TLVM_REG_E];
+	break;
+	case TLVM_XRA_H:
+		src = &context->m_Registers[TLVM_REG_H];
+	break;
+	case TLVM_XRA_L:
+		src = &context->m_Registers[TLVM_REG_L];
+	break;
+	case TLVM_XRA_M:
+		{
+			tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+			src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
+		}
+	break;
+	case TLVM_XRA_A:
+		src = &context->m_Registers[TLVM_REG_A];
+	break;
+	}
+
+	if(src == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+
+	context->m_Registers[TLVM_REG_A] ^= *src;
+
+	// size of instruction    = 1
+	context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles =1;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmXRI(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(operand, 1);
+
+	context->m_Registers[TLVM_REG_A] ^= operand;
 
 	// size of instruction    = 1
 	// size of operand        = 1

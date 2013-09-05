@@ -6,6 +6,7 @@ TEST(NOP, Core, 0.0f,
      {
       tlvmInitContext(&m_data.context);
       m_data.bootloader[0] = TLVM_NOP;
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
      },
      // cleanup
      {
@@ -14,7 +15,7 @@ TEST(NOP, Core, 0.0f,
      // test
      {
           // reload the program so each time we start from 0x0
-          tlvmLoadBootloader(m_data.context, m_data.bootloader);
+          tlvmReset(m_data.context);
 
           tlvmByte cycle = 0;
           ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS);
@@ -31,13 +32,14 @@ TEST(LXI, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmSetMemoryBuffer(m_data.context, m_data.memory, 255);
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
+      tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
       tlvmAddALU(m_data.context);
-      tlvmShort addr = 10;
+      tlvmShort addr = 0x100;
       tlvmByte* pAddr = (tlvmByte*)&addr;
       m_data.bootloader[0] = TLVM_ADI; // add 99 to A
       m_data.bootloader[1] = 99;
-      m_data.bootloader[2] = TLVM_LXI_H; // set HL to 10
+      m_data.bootloader[2] = TLVM_LXI_H; // set HL to beginning of RAM
       m_data.bootloader[3] = pAddr[0];
       m_data.bootloader[4] = pAddr[1];
       m_data.bootloader[5] = TLVM_MOV_MA; // write A to (HL)
@@ -51,7 +53,7 @@ TEST(LXI, Core, 0.0f,
      // test
      {
           // reload the program so each time we start from 0x0
-          tlvmLoadBootloader(m_data.context, m_data.bootloader);
+          tlvmReset(m_data.context);
           tlvmStep(m_data.context, NULL); // we're going to assume that the ADI works, as it's tested in ALU
 
           tlvmByte cycle = 0;
@@ -59,7 +61,7 @@ TEST(LXI, Core, 0.0f,
           ASSERT(cycle == 3);
 
           tlvmStep(m_data.context, NULL); // Assume MOV works
-          ASSERT(m_data.memory[10] == 99); // HL should be set to 0x0000 so it should write the value into the beginning
+          ASSERT(m_data.memory[0] == 99); // HL should be set to 0x0000 so it should write the value into the beginning
 
           tlvmStep(m_data.context, NULL); // we're going to assume that the ANI works
      },
@@ -78,7 +80,7 @@ TEST(LXI, Core, 0.0f,
   m_data.bootloader[2] = TLVM_MOV_##to##from; \
   m_data.bootloader[3] = TLVM_MVI_##to; \
   m_data.bootloader[4] = 0; \
-  tlvmLoadBootloader(m_data.context, m_data.bootloader); \
+  tlvmReset(m_data.context); \
   tlvmStep(m_data.context, NULL); \
   tlvmByte cycle = 0; \
   ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); \
@@ -91,7 +93,8 @@ TEST(MOV, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmSetMemoryBuffer(m_data.context, m_data.memory, 255);
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
+      tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
       tlvmAddALU(m_data.context);
      },
      // cleanup

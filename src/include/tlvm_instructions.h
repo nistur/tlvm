@@ -127,6 +127,26 @@
 #define TLVM_ANA_M         0xA6
 #define TLVM_ANA_A         0xA7
 #define TLVM_ANI           0xE6
+ 
+#define TLVM_ORA_B         0xB0
+#define TLVM_ORA_C         0xB1
+#define TLVM_ORA_D         0xB2
+#define TLVM_ORA_E         0xB3
+#define TLVM_ORA_H         0xB4
+#define TLVM_ORA_L         0xB5
+#define TLVM_ORA_M         0xB6
+#define TLVM_ORA_A         0xB7
+#define TLVM_ORI           0xF6
+ 
+#define TLVM_XRA_B         0xA8
+#define TLVM_XRA_C         0xA9
+#define TLVM_XRA_D         0xAA
+#define TLVM_XRA_E         0xAB
+#define TLVM_XRA_H         0xAC
+#define TLVM_XRA_L         0xAD
+#define TLVM_XRA_M         0xAE
+#define TLVM_XRA_A         0xAF
+#define TLVM_XRI           0xEE
 
 /*********************************************
  * ALU instruction opcodes
@@ -149,6 +169,7 @@
  #define TLVM_SUB_A        0x97 // add register A to A
  
  #define TLVM_ADI          0xC6 // add immediate to A
+ #define TLVM_SUI          0xD6 // subtract immediate from A
 
  #define TLVM_INR_B        0x04
  #define TLVM_INR_C        0x0C
@@ -183,6 +204,10 @@ tlvmReturn tlvmLDA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmMOV  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmANA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmANI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmORA  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmORI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmXRA  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmXRI  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
@@ -191,6 +216,7 @@ tlvmReturn tlvmADD  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmADI  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmSUB  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSUI  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmINR  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);
