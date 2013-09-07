@@ -169,7 +169,8 @@ tlvmReturn tlvmReset(tlvmContext* context)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
     context->m_ProgramCounter = 0;
-    // reset flags and registers maybe?
+    memset(context->m_Registers, 0, 8);
+    context->m_StackPointer = 0;
 
     tlvmReturnCode(SUCCESS);
 }

@@ -147,6 +147,16 @@ tlvmReturn tlvmInitCore(tlvmContext* context)
 
     context->m_InstructionSet[TLVM_SPHL]     = tlvmSPHL;
     context->m_InstructionSet[TLVM_XTHL]     = tlvmXTHL;
+
+    context->m_InstructionSet[TLVM_JNZ]      = tlvmJMP;
+    context->m_InstructionSet[TLVM_JZ]       = tlvmJMP;
+    context->m_InstructionSet[TLVM_JNC]      = tlvmJMP;
+    context->m_InstructionSet[TLVM_JC]       = tlvmJMP;
+    context->m_InstructionSet[TLVM_JPO]      = tlvmJMP;
+    context->m_InstructionSet[TLVM_JPE]      = tlvmJMP;
+    context->m_InstructionSet[TLVM_JP]       = tlvmJMP;
+    context->m_InstructionSet[TLVM_JM]       = tlvmJMP;
+    context->m_InstructionSet[TLVM_JMP]      = tlvmJMP;
     
     tlvmReturnCode(SUCCESS);
 }
@@ -226,7 +236,7 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
     	addr = TLVM_GET_16BIT(TLVM_REG_B, TLVM_REG_C);
 	break;
     case TLVM_STAX_D:
-    	addr = TLVM_GET_16BIT(TLVM_REG_B, TLVM_REG_C);
+    	addr = TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E);
 	break;
     }
     tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
@@ -368,6 +378,10 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 	if(src == NULL)
 		tlvmReturnCode(INVALID_INPUT);
 
+	if(*src == 0)
+		TLVM_FLAG_SET(Z);
+	else
+		TLVM_FLAG_UNSET(Z);
 	context->m_Registers[TLVM_REG_A] = *src;
 
 	// size of instruction    = 1
@@ -786,6 +800,66 @@ tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
 	context->m_ProgramCounter += 1;
     if(cycles)
     	*cycles =18;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmJMP(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(opcode, 0);
+	TLVM_GET_OP(opLow,  1);
+	TLVM_GET_OP(opHigh, 2);
+	tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
+
+	// increment PC before logic as it is fallback
+	// size of instruction    = 1
+	// size of address        = 2
+	context->m_ProgramCounter += 3;
+
+	switch(opcode)
+	{
+	case TLVM_JNZ:
+		if(!TLVM_FLAG_ISSET(Z))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JZ:
+		if(TLVM_FLAG_ISSET(Z))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JNC:
+		if(!TLVM_FLAG_ISSET(C))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JC:
+		if(TLVM_FLAG_ISSET(C))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JPO:
+		if(!TLVM_FLAG_ISSET(P))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JPE:
+		if(TLVM_FLAG_ISSET(P))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JP:
+		if(!TLVM_FLAG_ISSET(S))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JM:
+		if(TLVM_FLAG_ISSET(S))
+			context->m_ProgramCounter = addr;
+	break;
+	case TLVM_JMP:
+		context->m_ProgramCounter = addr;
+	break;
+	}
+
+    if(cycles)
+    	*cycles =10;
 
 	tlvmReturnCode(SUCCESS);
 }

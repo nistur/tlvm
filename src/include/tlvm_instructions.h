@@ -180,6 +180,11 @@
  #define TLVM_INR_M        0x34
  #define TLVM_INR_A        0x3C
 
+ #define TLVM_INX_B		   0x03
+ #define TLVM_INX_D		   0x13
+ #define TLVM_INX_H		   0x23
+ #define TLVM_INX_SP	   0x33
+
  #define TLVM_DCR_B        0x05
  #define TLVM_DCR_C        0x0D
  #define TLVM_DCR_D        0x15
@@ -188,6 +193,11 @@
  #define TLVM_DCR_L        0x2D
  #define TLVM_DCR_M        0x35
  #define TLVM_DCR_A        0x3D
+
+ #define TLVM_DCX_B		   0x0B
+ #define TLVM_DCX_D		   0x1B
+ #define TLVM_DCX_H		   0x2B
+ #define TLVM_DCX_SP	   0x3B
 
  #define TLVM_PUSH_B       0xC5
  #define TLVM_PUSH_D       0xD5
@@ -201,6 +211,16 @@
 
  #define TLVM_SPHL         0xF9
  #define TLVM_XTHL         0xE3
+
+ #define TLVM_JNZ          0xC2
+ #define TLVM_JZ           0xCA
+ #define TLVM_JNC          0xD2
+ #define TLVM_JC           0xDA
+ #define TLVM_JPO          0xE2
+ #define TLVM_JPE          0xEA
+ #define TLVM_JP           0xF2
+ #define TLVM_JM           0xFA
+ #define TLVM_JMP          0xC3
 
 
 /*********************************************
@@ -225,6 +245,7 @@ tlvmReturn tlvmPUSH (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmJMP  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
@@ -237,5 +258,8 @@ tlvmReturn tlvmSUI  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmINR  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);
+
+tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 
 #endif/*__TLVM_INSTRUCTIONS_H__*/

@@ -15,21 +15,32 @@
 #define TLVM_REG_L 0x6
 #define TLVM_REG_H 0x7
 
-#define TLVM_FLAG_S 	(1<<7) // 
+#define TLVM_FLAG_S 	(1<<7) // Sign
 #define TLVM_FLAG_Z 	(1<<6) // Zero
-#define TLVM_FLAG_A 	(1<<4) // 
+#define TLVM_FLAG_I 	(1<<5) // Interrupt
+#define TLVM_FLAG_H 	(1<<4) // Auxiliary Carry
 #define TLVM_FLAG_P 	(1<<2) // Parity
 #define TLVM_FLAG_C 	(1<<0) // Carry
-#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_A | TLVM_FLAG_P | TLVM_FLAG_C)
+#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_I| TLVM_FLAG_H | TLVM_FLAG_P | TLVM_FLAG_C)
 #define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
 
 #define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
 #define TLVM_FLAG_SET(x) context->m_Registers[TLVM_REG_F] |= TLVM_FLAG_##x
 #define TLVM_FLAG_UNSET(x) context->m_Registers[TLVM_REG_F] &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
+#define TLVM_FLAG_SET_IF(test, x) if(test){ TLVM_FLAG_SET(x); }else{ TLVM_FLAG_UNSET(x); }
+#define TLVM_SET_FLAGS(res) \
+	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); // Zero \
+	TLVM_FLAG_SET_IF(res & 0x80, S); // Sign \
+	TLVM_FLAG_SET_IF(res > 0xFF, C); // Carry
+	
 
 #define TLVM_OPCODE_MAX (256)
 
-#define TLVM_GET_16BIT(a, b) ((tlvmShort)context->m_Registers[a]) << 8 | (tlvmShort)context->m_Registers[b]
+#define TLVM_GET_16BIT(h, l) 	((tlvmShort)context->m_Registers[h]) << 8 | (tlvmShort)context->m_Registers[l]
+#define TLVM_SET_16BIT(h, l, v) \
+	context->m_Registers[h] = (tlvmByte)(v >> 8); \
+	context->m_Registers[l] = (tlvmByte)(v & 0xFF);
+
 #define TLVM_GET_OP(v, n) \
 	tlvmByte v = 0;\
 	tlvmByte* v##addr = tlvmGetMemory(context, context->m_ProgramCounter+n, TLVM_FLAG_READ); \
