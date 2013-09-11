@@ -29,9 +29,9 @@
 #define TLVM_FLAG_UNSET(x) context->m_Registers[TLVM_REG_F] &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
 #define TLVM_FLAG_SET_IF(test, x) if(test){ TLVM_FLAG_SET(x); }else{ TLVM_FLAG_UNSET(x); }
 #define TLVM_SET_FLAGS(res) \
-	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); // Zero \
-	TLVM_FLAG_SET_IF(res & 0x80, S); // Sign \
-	TLVM_FLAG_SET_IF(res > 0xFF, C); // Carry
+	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); \
+	TLVM_FLAG_SET_IF(res & 0x80, S); \
+	TLVM_FLAG_SET_IF(res > 0xFF, C); \
 	
 
 #define TLVM_OPCODE_MAX (256)

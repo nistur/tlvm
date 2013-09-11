@@ -222,6 +222,26 @@
  #define TLVM_JM           0xFA
  #define TLVM_JMP          0xC3
 
+ #define TLVM_CNZ          0xC4
+ #define TLVM_CZ           0xCC
+ #define TLVM_CNC          0xD4
+ #define TLVM_CC           0xDC
+ #define TLVM_CPO          0xE4
+ #define TLVM_CPE          0xEC
+ #define TLVM_CP           0xF4
+ #define TLVM_CM           0xFC
+ #define TLVM_CALL         0xCD
+
+ #define TLVM_RNZ          0xC0
+ #define TLVM_RZ           0xC8
+ #define TLVM_RNC          0xD0
+ #define TLVM_RC           0xD8
+ #define TLVM_RPO          0xE0
+ #define TLVM_RPE          0xE8
+ #define TLVM_RP           0xF0
+ #define TLVM_RM           0xF8
+ #define TLVM_RET          0xC9
+
 
 /*********************************************
  * Core instructions
@@ -246,6 +266,8 @@ tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmJMP  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCALL (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmRET  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions

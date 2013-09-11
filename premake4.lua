@@ -13,7 +13,7 @@ targetdir "build/debug"
 
 configuration "Release"
 defines { "NDEBUG" }
-flags { "OptimizeSpeed",
+flags { "OptimizeSize",
 	"ExtraWarnings",
 	"FatalWarnings",
 	"NoFramePointer" }
