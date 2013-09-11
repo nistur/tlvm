@@ -1,31 +1,12 @@
 #include "tlvm-tests.h"
 #include "tlvm.h"
-#include "tlvm_instructions.h"
-
-TEST(InitTerminate, ALU, 0.0f,
-     // initialisation
-     {
-      tlvmInitContext(&m_data.context);
-     },
-     // cleanup
-     {
-      tlvmTerminateContext(&m_data.context);
-     },
-     // test
-     {
-          ASSERT(tlvmAddALU(m_data.context) == TLVM_SUCCESS);
-     },
-     // data
-     {
-      tlvmContext* context;
-     }
-    );
+#include "tlvm_internal.h"
 
 TEST(ADI, ALU, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAddALU(m_data.context);
+      tlvmAdd8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
       m_data.bootloader[0] = TLVM_ADI;
       m_data.bootloader[1] = 99;

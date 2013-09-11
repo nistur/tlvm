@@ -38,7 +38,7 @@ typedef struct _tlvmContext tlvmContext;
 #define TLVM_FLAG_READ			(1<<0)
 #define TLVM_FLAG_WRITE			(1<<1)
 
-#include "tlvm_alu.h"
+#include "tlvm_8080.h"
 
 TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context);
 TLVM_EXPORT tlvmReturn   tlvmTerminateContext(tlvmContext** context);

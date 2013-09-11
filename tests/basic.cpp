@@ -61,7 +61,7 @@ TEST(InstructionSet, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAddALU(m_data.context);
+      tlvmAdd8080(m_data.context);
       memset(m_data.nullInstructions, 0, 256);
 
       m_data.nullInstructions[0x08] = 1;

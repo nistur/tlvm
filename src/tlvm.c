@@ -32,9 +32,6 @@ tlvmReturn tlvmInitContext(tlvmContext** context)
        tlvmReturn();
     }
 
-    if(tlvmInitCore(*context) != TLVM_SUCCESS)
-        tlvmReturn();
-
     tlvmReturnCode(SUCCESS);
 }
 

@@ -1,6 +1,24 @@
 #pragma once
-#ifndef __TLVM_INSTRUCTIONS_H__
-#define __TLVM_INSTRUCTIONS_H__
+#ifndef __8080_H__
+#define __8080_H__
+
+#define TLVM_REG_F 0x0
+#define TLVM_REG_A 0x1
+#define TLVM_REG_C 0x2
+#define TLVM_REG_B 0x3
+#define TLVM_REG_E 0x4
+#define TLVM_REG_D 0x5
+#define TLVM_REG_L 0x6
+#define TLVM_REG_H 0x7
+
+#define TLVM_FLAG_S 	(1<<7) // Sign
+#define TLVM_FLAG_Z 	(1<<6) // Zero
+#define TLVM_FLAG_I 	(1<<5) // Interrupt
+#define TLVM_FLAG_H 	(1<<4) // Auxiliary Carry
+#define TLVM_FLAG_P 	(1<<2) // Parity
+#define TLVM_FLAG_C 	(1<<0) // Carry
+#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_I| TLVM_FLAG_H | TLVM_FLAG_P | TLVM_FLAG_C)
+#define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
 
 #define TLVM_MOV_FROM_B    0x00
 #define TLVM_MOV_FROM_C    0x01
@@ -284,4 +302,4 @@ tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 
-#endif/*__TLVM_INSTRUCTIONS_H__*/
+#endif/*__8080_H__*/
