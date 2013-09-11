@@ -2,7 +2,6 @@
 #include "tlvm.h"
 #include "tlvm_internal.h"
 
-#include <stdio.h>
 #include <string.h>
 
 // TODO: replace Hello world with more condense version
