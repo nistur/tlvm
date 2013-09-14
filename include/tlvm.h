@@ -25,8 +25,8 @@ typedef unsigned char  tlvmByte;
 typedef unsigned short tlvmShort;
 typedef unsigned char  tlvmBool;
 
-typedef TLVM_FALSE 				 0
-typedef TLVM_TRUE 				 1
+#define TLVM_FALSE 				 0
+#define TLVM_TRUE 				 1
 
 typedef struct _tlvmContext tlvmContext;
 
