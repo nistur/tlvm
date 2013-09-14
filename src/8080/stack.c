@@ -28,18 +28,8 @@ tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
     	srcLo = context->m_Registers[TLVM_REG_F];
 	break;
 	}
-
-	// rather than just getting one address, get each location manually
-	// as in theory it might go across memory boundaries
-	tlvmByte* dstHi = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE);
-	tlvmByte* dstLo = tlvmGetMemory(context, context->m_StackPointer - 2, TLVM_FLAG_WRITE);
-	if(dstHi == NULL || dstLo == NULL)
-		tlvmReturnCode(INVALID_INPUT);
-
-	*dstHi = srcHi;
-	*dstLo = srcLo;
-
-	context->m_StackPointer -= 2;
+	TLVM_STACK_PUSH(srcHi);
+	TLVM_STACK_PUSH(srcLo);
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
@@ -78,17 +68,8 @@ tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 	break;
 	}
 
-	// rather than just getting one address, get each location manually
-	// as in theory it might go across memory boundaries
-	tlvmByte* srcHi = tlvmGetMemory(context, context->m_StackPointer + 1, TLVM_FLAG_READ);
-	tlvmByte* srcLo = tlvmGetMemory(context, context->m_StackPointer + 0, TLVM_FLAG_READ);
-	if(srcHi == NULL || srcLo == NULL || dstHi == NULL || dstLo == NULL)
-		tlvmReturnCode(INVALID_INPUT);
-
-	*dstHi = *srcHi;
-	*dstLo = *srcLo;
-
-	context->m_StackPointer += 2;
+	TLVM_STACK_POP(*dstLo);
+	TLVM_STACK_POP(*dstHi);
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
@@ -122,6 +103,27 @@ tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
 	context->m_ProgramCounter += 1;
     if(cycles)
     	*cycles =18;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	TLVM_GET_OP(opLo,  1);
+	TLVM_GET_OP(opHi, 2);
+	tlvmShort addr = ((tlvmShort)opHi) << 8 | opLo;
+
+	context->m_StackPointer = addr;
+
+
+	// size of instruction    = 1
+	// size of address        = 2
+	context->m_ProgramCounter += 3;
+    if(cycles)
+    	*cycles =13;
 
 	tlvmReturnCode(SUCCESS);
 }

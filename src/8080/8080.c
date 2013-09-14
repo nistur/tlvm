@@ -146,6 +146,7 @@ tlvmReturn tlvmAdd8080(tlvmContext* context)
 
     context->m_InstructionSet[TLVM_SPHL]     = tlvmSPHL;
     context->m_InstructionSet[TLVM_XTHL]     = tlvmXTHL;
+    context->m_InstructionSet[TLVM_XCHG]     = tlvmXCHG;
 
     context->m_InstructionSet[TLVM_JNZ]      = tlvmJMP;
     context->m_InstructionSet[TLVM_JZ]       = tlvmJMP;
@@ -176,57 +177,82 @@ tlvmReturn tlvmAdd8080(tlvmContext* context)
     context->m_InstructionSet[TLVM_RP]       = tlvmRET;
     context->m_InstructionSet[TLVM_RM]       = tlvmRET;
     context->m_InstructionSet[TLVM_RET]      = tlvmRET;
-    context->m_InstructionSet[TLVM_ADD_B] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_C] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_D] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_E] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_H] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_L] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_M] = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_A] = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_B]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_C]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_D]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_E]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_H]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_L]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_M]    = tlvmADD;
+    context->m_InstructionSet[TLVM_ADD_A]    = tlvmADD;
+   
+    context->m_InstructionSet[TLVM_SUB_B]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_C]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_D]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_E]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_H]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_L]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_M]    = tlvmSUB;
+    context->m_InstructionSet[TLVM_SUB_A]    = tlvmSUB;
+   
+    context->m_InstructionSet[TLVM_INR_B]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_C]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_D]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_E]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_H]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_L]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_M]    = tlvmINR;
+    context->m_InstructionSet[TLVM_INR_A]    = tlvmINR;
+   
+    context->m_InstructionSet[TLVM_INX_B]    = tlvmINX;
+    context->m_InstructionSet[TLVM_INX_D]    = tlvmINX;
+    context->m_InstructionSet[TLVM_INX_H]    = tlvmINX;
+    context->m_InstructionSet[TLVM_INX_SP]   = tlvmINX;
+   
+    context->m_InstructionSet[TLVM_DCR_B]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_C]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_D]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_E]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_H]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_L]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_M]    = tlvmDCR;
+    context->m_InstructionSet[TLVM_DCR_A]    = tlvmDCR;
+   
+    context->m_InstructionSet[TLVM_DCX_B]    = tlvmDCX;
+    context->m_InstructionSet[TLVM_DCX_D]    = tlvmDCX;
+    context->m_InstructionSet[TLVM_DCX_H]    = tlvmDCX;
+    context->m_InstructionSet[TLVM_DCX_SP]   = tlvmDCX;
+   
+    context->m_InstructionSet[TLVM_ADI]      = tlvmADI;
+    context->m_InstructionSet[TLVM_SUI]      = tlvmSUI;
+   
+    context->m_InstructionSet[TLVM_DAD_B]    = tlvmDAD;
+    context->m_InstructionSet[TLVM_DAD_D]    = tlvmDAD;
+    context->m_InstructionSet[TLVM_DAD_H]    = tlvmDAD;
+    context->m_InstructionSet[TLVM_DAD_SP]   = tlvmDAD;
+   
+    context->m_InstructionSet[TLVM_STA]      = tlvmSTA;
+   
+    context->m_InstructionSet[TLVM_OUT]      = tlvmOUT;
+    context->m_InstructionSet[TLVM_IN]       = tlvmIN;
 
-    context->m_InstructionSet[TLVM_SUB_B] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_C] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_D] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_E] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_H] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_L] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_M] = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_A] = tlvmSUB;
+    context->m_InstructionSet[TLVM_RST_0]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_1]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_2]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_3]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_4]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_5]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_6]    = tlvmRST;
+    context->m_InstructionSet[TLVM_RST_7]    = tlvmRST;
 
-    context->m_InstructionSet[TLVM_INR_B] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_C] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_D] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_E] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_H] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_L] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_M] = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_A] = tlvmINR;
+    // TEMPORARY CODE JUST TO CHECK HOW MANY INSTRUCTIONS
+    // ARE IMPLEMENTED
+    // TODO: REMOVE
+    int t = 0;
+    for(int i = 0; i < 256; ++i)
+        if(context->m_InstructionSet[i] != NULL)
+        t++;
 
-    context->m_InstructionSet[TLVM_INX_B] = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_D] = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_H] = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_SP]= tlvmINX;
-
-    context->m_InstructionSet[TLVM_DCR_B] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_C] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_D] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_E] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_H] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_L] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_M] = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_A] = tlvmDCR;
-
-    context->m_InstructionSet[TLVM_DCX_B] = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_D] = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_H] = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_SP]= tlvmDCX;
-
-    context->m_InstructionSet[TLVM_ADI] = tlvmADI;
-    context->m_InstructionSet[TLVM_SUI] = tlvmSUI;
-
-
-    
     tlvmReturnCode(SUCCESS);
 }
 
@@ -802,4 +828,77 @@ tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles)
 
     tlvmReturnCode(SUCCESS);
 
+}
+
+tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+
+    tlvmShort tmp = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+    TLVM_SET_16BIT(TLVM_REG_H, TLVM_REG_L, TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E));
+    TLVM_SET_16BIT(TLVM_REG_D, TLVM_REG_E, tmp);
+    // size of instruction    = 1
+    context->m_ProgramCounter += 1;
+    if(cycles)
+        *cycles =5;
+
+    tlvmReturnCode(SUCCESS);
+
+}
+
+tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+
+    TLVM_GET_OP(opcode, 0);
+
+    // increment the program counter first so if/when we return,
+    // we don't hit the interrupt again
+    // size of instruction    = 1
+    context->m_ProgramCounter += 1;
+
+    // push the program counter
+    tlvmByte pcLo = (tlvmByte)(context->m_ProgramCounter & 0xFF);
+    tlvmByte pcHi = (tlvmByte)(context->m_ProgramCounter >> 8);
+
+    TLVM_STACK_PUSH(pcHi);
+    TLVM_STACK_PUSH(pcLo);
+
+    // which interrupt are we hitting?
+    tlvmShort addr = 0x08;
+    switch(opcode)
+    {
+    case TLVM_RST_0:
+        addr *= 0;
+    break;
+    case TLVM_RST_1:
+        addr *= 1;
+    break;
+    case TLVM_RST_2:
+        addr *= 2;
+    break;
+    case TLVM_RST_3:
+        addr *= 3;
+    break;
+    case TLVM_RST_4:
+        addr *= 4;
+    break;
+    case TLVM_RST_5:
+        addr *= 5;
+    break;
+    case TLVM_RST_6:
+        addr *= 6;
+    break;
+    case TLVM_RST_7:
+        addr *= 7;
+    break;
+    }
+
+    context->m_ProgramCounter = addr;
+    if(cycles)
+        *cycles =11;
+
+    tlvmReturnCode(SUCCESS);
 }

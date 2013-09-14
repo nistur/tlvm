@@ -194,6 +194,19 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
     return &pMem->m_Buffer[addr];
 }
 
+// kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c
+tlvmBool tlvmParity(tlvmByte val)
+{
+    tlvmByte p = 0;
+
+    for (tlvmByte i=0; i<8; i++)
+    {
+        if (val & 0x1) p++;
+        val = val >> 1;
+    }
+    return (0 == (p & 0x1));
+}
+
 const char* tlvmError()
 {
     if(g_tlvmStatus == -1)

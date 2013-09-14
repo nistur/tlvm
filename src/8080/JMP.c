@@ -70,19 +70,11 @@ tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
 	TLVM_GET_OP(opHigh, 2);
 	tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
 
-	// increment PC before logic as it is fallback
+	// increment PC before logic as it is after the current instruction
+	// that we want to return to
 	// size of instruction    = 1
 	// size of address        = 2
 	context->m_ProgramCounter += 3;
-
-	// rather than just getting one address, get each location manually
-	// as in theory it might go across memory boundaries
-	tlvmByte* dstHi = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE);
-	tlvmByte* dstLo = tlvmGetMemory(context, context->m_StackPointer - 2, TLVM_FLAG_WRITE);
-	if(dstHi == NULL || dstLo == NULL)
-		tlvmReturnCode(INVALID_INPUT);
-	tlvmByte srcHi = (tlvmByte)(context->m_ProgramCounter >> 8);
-	tlvmByte srcLo = (tlvmByte)(context->m_ProgramCounter & 0xFF);
 
 	tlvmByte cycleCnt = 11;
 	switch(opcode)
@@ -90,71 +82,62 @@ tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
 	case TLVM_CNZ:
 		if(!TLVM_FLAG_ISSET(Z))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CZ:
 		if(TLVM_FLAG_ISSET(Z))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CNC:
 		if(!TLVM_FLAG_ISSET(C))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CC:
 		if(TLVM_FLAG_ISSET(C))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CPO:
 		if(!TLVM_FLAG_ISSET(P))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CPE:
 		if(TLVM_FLAG_ISSET(P))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CP:
 		if(!TLVM_FLAG_ISSET(S))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CM:
 		if(TLVM_FLAG_ISSET(S))
 		{
-			*dstHi = srcHi; *dstLo = srcLo;
-			context->m_ProgramCounter = addr;
+			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CALL:
 	{
-		*dstHi = srcHi; *dstLo = srcLo;
-		context->m_ProgramCounter = addr;
+		TLVM_PUSH_PC(addr);
 		cycleCnt = 17;
 	}
 	break;
@@ -179,76 +162,68 @@ tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
 
-	// rather than just getting one address, get each location manually
-	// as in theory it might go across memory boundaries
-	tlvmByte* srcHi = tlvmGetMemory(context, context->m_StackPointer + 1, TLVM_FLAG_WRITE);
-	tlvmByte* srcLo = tlvmGetMemory(context, context->m_StackPointer + 0, TLVM_FLAG_WRITE);
-	if(srcHi == NULL || srcLo == NULL)
-		tlvmReturnCode(INVALID_INPUT);
-	tlvmShort addr = (tlvmShort)((*srcHi) << 8) | ((tlvmShort)(*srcLo));
-
 	tlvmByte cycleCnt = 5;
 	switch(opcode)
 	{
 	case TLVM_CNZ:
 		if(!TLVM_FLAG_ISSET(Z))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CZ:
 		if(TLVM_FLAG_ISSET(Z))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CNC:
 		if(!TLVM_FLAG_ISSET(C))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CC:
 		if(TLVM_FLAG_ISSET(C))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CPO:
 		if(!TLVM_FLAG_ISSET(P))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CPE:
 		if(TLVM_FLAG_ISSET(P))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CP:
 		if(!TLVM_FLAG_ISSET(S))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CM:
 		if(TLVM_FLAG_ISSET(S))
 		{
-			context->m_ProgramCounter = addr;
+			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_CALL:
 	{
-		context->m_ProgramCounter = addr;
+		TLVM_POP_PC();
 		cycleCnt = 10;
 	}
 	break;

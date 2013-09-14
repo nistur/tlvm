@@ -13,6 +13,7 @@
 	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); \
 	TLVM_FLAG_SET_IF(res & 0x80, S); \
 	TLVM_FLAG_SET_IF(res > 0xFF, C); \
+	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P);
 	
 
 #define TLVM_OPCODE_MAX (256)
@@ -28,9 +29,46 @@
 	if(v##addr != NULL) \
 		v = *v##addr;
 
+#define TLVM_STACK_PUSH(v) \
+{ \
+    tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE); \
+    if(dst == NULL) \
+        tlvmReturnCode(INVALID_INPUT); \
+    *dst = v; \
+    context->m_StackPointer --; \
+}
+
+#define TLVM_STACK_POP(v) \
+{ \
+    tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
+    if(dst == NULL) \
+        tlvmReturnCode(INVALID_INPUT); \
+    v = *dst; \
+    context->m_StackPointer ++; \
+}
+
+#define TLVM_PUSH_PC(val) \
+{ \
+	tlvmByte pcHi = (tlvmByte)(context->m_ProgramCounter >> 8); \
+	tlvmByte pcLo = (tlvmByte)(context->m_ProgramCounter & 0xFF); \
+	TLVM_STACK_PUSH(pcHi); \
+	TLVM_STACK_PUSH(pcLo); \
+	context->m_ProgramCounter = val; \
+}
+
+#define TLVM_POP_PC() \
+{ \
+	tlvmByte pcHi, pcLo; \
+	TLVM_STACK_POP(pcLo); \
+	TLVM_STACK_POP(pcHi); \
+	context->m_ProgramCounter = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo; \
+}
+
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
 
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
+
+tlvmBool tlvmParity(tlvmByte val);
 
 /***************************************
  * Library context
@@ -51,6 +89,8 @@ struct _tlvmContext
 
 	// registers
 	tlvmByte  m_Registers[8];
+
+	tlvmByte  m_Ports[256]; // for now, just hardcode this in
 };
 
 struct _tlvmMemoryBuffer

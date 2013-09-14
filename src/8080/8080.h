@@ -166,9 +166,64 @@
 #define TLVM_XRA_A         0xAF
 #define TLVM_XRI           0xEE
 
-/*********************************************
- * ALU instruction opcodes
- *********************************************/
+ #define TLVM_JNZ          0xC2
+ #define TLVM_JZ           0xCA
+ #define TLVM_JNC          0xD2
+ #define TLVM_JC           0xDA
+ #define TLVM_JPO          0xE2
+ #define TLVM_JPE          0xEA
+ #define TLVM_JP           0xF2
+ #define TLVM_JM           0xFA
+ #define TLVM_JMP          0xC3
+
+ #define TLVM_CNZ          0xC4
+ #define TLVM_CZ           0xCC
+ #define TLVM_CNC          0xD4
+ #define TLVM_CC           0xDC
+ #define TLVM_CPO          0xE4
+ #define TLVM_CPE          0xEC
+ #define TLVM_CP           0xF4
+ #define TLVM_CM           0xFC
+ #define TLVM_CALL         0xCD
+
+ #define TLVM_RNZ          0xC0
+ #define TLVM_RZ           0xC8
+ #define TLVM_RNC          0xD0
+ #define TLVM_RC           0xD8
+ #define TLVM_RPO          0xE0
+ #define TLVM_RPE          0xE8
+ #define TLVM_RP           0xF0
+ #define TLVM_RM           0xF8
+ #define TLVM_RET          0xC9
+
+ #define TLVM_PUSH_B       0xC5
+ #define TLVM_PUSH_D       0xD5
+ #define TLVM_PUSH_H       0xE5
+ #define TLVM_PUSH_PSW     0xF5
+
+ #define TLVM_POP_B        0xC1
+ #define TLVM_POP_D        0xD1
+ #define TLVM_POP_H        0xE1
+ #define TLVM_POP_PSW      0xF1
+
+ #define TLVM_SPHL         0xF9
+ #define TLVM_XTHL         0xE3
+ #define TLVM_XCHG         0xEB
+
+ #define TLVM_STA          0x32 // set stack pointer
+
+ #define TLVM_OUT          0xD3
+ #define TLVM_IN           0xDB
+
+ #define TLVM_RST_0        0xC7
+ #define TLVM_RST_1        0xCF
+ #define TLVM_RST_2        0xD7
+ #define TLVM_RST_3        0xDF
+ #define TLVM_RST_4        0xE7
+ #define TLVM_RST_5        0xEF
+ #define TLVM_RST_6        0xF7
+ #define TLVM_RST_7        0xFF
+
  #define TLVM_ADD_B        0x80 // add register B to A
  #define TLVM_ADD_C        0x81 // add register C to A
  #define TLVM_ADD_D        0x82 // add register D to A
@@ -185,6 +240,11 @@
  #define TLVM_SUB_L        0x95 // add register L to A
  #define TLVM_SUB_M        0x96 // add (HL) to A
  #define TLVM_SUB_A        0x97 // add register A to A
+
+ #define TLVM_DAD_B        0x09 // add register pair BC to HL
+ #define TLVM_DAD_D        0x19 // add register pair DE to HL
+ #define TLVM_DAD_H        0x29 // add register pair HL to HL
+ #define TLVM_DAD_SP       0x39 // add register SP to HL
  
  #define TLVM_ADI          0xC6 // add immediate to A
  #define TLVM_SUI          0xD6 // subtract immediate from A
@@ -217,49 +277,6 @@
  #define TLVM_DCX_H		   0x2B
  #define TLVM_DCX_SP	   0x3B
 
- #define TLVM_PUSH_B       0xC5
- #define TLVM_PUSH_D       0xD5
- #define TLVM_PUSH_H       0xE5
- #define TLVM_PUSH_PSW     0xF5
-
- #define TLVM_POP_B        0xC1
- #define TLVM_POP_D        0xD1
- #define TLVM_POP_H        0xE1
- #define TLVM_POP_PSW      0xF1
-
- #define TLVM_SPHL         0xF9
- #define TLVM_XTHL         0xE3
-
- #define TLVM_JNZ          0xC2
- #define TLVM_JZ           0xCA
- #define TLVM_JNC          0xD2
- #define TLVM_JC           0xDA
- #define TLVM_JPO          0xE2
- #define TLVM_JPE          0xEA
- #define TLVM_JP           0xF2
- #define TLVM_JM           0xFA
- #define TLVM_JMP          0xC3
-
- #define TLVM_CNZ          0xC4
- #define TLVM_CZ           0xCC
- #define TLVM_CNC          0xD4
- #define TLVM_CC           0xDC
- #define TLVM_CPO          0xE4
- #define TLVM_CPE          0xEC
- #define TLVM_CP           0xF4
- #define TLVM_CM           0xFC
- #define TLVM_CALL         0xCD
-
- #define TLVM_RNZ          0xC0
- #define TLVM_RZ           0xC8
- #define TLVM_RNC          0xD0
- #define TLVM_RC           0xD8
- #define TLVM_RPO          0xE0
- #define TLVM_RPE          0xE8
- #define TLVM_RP           0xF0
- #define TLVM_RM           0xF8
- #define TLVM_RET          0xC9
-
 
 /*********************************************
  * Core instructions
@@ -283,9 +300,14 @@ tlvmReturn tlvmPUSH (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmXCHG (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmJMP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmCALL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRET  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSTA  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmOUT  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmIN   (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmRST  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
@@ -301,5 +323,7 @@ tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
+
+tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
 
 #endif/*__8080_H__*/
