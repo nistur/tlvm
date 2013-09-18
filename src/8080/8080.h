@@ -224,6 +224,9 @@
  #define TLVM_RST_6        0xF7
  #define TLVM_RST_7        0xFF
 
+ #define TLVM_DI           0xF3 // Disable hardware interrupts
+ #define TLVM_EI           0xFB // Enable hardware interrupts
+
  #define TLVM_ADD_B        0x80 // add register B to A
  #define TLVM_ADD_C        0x81 // add register C to A
  #define TLVM_ADD_D        0x82 // add register D to A
@@ -232,6 +235,16 @@
  #define TLVM_ADD_L        0x85 // add register L to A
  #define TLVM_ADD_M        0x86 // add (HL) to A
  #define TLVM_ADD_A        0x87 // add register A to A
+
+ #define TLVM_ADC_B        0x88 // add register B to A with carry
+ #define TLVM_ADC_C        0x89 // add register C to A with carry
+ #define TLVM_ADC_D        0x8A // add register D to A with carry
+ #define TLVM_ADC_E        0x8B // add register E to A with carry
+ #define TLVM_ADC_H        0x8C // add register H to A with carry
+ #define TLVM_ADC_L        0x8D // add register L to A with carry
+ #define TLVM_ADC_M        0x8E // add (HL) to A with carry
+ #define TLVM_ADC_A        0x8F // add register A to A with carry
+
  #define TLVM_SUB_B        0x90 // add register B to A
  #define TLVM_SUB_C        0x91 // add register C to A
  #define TLVM_SUB_D        0x92 // add register D to A
@@ -241,13 +254,34 @@
  #define TLVM_SUB_M        0x96 // add (HL) to A
  #define TLVM_SUB_A        0x97 // add register A to A
 
+ #define TLVM_SBB_B        0x98 // add register B to A with borrow
+ #define TLVM_SBB_C        0x99 // add register C to A with borrow
+ #define TLVM_SBB_D        0x9A // add register D to A with borrow
+ #define TLVM_SBB_E        0x9B // add register E to A with borrow
+ #define TLVM_SBB_H        0x9C // add register H to A with borrow
+ #define TLVM_SBB_L        0x9D // add register L to A with borrow
+ #define TLVM_SBB_M        0x9E // add (HL) to A with borrow
+ #define TLVM_SBB_A        0x9F // add register A to A with borrow
+
+ #define TLVM_CMP_B        0xB8 // compare register B to A
+ #define TLVM_CMP_C        0xB9 // compare register C to A
+ #define TLVM_CMP_D        0xBA // compare register D to A
+ #define TLVM_CMP_E        0xBB // compare register E to A
+ #define TLVM_CMP_H        0xBC // compare register H to A
+ #define TLVM_CMP_L        0xBD // compare register L to A
+ #define TLVM_CMP_M        0xBE // compare (HL) to A
+ #define TLVM_CMP_A        0xBF // compare register A to A
+
  #define TLVM_DAD_B        0x09 // add register pair BC to HL
  #define TLVM_DAD_D        0x19 // add register pair DE to HL
  #define TLVM_DAD_H        0x29 // add register pair HL to HL
  #define TLVM_DAD_SP       0x39 // add register SP to HL
  
  #define TLVM_ADI          0xC6 // add immediate to A
+ #define TLVM_ACI          0xCE // add immediate to A with carry
  #define TLVM_SUI          0xD6 // subtract immediate from A
+ #define TLVM_SBI          0xDE // subtract immediate from A with borrow
+ #define TLVM_CPI          0xDE // compare immediate with A
 
  #define TLVM_INR_B        0x04
  #define TLVM_INR_C        0x0C
@@ -308,15 +342,19 @@ tlvmReturn tlvmSTA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmOUT  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmIN   (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRST  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmEI   (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmDI   (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
  *********************************************/
 tlvmReturn tlvmADD  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmADI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCMP  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmSUB  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSUI  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCPI  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmINR  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCR  (tlvmContext* context, tlvmByte* cycles);

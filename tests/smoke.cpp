@@ -80,8 +80,6 @@ TEST(HelloWorld, Smoke, 0.0f,
      }
     );
 
-
-// TODO: replace Hello world with more condense version
 TEST(HelloWorld2, Smoke, 0.0f,
      // initialisation
      {
@@ -89,16 +87,16 @@ TEST(HelloWorld2, Smoke, 0.0f,
       tlvmAdd8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
-      m_data.bootloader[0x00] = TLVM_LXI_B;
-      m_data.bootloader[0x01] = 0x00;
+      m_data.bootloader[0x00] = TLVM_LXI_B; // set the position that we're
+      m_data.bootloader[0x01] = 0x00;       // going to write to
       m_data.bootloader[0x02] = 0x01;
-      m_data.bootloader[0x03] = TLVM_LXI_D;
+      m_data.bootloader[0x03] = TLVM_LXI_D; // where we're reading data from
       m_data.bootloader[0x04] = 0x09;
       m_data.bootloader[0x05] = 0x00;
-      m_data.bootloader[0x06] = TLVM_JMP;
-      m_data.bootloader[0x07] = 0x17;
+      m_data.bootloader[0x06] = TLVM_JMP; // jump forward, over the data
+      m_data.bootloader[0x07] = 0x19;     // and over the INX's
       m_data.bootloader[0x08] = 0x00;
-      m_data.bootloader[0x09] = 'H';
+      m_data.bootloader[0x09] = 'H';      // Data
       m_data.bootloader[0x0A] = 'e';
       m_data.bootloader[0x0B] = 'l';
       m_data.bootloader[0x0C] = 'l';
@@ -112,14 +110,16 @@ TEST(HelloWorld2, Smoke, 0.0f,
       m_data.bootloader[0x14] = 'd';
       m_data.bootloader[0x15] = '!';
       m_data.bootloader[0x16] = 0;
-      m_data.bootloader[0x17] = TLVM_LDAX_D;
-      m_data.bootloader[0x18] = TLVM_STAX_B;
-      m_data.bootloader[0x19] = TLVM_INX_D;
-      m_data.bootloader[0x1A] = TLVM_INX_B;
-      m_data.bootloader[0x1B] = TLVM_JNZ;
-      m_data.bootloader[0x1C] = 0x17;
-      m_data.bootloader[0x1D] = 0x00;
-      m_data.bootloader[0x1E] = TLVM_HLT;
+      m_data.bootloader[0x17] = TLVM_INX_D;
+      m_data.bootloader[0x18] = TLVM_INX_B;
+      m_data.bootloader[0x19] = TLVM_LDAX_D;
+      m_data.bootloader[0x1A] = TLVM_STAX_B;
+      m_data.bootloader[0x1B] = TLVM_ADI; // Add 0 to A to set the zero flag if we're
+      m_data.bootloader[0x1C] = 0;        // at the end
+      m_data.bootloader[0x1D] = TLVM_JNZ; // if the flag wasn't set to zero
+      m_data.bootloader[0x1E] = 0x17;     // jump back to the INX's
+      m_data.bootloader[0x1F] = 0x00;
+      m_data.bootloader[0x20] = TLVM_HLT;
 
      },
      // cleanup

@@ -21,7 +21,7 @@ TEST(ADI, ALU, 0.0f,
           tlvmReset(m_data.context);
           tlvmByte cycle = 0;
           ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
-          ASSERT(cycle == 2);
+          ASSERT(cycle == 7);
      },
      // data
      {
