@@ -4,6 +4,7 @@
 
 #include "tlvm.h"
 #include "../8080/8080.h"
+#include "../z80/z80.h"
 
 #define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
 #define TLVM_FLAG_SET(x) context->m_Registers[TLVM_REG_F] |= TLVM_FLAG_##x

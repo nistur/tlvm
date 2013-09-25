@@ -7,7 +7,7 @@ files { "include/**.h" }
 defines { "TLVM_BUILD" }
 
 -- Processor specific defines
-defines { "TLVM_HAS_8080" }
+defines { "TLVM_HAS_8080", "TLVM_HAS_Z80" }
 
 configuration "Debug"
 defines { "DEBUG" }

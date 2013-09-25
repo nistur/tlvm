@@ -107,6 +107,7 @@ typedef struct _tlvmContext tlvmContext;
  * PROCESSOR INSTRUCTION SETS
  *********************************************/
 #include "tlvm_8080.h"
+#include "tlvm_z80.h"
 
 /*********************************************
  * tlvmInitContext
