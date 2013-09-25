@@ -1,3 +1,4 @@
+#ifdef TLVM_HAS_8080
 #include "tlvm_internal.h"
 
 #define TEST_MOV(x) ((opcode & x) == x)
@@ -111,3 +112,4 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 
 	tlvmReturnCode(SUCCESS);
 }
+#endif/*TLVM_HAS_8080*/

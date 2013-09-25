@@ -1,3 +1,4 @@
+#ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
 tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
@@ -72,4 +73,4 @@ tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
 
     tlvmReturnCode(SUCCESS);
 }
-
+#endif/*TLVM_HAS_8080*/

@@ -5,7 +5,7 @@ TEST(NOP, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAdd8080(m_data.context);
+      tlvmInit8080(m_data.context);
       m_data.bootloader[0] = TLVM_NOP;
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
      },
@@ -33,7 +33,7 @@ TEST(LXI, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAdd8080(m_data.context);
+      tlvmInit8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
       tlvmShort addr = 0x100;
@@ -94,7 +94,7 @@ TEST(MOV, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAdd8080(m_data.context);
+      tlvmInit8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
      },

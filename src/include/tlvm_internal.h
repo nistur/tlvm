@@ -15,9 +15,6 @@
 	TLVM_FLAG_SET_IF(res > 0xFF, C); \
 	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P);
 	
-
-#define TLVM_OPCODE_MAX (256)
-
 #define TLVM_GET_16BIT(h, l) 	((tlvmShort)context->m_Registers[h]) << 8 | (tlvmShort)context->m_Registers[l]
 #define TLVM_SET_16BIT(h, l, v) \
 	context->m_Registers[h] = (tlvmByte)(v >> 8); \
@@ -81,16 +78,18 @@ struct _tlvmContext
 	tlvmMemoryBuffer* m_Memory;
 
 	// instrution set
-	tlvmInstruction m_InstructionSet[TLVM_OPCODE_MAX];
+	tlvmInstruction* m_InstructionSet;
 
 	tlvmShort  m_ProgramCounter;
 
 	tlvmShort  m_StackPointer;
 
 	// registers
-	tlvmByte  m_Registers[8];
+	tlvmByte*  m_Registers;
 
-	tlvmByte  m_Ports[256]; // for now, just hardcode this in
+	tlvmByte*  m_Ports; // for now, just hardcode this in
+
+	tlvmShort  m_Clockspeed;
 };
 
 struct _tlvmMemoryBuffer

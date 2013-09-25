@@ -1,6 +1,29 @@
+#ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
-tlvmReturn tlvmAdd8080(tlvmContext* context)
+tlvmReturn tlvmInit8080(tlvmContext* context)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+
+    // make sure we have enough space for instructions
+    if(context->m_InstructionSet)
+        tlvmFree(context->m_InstructionSet);
+    context->m_InstructionSet = tlvmMallocArray(tlvmInstruction, 256);
+
+    // initialise all the 8080 registers
+    if(context->m_Registers)
+        tlvmFree(context->m_Registers);
+    context->m_Registers = tlvmMallocArray(tlvmByte, 8);
+
+    // create default I/O ports
+    if(context->m_Ports)
+        tlvmFree(context->m_Ports);
+    context->m_Ports = tlvmMallocArray(tlvmByte, 255);
+
+    return tlvmAdd8080Instructions(context);
+}
+tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -803,3 +826,4 @@ tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
     tlvmReturnCode(SUCCESS);
 
 }
+#endif/*TLVM_HAS_8080*/

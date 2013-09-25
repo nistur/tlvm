@@ -1,3 +1,4 @@
+#ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
 tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
@@ -96,3 +97,4 @@ tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
 
     tlvmReturnCode(SUCCESS);
 }
+#endif/*TLVM_HAS_8080*/

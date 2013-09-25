@@ -2,6 +2,10 @@
 #ifndef __8080_H__
 #define __8080_H__
 
+#ifdef  TLVM_HAS_8080
+/*********************************************
+ * REGISTERS
+ *********************************************/
 #define TLVM_REG_F 0x0
 #define TLVM_REG_A 0x1
 #define TLVM_REG_C 0x2
@@ -11,37 +15,24 @@
 #define TLVM_REG_L 0x6
 #define TLVM_REG_H 0x7
 
+/*********************************************
+ * FLAGS
+ *********************************************/
 #define TLVM_FLAG_S 	(1<<7) // Sign
 #define TLVM_FLAG_Z 	(1<<6) // Zero
 #define TLVM_FLAG_I 	(1<<5) // Interrupt
 #define TLVM_FLAG_H 	(1<<4) // Auxiliary Carry
 #define TLVM_FLAG_P 	(1<<2) // Parity
 #define TLVM_FLAG_C 	(1<<0) // Carry
+
 #define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_I| TLVM_FLAG_H | TLVM_FLAG_P | TLVM_FLAG_C)
+
+// TLVM_FLAG_NONE is not just 0, as some of the bits are not used as flags
 #define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
 
-#define TLVM_MOV_FROM_B    0x00
-#define TLVM_MOV_FROM_C    0x01
-#define TLVM_MOV_FROM_D    0x02
-#define TLVM_MOV_FROM_E    0x03
-#define TLVM_MOV_FROM_H    0x04
-#define TLVM_MOV_FROM_L    0x05
-#define TLVM_MOV_FROM_M    0x06
-#define TLVM_MOV_FROM_A    0x07
-
-#define TLVM_MOV_HI        0x08
-
-#define TLVM_MOV_TO_B      0x40
-#define TLVM_MOV_TO_C      0x48
-#define TLVM_MOV_TO_D      0x50
-#define TLVM_MOV_TO_E      0x58
-#define TLVM_MOV_TO_H      0x60
-#define TLVM_MOV_TO_L      0x68
-#define TLVM_MOV_TO_M      0x70
-#define TLVM_MOV_TO_A      0x78
-
 /*********************************************
- * Core instruction opcodes
+ * INSTRUCTIONS
+ *   TODO: Sort these
  *********************************************/
 #define TLVM_NOP           0x00
 #define TLVM_HLT           0x76
@@ -311,6 +302,29 @@
  #define TLVM_DCX_H		   0x2B
  #define TLVM_DCX_SP	   0x3B
 
+/*********************************************
+ * MOV HELPERS
+ *********************************************/
+#define TLVM_MOV_FROM_B    0x00
+#define TLVM_MOV_FROM_C    0x01
+#define TLVM_MOV_FROM_D    0x02
+#define TLVM_MOV_FROM_E    0x03
+#define TLVM_MOV_FROM_H    0x04
+#define TLVM_MOV_FROM_L    0x05
+#define TLVM_MOV_FROM_M    0x06
+#define TLVM_MOV_FROM_A    0x07
+
+#define TLVM_MOV_HI        0x08
+
+#define TLVM_MOV_TO_B      0x40
+#define TLVM_MOV_TO_C      0x48
+#define TLVM_MOV_TO_D      0x50
+#define TLVM_MOV_TO_E      0x58
+#define TLVM_MOV_TO_H      0x60
+#define TLVM_MOV_TO_L      0x68
+#define TLVM_MOV_TO_M      0x70
+#define TLVM_MOV_TO_A      0x78
+
 
 /*********************************************
  * Core instructions
@@ -364,4 +378,14 @@ tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
 
+/*********************************************
+ * tlvmAdd8080
+ *     Add Intel 8080 instruction set to CPU
+ * parameters:
+ *     context - the CPU context to add 8080 
+ *     support to
+ *********************************************/
+TLVM_EXPORT tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
+
+#endif/*TLVM_HAS_8080*/
 #endif/*__8080_H__*/

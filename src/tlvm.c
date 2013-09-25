@@ -2,10 +2,6 @@
 
 tlvmReturn tlvmClearContext(tlvmContext* context)
 {
-    context->m_ProgramCounter = 0;
-
-    memset(context->m_InstructionSet, 0, sizeof(tlvmInstruction*) * TLVM_OPCODE_MAX);
-
     tlvmMemoryBuffer* pMem = context->m_Memory;
     while(pMem)
     {
@@ -13,7 +9,9 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
         tlvmFree(pMem);
         pMem = pNext;
     }
-    context->m_Memory = NULL;
+
+    // set everything to NULL/0
+    memset(context, 0, sizeof(tlvmContext));
 
     tlvmReturnCode(SUCCESS);
 }
@@ -45,6 +43,15 @@ tlvmReturn tlvmTerminateContext(tlvmContext** context)
 
     tlvmFree(*context);
     *context = 0;
+    tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmSetClockspeed(tlvmContext* context, tlvmShort clockspeed)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+    context->m_Clockspeed = clockspeed;
+
     tlvmReturnCode(SUCCESS);
 }
 
@@ -154,11 +161,33 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmRun(tlvmContext* context)
 {
-    tlvmByte empty;
-    while(tlvmStep(context, &empty) == TLVM_SUCCESS){}
-    if(g_tlvmStatus != TLVM_EXIT)
-        tlvmReturn();
-    tlvmReturnCode(SUCCESS);
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+
+    if(context->m_Clockspeed == 0)
+    {
+        tlvmByte empty;
+        while(tlvmStep(context, &empty) == TLVM_SUCCESS){}
+        if(g_tlvmStatus != TLVM_EXIT)
+            tlvmReturn();
+        tlvmReturnCode(SUCCESS);
+    }
+    else
+    {
+        tlvmLong cycleCount = 0;
+        tlvmByte cycles = 0;
+        tlvmReturn status = TLVM_SUCCESS;
+
+        while(status == TLVM_SUCCESS)
+        {
+            status = tlvmStep(context, &cycles);
+            cycleCount += (tlvmLong)cycles;
+        }
+
+        if(status != TLVM_EXIT)
+            tlvmReturn();
+        tlvmReturnCode(SUCCESS);
+    }
 }
 
 tlvmReturn tlvmReset(tlvmContext* context)
