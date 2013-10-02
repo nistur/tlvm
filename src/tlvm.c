@@ -178,10 +178,15 @@ tlvmReturn tlvmRun(tlvmContext* context)
         tlvmByte cycles = 0;
         tlvmReturn status = TLVM_SUCCESS;
 
+        tlvmResetClock(context);
+
         while(status == TLVM_SUCCESS)
         {
             status = tlvmStep(context, &cycles);
+
             cycleCount += (tlvmLong)cycles;
+
+            tlvmSleepUntil(context, cycleCount); // sleep until we've taken long enough for 
         }
 
         if(status != TLVM_EXIT)

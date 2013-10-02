@@ -12,6 +12,7 @@ TEST(HelloWorld, Smoke, 0.0f,
       tlvmInit8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
+      tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
       m_data.bootloader[0x00] = TLVM_LXI_H;
       m_data.bootloader[0x01] = 0x0;
       m_data.bootloader[0x02] = 0x1;
@@ -80,6 +81,9 @@ TEST(HelloWorld, Smoke, 0.0f,
      }
     );
 
+// This Hello World program is expected to run significantly slower than the above one
+// as it uses a couple of "slow" JMPs however it demonstrates a more concise and sane
+// program where all the data is together
 TEST(HelloWorld2, Smoke, 0.0f,
      // initialisation
      {
@@ -87,6 +91,7 @@ TEST(HelloWorld2, Smoke, 0.0f,
       tlvmInit8080(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
+      tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
       m_data.bootloader[0x00] = TLVM_LXI_B; // set the position that we're
       m_data.bootloader[0x01] = 0x00;       // going to write to
       m_data.bootloader[0x02] = 0x01;

@@ -3,6 +3,8 @@
 #define __TLVM_INTERNAL_H__
 
 #include "tlvm.h"
+#include "tlvm_time.h"
+
 #include "../8080/8080.h"
 
 #define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
@@ -90,6 +92,8 @@ struct _tlvmContext
 	tlvmByte*  m_Ports; // for now, just hardcode this in
 
 	tlvmShort  m_Clockspeed;
+
+	tlvmLong   m_StartTime;
 };
 
 struct _tlvmMemoryBuffer
