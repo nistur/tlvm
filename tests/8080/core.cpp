@@ -1,5 +1,4 @@
-#include "tlvm-tests.h"
-#include "tlvm_internal.h"
+#include "../tlvm-tests.h"
 
 TEST(NOP, Core, 0.0f,
      // initialisation

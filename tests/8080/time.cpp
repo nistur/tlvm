@@ -1,5 +1,4 @@
-#include "tlvm-tests.h"
-#include "tlvm_internal.h"
+#include "../tlvm-tests.h"
 
 TEST(SetClockspeed, Time, 0.0f,
      // initialisation
@@ -38,6 +37,7 @@ TEST(Time, Time, 0.0f,
      },
      // test
      {
+      // Um. This should really test how long it takes to run some random program with known execution time
       tlvmRun(m_data.context);
      },
      // data

@@ -1,6 +1,4 @@
-#include "tlvm-tests.h"
-#include "tlvm.h"
-#include "tlvm_internal.h"
+#include "../tlvm-tests.h"
 
 TEST(ADI, ALU, 0.0f,
      // initialisation
