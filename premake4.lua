@@ -35,6 +35,7 @@ project "tests"
 kind "ConsoleApp"
 files { "tests/**.cpp" }
 links { "tlvm" }
+defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
 configuration "Debug"
 postbuildcommands("build/debug/tests")
 configuration "Release"
