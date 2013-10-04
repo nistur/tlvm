@@ -198,8 +198,9 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
 tlvmBool tlvmParity(tlvmByte val)
 {
     tlvmByte p = 0;
+    tlvmByte i = 0;
 
-    for (tlvmByte i=0; i<8; i++)
+    for (i=0; i<8; i++)
     {
         if (val & 0x1) p++;
         val = val >> 1;
