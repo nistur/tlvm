@@ -306,7 +306,8 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
     // ARE IMPLEMENTED
     // TODO: REMOVE
     int t = 0;
-    for(int i = 0; i < 256; ++i)
+    int i = 0;
+    for(i = 0; i < 256; ++i)
         if(context->m_InstructionSet[i] != NULL)
         t++;
 

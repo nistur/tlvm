@@ -26,10 +26,10 @@ project "tlvm"
 kind "StaticLib"
 files { "src/**.c", "src/**.cpp" }
 
-project "tlvm-dynamic"
-kind "SharedLib"
-files { "src/**.c", "src/**.cpp" }
-targetname "tlvm"
+--project "tlvm-dynamic"
+--kind "SharedLib"
+--files { "src/**.c", "src/**.cpp" }
+--targetname "tlvm"
 
 project "tests"
 kind "ConsoleApp"
