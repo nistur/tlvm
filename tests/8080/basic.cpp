@@ -1,5 +1,4 @@
-#include "tlvm-tests.h"
-#include "tlvm_internal.h"
+#include "../tlvm-tests.h"
 
 TEST(InitTerminate, Basic, 0.0f,
      // initialisation
@@ -56,12 +55,11 @@ TEST(SetMemory, Basic, 0.0f,
      }
     );
 
-#include <iostream>
 TEST(InstructionSet, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmAdd8080(m_data.context);
+      tlvmInit8080(m_data.context);
       memset(m_data.nullInstructions, 0, 256);
 
       m_data.nullInstructions[0x08] = 1;
@@ -91,5 +89,25 @@ TEST(InstructionSet, Basic, 0.0f,
      {
       tlvmContext* context;
       tlvmByte nullInstructions[256];
+     }
+    );
+
+TEST(SetClockspeed, Basic, 0.0f,
+     // initialisation
+     {
+      tlvmInitContext(&m_data.context);
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+          ASSERT(tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0)) == TLVM_SUCCESS);
+          ASSERT(m_data.context->m_Clockspeed == TLVM_MHZ(2, 0));
+     },
+     // data
+     {
+      tlvmContext* context;
      }
     );

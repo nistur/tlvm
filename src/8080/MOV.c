@@ -1,3 +1,4 @@
+#ifdef TLVM_HAS_8080
 #include "tlvm_internal.h"
 
 #define TEST_MOV(x) ((opcode & x) == x)
@@ -11,10 +12,14 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	tlvmByte* dst = NULL;
 	tlvmByte* src = NULL;
 
+	tlvmByte cycleCount = 5;
 	if( (TEST_MOV(TLVM_MOV_TO_A)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_A];
 	else if( (TEST_MOV(TLVM_MOV_TO_M)) && !(opcode & TLVM_MOV_HI) )
+	{
 		dst = tlvmGetMemory(context, TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L), TLVM_FLAG_WRITE);
+		cycleCount = 7;
+	}
 	else if( (TEST_MOV(TLVM_MOV_TO_L)) && (opcode & TLVM_MOV_HI) )
 		dst = &context->m_Registers[TLVM_REG_L];
 	else if( (TEST_MOV(TLVM_MOV_TO_H)) && !(opcode & TLVM_MOV_HI) )
@@ -31,7 +36,10 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	if( (TEST_MOV(TLVM_MOV_FROM_A)) )
 		src = &context->m_Registers[TLVM_REG_A];
 	else if( (TEST_MOV(TLVM_MOV_FROM_M)) )
+	{
 		src = tlvmGetMemory(context, TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L), TLVM_FLAG_READ);
+		cycleCount = 7;
+	}
 	else if( (TEST_MOV(TLVM_MOV_FROM_L)) )
 		src = &context->m_Registers[TLVM_REG_L];
 	else if( (TEST_MOV(TLVM_MOV_FROM_H)) )
@@ -54,7 +62,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
     if(cycles)
-    	*cycles =1;
+    	*cycles =cycleCount;
 
 	tlvmReturnCode(SUCCESS);
 }
@@ -111,3 +119,4 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 
 	tlvmReturnCode(SUCCESS);
 }
+#endif/*TLVM_HAS_8080*/

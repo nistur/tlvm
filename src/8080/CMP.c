@@ -1,7 +1,7 @@
 #ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
-tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -10,50 +10,33 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
 
     tlvmByte* src = NULL;
 
-    tlvmShort carry = 0;
     switch(opcode)
     {
-    case TLVM_ADC_B:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_B:
+    case TLVM_CMP_B:
         src = &context->m_Registers[TLVM_REG_B];
     break;
-    case TLVM_ADC_C:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_C:
+    case TLVM_CMP_C:
         src = &context->m_Registers[TLVM_REG_C];
     break;
-    case TLVM_ADC_D:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_D:
+    case TLVM_CMP_D:
         src = &context->m_Registers[TLVM_REG_D];
     break;
-    case TLVM_ADC_E:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_E:
+    case TLVM_CMP_E:
         src = &context->m_Registers[TLVM_REG_E];
     break;
-    case TLVM_ADC_H:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_H:
+    case TLVM_CMP_H:
         src = &context->m_Registers[TLVM_REG_H];
     break;
-    case TLVM_ADC_L:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_L:
+    case TLVM_CMP_L:
         src = &context->m_Registers[TLVM_REG_L];
     break;
-    case TLVM_ADC_M:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_M:
+    case TLVM_CMP_M:
         {
             tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
             src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
         }
     break;
-    case TLVM_ADC_A:
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-    case TLVM_ADD_A:
+    case TLVM_CMP_A:
         src = &context->m_Registers[TLVM_REG_A];
     break;
     }
@@ -61,9 +44,8 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     if(src == NULL)
         tlvmReturnCode(INVALID_INPUT);
 
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)*src + carry;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src;
     TLVM_SET_FLAGS(res);
-    context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
@@ -73,21 +55,15 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
 
-    TLVM_GET_OP(operand, 0);
-    TLVM_GET_OP(op1,     1);
+    TLVM_GET_OP(op1, 1);
 
-    tlvmShort carry = 0;
-    if(operand == TLVM_ACI)
-        carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
-
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)op1 + carry;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)op1;
     TLVM_SET_FLAGS(res);
-    context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
 
     // size of instruction    = 1
     // size of operand        = 1

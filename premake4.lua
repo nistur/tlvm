@@ -6,6 +6,9 @@ files { "include/**.h" }
 
 defines { "TLVM_BUILD" }
 
+-- Processor specific defines
+defines { "TLVM_HAS_8080" }
+
 configuration "Debug"
 defines { "DEBUG" }
 flags { "Symbols" }
@@ -32,6 +35,7 @@ project "tests"
 kind "ConsoleApp"
 files { "tests/**.cpp" }
 links { "tlvm" }
+defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
 configuration "Debug"
 postbuildcommands("build/debug/tests")
 configuration "Release"
