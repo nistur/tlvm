@@ -16,8 +16,6 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
     tlvmReturnCode(SUCCESS);
 }
 
-tlvmReturn tlvmInitCore(tlvmContext* context);
-
 tlvmReturn tlvmInitContext(tlvmContext** context)
 {
     if(context == NULL)
@@ -29,6 +27,8 @@ tlvmReturn tlvmInitContext(tlvmContext** context)
 	   tlvmTerminateContext(context);
        tlvmReturn();
     }
+
+    (*context)->m_StepFunction = tlvmStepInternal;
 
     tlvmReturnCode(SUCCESS);
 }
@@ -145,7 +145,7 @@ tlvmReturn tlvmUnsetMemory(tlvmContext* context, tlvmByte* memory)
     tlvmReturnCode(INVALID_INPUT);
 }
 
-tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvmStepInternal(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
@@ -157,6 +157,15 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
         tlvmReturnCode(UNKNOWN_INSTRUCTION);
     context->m_InstructionSet[*opcode](context, cycles);
     tlvmReturn();
+}
+
+tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+    if(context->m_StepFunction)
+        return context->m_StepFunction(context, cycles);
+    tlvmReturnCode(INVALID_INPUT);
 }
 
 tlvmReturn tlvmRun(tlvmContext* context)
@@ -226,6 +235,16 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
 
     tlvmShort addr = address - pMem->m_Start;
     return &pMem->m_Buffer[addr];
+}
+
+tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte** outPort)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+    if(outPort == NULL)
+        tlvmReturnCode(INVALID_INPUT);
+    *outPort = &context->m_Ports[port];
+    tlvmReturnCode(SUCCESS);
 }
 
 // kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c

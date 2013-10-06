@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(Instructions, MOV, 0.0f,
+TEST_8080(Instructions, MOV, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -140,7 +140,7 @@ TEST_MOV_MEM_REG(C);
 TEST_MOV_MEM_REG(D);
 TEST_MOV_MEM_REG(E);
 TEST_MOV_MEM_REG(H);
-TEST(ML, MOV, 0.0f,
+TEST_8080(ML, MOV, 0.0f,
      {
       tlvmInitContext(&m_data.context);
       tlvmInit8080(m_data.context);

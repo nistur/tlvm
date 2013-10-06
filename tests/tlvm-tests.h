@@ -7,8 +7,14 @@ extern "C" {
 
 #include "testsuite/tests.h"
 
+#define TEST_8080(x, grp, t, init, cleanup, test, data) \
+  TEST(x, grp##_8080, t, init, cleanup, test, data)
+
+#define TEST_8231(x, grp, t, init, cleanup, test, data) \
+  TEST(x, grp##_8231, t, init, cleanup, test, data)
+
 #define TEST_MOV_REG_REG(to, from) \
-TEST(to##from, MOV, 0.0f, \
+TEST_8080(to##from, MOV, 0.0f, \
      { \
       tlvmInitContext(&m_data.context); \
       tlvmInit8080(m_data.context); \
@@ -33,7 +39,7 @@ TEST(to##from, MOV, 0.0f, \
     );
 
 #define TEST_MOV_REG_MEM(to) \
-TEST(to##M, MOV, 0.0f, \
+TEST_8080(to##M, MOV, 0.0f, \
      { \
       tlvmInitContext(&m_data.context); \
       tlvmInit8080(m_data.context); \
@@ -61,7 +67,7 @@ TEST(to##M, MOV, 0.0f, \
     );
 
 #define TEST_MOV_MEM_REG(from) \
-TEST(M##from, MOV, 0.0f, \
+TEST_8080(M##from, MOV, 0.0f, \
      { \
       tlvmInitContext(&m_data.context); \
       tlvmInit8080(m_data.context); \
@@ -87,5 +93,53 @@ TEST(M##from, MOV, 0.0f, \
       tlvmByte     memory[255]; \
      } \
     );
+
+#define STEP(x) \
+{ \
+  { x; } \
+  ASSERT(tlvmStep(m_data.context, NULL) == TLVM_SUCCESS); \
+}
+#define SET_HIGH_8231A(x) *cmd |=  TLVM_8231A_CMD_##x
+#define SET_LOW_8231A(x)  *cmd &= ~TLVM_8231A_CMD_##x
+
+#define WRITE_COMMAND_8231A(x) \
+{ \
+  STEP(SET_LOW_8231A(CS)); \
+  STEP(SET_HIGH_8231A(A0)); \
+  STEP(SET_LOW_8231A(WR)); \
+  while((*cmd & TLVM_8231A_CMD_READY)) \
+    STEP({}); \
+  STEP(*db = x); \
+  STEP(SET_HIGH_8231A(WR)); \
+  STEP(SET_LOW_8231A(A0)); \
+  STEP(SET_HIGH_8231A(CS)); \
+}
+
+#define WRITE_DATA_8231A(x) \
+{ \
+  STEP(SET_LOW_8231A(CS)); \
+  STEP(SET_LOW_8231A(A0)); \
+  STEP(SET_LOW_8231A(WR)); \
+  while((*cmd & TLVM_8231A_CMD_READY)) \
+    STEP({}); \
+  STEP(*db = x); \
+  STEP(SET_HIGH_8231A(WR)); \
+  STEP(SET_HIGH_8231A(A0)); \
+  STEP(SET_HIGH_8231A(CS)); \
+}
+
+#define READ_DATA_8231A(x) \
+{ \
+  STEP(SET_LOW_8231A(CS)); \
+  STEP(SET_LOW_8231A(A0)); \
+  STEP(SET_LOW_8231A(RD)); \
+  while((*cmd & TLVM_8231A_CMD_READY)) \
+    STEP({}); \
+  x = *db; \
+  STEP(SET_HIGH_8231A(RD)); \
+  STEP(SET_HIGH_8231A(A0)); \
+  STEP(SET_HIGH_8231A(CS)); \
+}
+
 
 #endif/*__TLVM_TESTS_H__*/

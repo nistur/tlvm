@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(ADI, ALU, 0.0f,
+TEST_8080(ADI, ALU, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);

@@ -3,7 +3,7 @@
 #include <string.h>
 
 // TODO: replace Hello world with more condense version
-TEST(HelloWorld, Smoke, 0.0f,
+TEST_8080(HelloWorld, Smoke, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -82,7 +82,7 @@ TEST(HelloWorld, Smoke, 0.0f,
 // This Hello World program is expected to run significantly slower than the above one
 // as it uses a couple of "slow" JMPs however it demonstrates a more concise and sane
 // program where all the data is together
-TEST(HelloWorld2, Smoke, 0.0f,
+TEST_8080(HelloWorld2, Smoke, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);

@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(NOP, Core, 0.0f,
+TEST_8080(NOP, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -28,7 +28,7 @@ TEST(NOP, Core, 0.0f,
      }
     );
 
-TEST(LXI, Core, 0.0f,
+TEST_8080(LXI, Core, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);

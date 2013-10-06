@@ -65,10 +65,13 @@
 }
 
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
+typedef tlvmReturn(*tlvmStepFunction)(tlvmContext*, tlvmByte*);
 
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
 tlvmBool tlvmParity(tlvmByte val);
+
+tlvmReturn tlvmStepInternal(tlvmContext* context, tlvmByte* cycles);
 
 /***************************************
  * Library context
@@ -95,6 +98,8 @@ struct _tlvmContext
 	tlvmShort  m_Clockspeed;
 
 	tlvmLong   m_StartTime;
+
+	tlvmStepFunction m_StepFunction;
 };
 
 struct _tlvmMemoryBuffer

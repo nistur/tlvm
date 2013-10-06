@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(InitTerminate, Basic, 0.0f,
+TEST_8080(InitTerminate, Basic, 0.0f,
      // initialisation
      {
       m_data.context = 0;
@@ -21,7 +21,7 @@ TEST(InitTerminate, Basic, 0.0f,
      }
     );
 
-TEST(SetMemory, Basic, 0.0f,
+TEST_8080(SetMemory, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -55,7 +55,7 @@ TEST(SetMemory, Basic, 0.0f,
      }
     );
 
-TEST(InstructionSet, Basic, 0.0f,
+TEST_8080(InstructionSet, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -92,7 +92,7 @@ TEST(InstructionSet, Basic, 0.0f,
      }
     );
 
-TEST(SetClockspeed, Basic, 0.0f,
+TEST_8080(SetClockspeed, Basic, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);

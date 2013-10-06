@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(SetClockspeed, Time, 0.0f,
+TEST_8080(SetClockspeed, Time, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -20,7 +20,7 @@ TEST(SetClockspeed, Time, 0.0f,
      }
     );
 
-TEST(Time, Time, 0.0f,
+TEST_8080(Time, Time, 0.0f,
      // initialisation
      {
       m_data.memory[0] = TLVM_NOP;

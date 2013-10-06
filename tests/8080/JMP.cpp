@@ -1,6 +1,6 @@
 #include "../tlvm-tests.h"
 
-TEST(Instructions, JMP, 0.0f,
+TEST_8080(Instructions, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -30,7 +30,7 @@ TEST(Instructions, JMP, 0.0f,
      }
     );
 
-TEST(JMP, JMP, 0.0f,
+TEST_8080(JMP, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -65,7 +65,7 @@ TEST(JMP, JMP, 0.0f,
      }
     );
 
-TEST(JNZ, JMP, 0.0f,
+TEST_8080(JNZ, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -107,7 +107,7 @@ TEST(JNZ, JMP, 0.0f,
      }
     );
 
-TEST(JZ, JMP, 0.0f,
+TEST_8080(JZ, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -149,7 +149,7 @@ TEST(JZ, JMP, 0.0f,
      }
     );
 
-TEST(JNC, JMP, 0.0f,
+TEST_8080(JNC, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -191,7 +191,7 @@ TEST(JNC, JMP, 0.0f,
      }
     );
 
-TEST(JC, JMP, 0.0f,
+TEST_8080(JC, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -233,7 +233,7 @@ TEST(JC, JMP, 0.0f,
      }
     );
 
-TEST(JPO, JMP, 0.0f,
+TEST_8080(JPO, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -275,7 +275,7 @@ TEST(JPO, JMP, 0.0f,
      }
     );
 
-TEST(JPE, JMP, 0.0f,
+TEST_8080(JPE, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -317,7 +317,7 @@ TEST(JPE, JMP, 0.0f,
      }
     );
 
-TEST(JP, JMP, 0.0f,
+TEST_8080(JP, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
@@ -359,7 +359,7 @@ TEST(JP, JMP, 0.0f,
      }
     );
 
-TEST(JM, JMP, 0.0f,
+TEST_8080(JM, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
