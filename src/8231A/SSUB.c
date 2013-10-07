@@ -1,7 +1,7 @@
 #ifdef  TLVM_HAS_8231A
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm8231ASADD(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvm8231ASSUB(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
@@ -12,7 +12,7 @@ tlvmReturn tlvm8231ASADD(tlvmContext* context, tlvmByte* cycles)
 	((tlvmByte*)&B)[1] = tlvm8231AStackPop(context);
 	((tlvmByte*)&A)[0] = tlvm8231AStackPop(context);
 	((tlvmByte*)&A)[1] = tlvm8231AStackPop(context);
-	tlvmShort R = A + B;
+	tlvmShort R = A - B;
 	tlvm8231AStackPush(context, ((tlvmByte*)&R)[1]);
 	tlvm8231AStackPush(context, ((tlvmByte*)&R)[0]);
 

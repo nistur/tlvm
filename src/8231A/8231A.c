@@ -17,7 +17,7 @@ tlvmReturn tlvmInit8231A(tlvmContext* context)
     // initialise the stack in the register space
     if(context->m_Registers)
         tlvmFree(context->m_Registers);
-    context->m_Registers = tlvmMallocArray(tlvmByte, 0x11);
+    context->m_Registers = tlvmMallocArray(tlvmByte, 0x13);
 
     // 8231A doesn't have any IO ports
     // but we will use 3 of them to represent our chip pins
@@ -49,7 +49,10 @@ tlvmReturn tlvmAdd8231AInstructions(tlvmContext* context)
         tlvmReturnCode(NO_CONTEXT);
 
     context->m_InstructionSet[TLVM_8231A_NOP] = tlvm8231ANOP;
+    context->m_InstructionSet[TLVM_8231A_POPS] = tlvm8231APOPS;
+    context->m_InstructionSet[TLVM_8231A_PTOS] = tlvm8231APTOS;
     context->m_InstructionSet[TLVM_8231A_SADD] = tlvm8231ASADD;
+    context->m_InstructionSet[TLVM_8231A_SSUB] = tlvm8231ASSUB;
 
     tlvmReturnCode(SUCCESS);
 }
@@ -59,56 +62,82 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
 
-    if(TLVM_8231A_PIN_LOW(CMD, CS) &&
-        //TLVM_8231A_PIN_HIGH(CMD, A0) &&
-        TLVM_8231A_PIN_LOW(CMD, WR) &&
-        TLVM_8231A_PIN_HIGH(CMD, READY))
+    // first, handle toggling CS pin
+    if(TLVM_8231A_PIN_HIGH(CMD, CS))
     {
-        TLVM_8231A_SET_PIN_LOW(CMD, READY);
-        if(cycles) *cycles = 1;
+        context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_ACTIVE;
     }
-    else if(TLVM_8231A_PIN_LOW(CMD, CS) &&
-        //TLVM_8231A_PIN_HIGH(CMD, A0) &&
-        TLVM_8231A_PIN_LOW(CMD, RD) &&
-        TLVM_8231A_PIN_HIGH(CMD, READY))
+    else if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_ACTIVE)
     {
-        TLVM_8231A_SET_PIN_LOW(CMD, READY);
-        if(cycles) *cycles = 1;
+        context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT;
+        tlvmReturnCode(SUCCESS);
     }
-    else if(TLVM_8231A_PIN_LOW(CMD, CS) &&
-        TLVM_8231A_PIN_HIGH(CMD, A0) &&
-        TLVM_8231A_PIN_LOW(CMD, WR) &&
-        TLVM_8231A_PIN_LOW(CMD, READY))
+
+    // if the chip is active, just perform normal execution
+    if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_ACTIVE)
     {
-        context->m_Registers[TLVM_8231A_COMMAND] = context->m_Ports[TLVM_8231A_PORT_DB];
-        TLVM_8231A_SET_PIN_HIGH(CMD, READY);
-        if(cycles) *cycles = 1;
+        if(context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]] != NULL)
+        {
+            context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]](context, cycles);
+            TLVM_8231A_SET_PIN_LOW(CMD, READY);
+            tlvmReturn();
+        }
+        else
+        {
+            tlvmReturnCode(UNKNOWN_INSTRUCTION);
+        }
     }
-    else if(TLVM_8231A_PIN_LOW(CMD, CS) &&
-        TLVM_8231A_PIN_LOW(CMD, A0) &&
-        TLVM_8231A_PIN_LOW(CMD, RD) &&
-        TLVM_8231A_PIN_LOW(CMD, READY))
+    else if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_WAIT)
     {
-        context->m_Ports[TLVM_8231A_PORT_DB] = tlvm8231AStackPop(context);
-        TLVM_8231A_SET_PIN_HIGH(CMD, READY);
-        if(cycles) *cycles = 1;
+        if(TLVM_8231A_PIN_LOW(CMD, RD))
+        {
+            context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT_READ;
+            TLVM_8231A_SET_PIN_LOW(CMD, READY);
+            tlvmReturnCode(SUCCESS);
+        }
+        else if(TLVM_8231A_PIN_LOW(CMD, WR))
+        {
+            if(TLVM_8231A_PIN_LOW(CMD, A0))
+            {
+                context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT_WRITE;
+            }
+            else
+            {
+                context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT_CMD;   
+            }
+            TLVM_8231A_SET_PIN_LOW(CMD, READY);
+            tlvmReturnCode(SUCCESS);
+        }
     }
-    else if(TLVM_8231A_PIN_LOW(CMD, CS) &&
-        TLVM_8231A_PIN_LOW(CMD, A0) &&
-        TLVM_8231A_PIN_LOW(CMD, WR) &&
-        TLVM_8231A_PIN_LOW(CMD, READY))
+    else if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_WAIT_READ)
     {
-        tlvm8231AStackPush(context, context->m_Ports[TLVM_8231A_PORT_DB]);
-        TLVM_8231A_SET_PIN_HIGH(CMD, READY);
-        if(cycles) *cycles = 1;
+        if(TLVM_8231A_PIN_HIGH(CMD, RD))
+        {
+            TLVM_8231A_SET_PIN_HIGH(CMD, READY);
+            context->m_Ports[TLVM_8231A_PORT_DB] = tlvm8231AStackPop(context);
+            context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT;
+        }
+        tlvmReturnCode(SUCCESS);
     }
-    else if(context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]] != NULL)
+    else if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_WAIT_WRITE)
     {
-        return context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]](context, cycles);
+        if(TLVM_8231A_PIN_HIGH(CMD, WR))
+        {
+            TLVM_8231A_SET_PIN_HIGH(CMD, READY);
+            tlvm8231AStackPush(context, context->m_Ports[TLVM_8231A_PORT_DB]);
+            context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT;
+        }
+        tlvmReturnCode(SUCCESS);
     }
-    else
+    else if(context->m_Registers[TLVM_8231A_STATE] == TLVM_8231A_STATE_WAIT_CMD)
     {
-        tlvmReturnCode(UNKNOWN_INSTRUCTION);
+        if(TLVM_8231A_PIN_HIGH(CMD, WR))
+        {
+            TLVM_8231A_SET_PIN_HIGH(CMD, READY);
+            context->m_Registers[TLVM_8231A_COMMAND] = context->m_Ports[TLVM_8231A_PORT_DB];
+            context->m_Registers[TLVM_8231A_STATE] = TLVM_8231A_STATE_WAIT;
+        }
+        tlvmReturnCode(SUCCESS);
     }
 
     tlvmReturnCode(SUCCESS);
@@ -119,6 +148,7 @@ void tlvm8231AStackPush(tlvmContext* context, tlvmByte val)
     if(context == NULL) return;
 
     context->m_StackPointer++;
+    printf("v");
 
     // wrap
     if(context->m_StackPointer > TLVM_8231A_STACK_END)
@@ -133,11 +163,13 @@ tlvmByte tlvm8231AStackPop(tlvmContext* context)
 
     tlvmByte val = context->m_Registers[context->m_StackPointer];
 
-    context->m_StackPointer--;
+    printf("^");
 
     // wrap
-    if(context->m_StackPointer < TLVM_8231A_STACK_START)
+    if(context->m_StackPointer == TLVM_8231A_STACK_START)
         context->m_StackPointer = TLVM_8231A_STACK_END;
+    else
+        context->m_StackPointer--;        
 
     return val;
 }

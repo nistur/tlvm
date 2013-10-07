@@ -110,9 +110,9 @@ TEST_8231(WriteCommand, Basic, 0.0f,
     STEP({});
 
   STEP(*db = 0x6C); // Random command
-  ASSERT(m_data.context->m_Registers[TLVM_8231A_COMMAND] == *db); // finally written it to the command buffer
 
   STEP(SET_HIGH_8231A(WR));
+  ASSERT(m_data.context->m_Registers[TLVM_8231A_COMMAND] == *db); // finally written it to the command buffer
   STEP(SET_LOW_8231A(A0));
   STEP(SET_HIGH_8231A(CS));
 },
@@ -142,9 +142,9 @@ TEST_8231(WriteData, Basic, 0.0f,
     STEP({});
 
   STEP(*db = 0x6E); // Random value
-  ASSERT(m_data.context->m_Registers[m_data.context->m_StackPointer] == *db); // finally written it to the command buffer
 
   STEP(SET_HIGH_8231A(WR));
+  ASSERT(m_data.context->m_Registers[m_data.context->m_StackPointer] == *db); // finally written it to the command buffer
   STEP(SET_HIGH_8231A(A0));
   STEP(SET_HIGH_8231A(CS));
 },
@@ -174,11 +174,49 @@ TEST_8231(ReadData, Basic, 0.0f,
   while((*cmd & TLVM_8231A_CMD_READY))
     STEP({});
 
-  ASSERT(*db == 0x6E); // Random value
-
   STEP(SET_HIGH_8231A(RD));
+  ASSERT(*db == 0x6E); // Random value
   STEP(SET_HIGH_8231A(A0));
   STEP(SET_HIGH_8231A(CS));
+},
+{
+  tlvmContext* context;
+})
+
+TEST_8231(Stack, Basic, 0.0f,
+{
+  tlvmInitContext(&m_data.context);
+  tlvmInit8231A(m_data.context);
+},
+{
+  tlvmTerminateContext(&m_data.context);
+},
+{
+  tlvmByte val = 55;
+  tlvm8231AStackPush(m_data.context, val);
+  ASSERT(m_data.context->m_Registers[m_data.context->m_StackPointer] == val);
+  tlvmByte res = tlvm8231AStackPop(m_data.context);
+  ASSERT(val == res);
+
+  // also, try pushing 2 16 bit numbers on and popping them off
+  tlvmShort A = 550;
+  tlvmShort B = 25;
+  // push A1 A0, B1, B0
+  tlvm8231AStackPush(m_data.context, ((tlvmByte*)&A)[1]);
+  tlvm8231AStackPush(m_data.context, ((tlvmByte*)&A)[0]);
+  tlvm8231AStackPush(m_data.context, ((tlvmByte*)&B)[1]);
+  tlvm8231AStackPush(m_data.context, ((tlvmByte*)&B)[0]);
+
+  tlvmShort resA = 0;
+  tlvmShort resB = 0;
+
+  // pop in reverse order, B0 B1, A0 A1
+  ((tlvmByte*)&resB)[0] = tlvm8231AStackPop(m_data.context);
+  ((tlvmByte*)&resB)[1] = tlvm8231AStackPop(m_data.context);
+  ((tlvmByte*)&resA)[0] = tlvm8231AStackPop(m_data.context);
+  ((tlvmByte*)&resA)[1] = tlvm8231AStackPop(m_data.context);
+
+  ASSERT(A == resA && B == resB);
 },
 {
   tlvmContext* context;

@@ -23,13 +23,24 @@
  * 0x0F
  * 0x10 flags
  * 0x11 command
+ * 0x12 state
  */
 
 #define TLVM_8231A_STACK_START 0x00
 #define TLVM_8231A_STACK_END   0x0F
 #define TLVM_8231A_REG_F       0x10
 #define TLVM_8231A_COMMAND     0x11
+#define TLVM_8231A_STATE       0x12
 
+
+/*********************************************
+ * States
+ *********************************************/
+#define TLVM_8231A_STATE_ACTIVE     0x00
+#define TLVM_8231A_STATE_WAIT       0x01
+#define TLVM_8231A_STATE_WAIT_READ  0x02
+#define TLVM_8231A_STATE_WAIT_WRITE 0x03
+#define TLVM_8231A_STATE_WAIT_CMD   0x04
 
 /*********************************************
  * Ports
@@ -80,10 +91,16 @@
  * Instructions
  *********************************************/ 
  #define TLVM_8231A_NOP   0x00
+ #define TLVM_8231A_POPS  0x78
+ #define TLVM_8231A_PTOS  0x77
  #define TLVM_8231A_SADD  0x6C
+ #define TLVM_8231A_SSUB  0x6D
 
 tlvmReturn tlvm8231ANOP (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvm8231APOPS(tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvm8231APTOS(tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm8231ASADD(tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvm8231ASSUB(tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * tlvmAdd8080

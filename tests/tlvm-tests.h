@@ -111,8 +111,10 @@ TEST_8080(M##from, MOV, 0.0f, \
     STEP({}); \
   STEP(*db = x); \
   STEP(SET_HIGH_8231A(WR)); \
+  ASSERT(m_data.context->m_Registers[TLVM_8231A_COMMAND] == x); \
   STEP(SET_LOW_8231A(A0)); \
   STEP(SET_HIGH_8231A(CS)); \
+  STEP({}); \
 }
 
 #define WRITE_DATA_8231A(x) \
