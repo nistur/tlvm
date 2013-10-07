@@ -44,11 +44,18 @@ TEST_8231(TEST, Smoke, 0.0f,
   WRITE_COMMAND_8231A(TLVM_8231A_SADD);
   PRINT_STACK(SADD);
   
-  READ_DATA_8231A(((tlvmByte*)&R)[0]);
+  tlvmByte RU = 0;
+  tlvmByte RL = 0;
+  READ_DATA_8231A(RL);
   PRINT_STACK(pop RL);
-  READ_DATA_8231A(((tlvmByte*)&R)[1]);
+  READ_DATA_8231A(RL);
+  PRINT_STACK(pop RL);
+  READ_DATA_8231A(RU);
   PRINT_STACK(pop RU);
-  
+
+  R = (tlvmShort)RU << 8 | (tlvmShort)RL;
+
+  printf("Huh: %d (%d %d)\n", R, RU, RL);
   ASSERT(R == 575);
 },
 {

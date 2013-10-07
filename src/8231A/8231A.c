@@ -28,7 +28,7 @@ tlvmReturn tlvmInit8231A(tlvmContext* context)
     context->m_StepFunction = tlvm8231Step;
     context->m_StackPointer = TLVM_8231A_STACK_START;
 
-    TLVM_8231A_SET_PIN_LOW(SVR,EACK);
+    TLVM_8231A_SET_PIN_HIGH(SVR,EACK);
     TLVM_8231A_SET_PIN_LOW(SVR,SVACK);
     TLVM_8231A_SET_PIN_LOW(SVR,SVREQ);
 
@@ -62,6 +62,15 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
 
+    if(TLVM_8231A_PIN_LOW(CMD, END))
+    {
+        if(TLVM_8231A_PIN_LOW(SVR, EACK))
+	{
+	    TLVM_8231A_SET_PIN_HIGH(CMD, END);
+	}
+	tlvmReturnCode(SUCCESS);
+    }
+
     // first, handle toggling CS pin
     if(TLVM_8231A_PIN_HIGH(CMD, CS))
     {
@@ -78,8 +87,9 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
     {
         if(context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]] != NULL)
         {
+	    
             context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]](context, cycles);
-            TLVM_8231A_SET_PIN_LOW(CMD, READY);
+            TLVM_8231A_SET_PIN_LOW(CMD, END);
             tlvmReturn();
         }
         else

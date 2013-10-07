@@ -41,6 +41,7 @@
 #define TLVM_8231A_STATE_WAIT_READ  0x02
 #define TLVM_8231A_STATE_WAIT_WRITE 0x03
 #define TLVM_8231A_STATE_WAIT_CMD   0x04
+#define TLVM_8231A_STATE_WAIT_END   0x05
 
 /*********************************************
  * Ports
