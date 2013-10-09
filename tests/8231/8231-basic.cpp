@@ -87,7 +87,7 @@ TEST_8231(GetDB, Basic, 0.0f,
 {
   tlvmContext* context;
 })
-
+#include <stdio.h>
 TEST_8231(WriteCommand, Basic, 0.0f,
 {
   tlvmInitContext(&m_data.context);
@@ -99,8 +99,10 @@ TEST_8231(WriteCommand, Basic, 0.0f,
 {
   tlvmByte* cmd = NULL;
   tlvmByte* db  = NULL;
+  tlvmByte* svr  = NULL;
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_CMD, &cmd);
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_DB, &db);
+  tlvmGetPort(m_data.context, TLVM_8231A_PORT_SVR, &svr);
 
   STEP(SET_LOW_8231A(CS));
   STEP(SET_HIGH_8231A(A0));
@@ -115,6 +117,12 @@ TEST_8231(WriteCommand, Basic, 0.0f,
   ASSERT(m_data.context->m_Registers[TLVM_8231A_COMMAND] == *db); // finally written it to the command buffer
   STEP(SET_LOW_8231A(A0));
   STEP(SET_HIGH_8231A(CS));
+  while((*cmd & TLVM_8231A_CMD_END))
+    STEP({});
+  STEP(SET_LOW_8231A_SVR(EACK));
+  while(!(*cmd & TLVM_8231A_CMD_END))
+    STEP({});
+  STEP(SET_HIGH_8231A_SVR(EACK));
 },
 {
   tlvmContext* context;
@@ -131,8 +139,10 @@ TEST_8231(WriteData, Basic, 0.0f,
 {
   tlvmByte* cmd = NULL;
   tlvmByte* db  = NULL;
+  tlvmByte* svr  = NULL;
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_CMD, &cmd);
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_DB, &db);
+  tlvmGetPort(m_data.context, TLVM_8231A_PORT_SVR, &svr);
 
   STEP(SET_LOW_8231A(CS));
   STEP(SET_LOW_8231A(A0));
@@ -163,8 +173,10 @@ TEST_8231(ReadData, Basic, 0.0f,
 {
   tlvmByte* cmd = NULL;
   tlvmByte* db  = NULL;
+  tlvmByte* svr  = NULL;
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_CMD, &cmd);
   tlvmGetPort(m_data.context, TLVM_8231A_PORT_DB, &db);
+  tlvmGetPort(m_data.context, TLVM_8231A_PORT_SVR, &svr);
 
   m_data.context->m_Registers[m_data.context->m_StackPointer] = 0x6E; // stick random value in the stack
   STEP(SET_LOW_8231A(CS));

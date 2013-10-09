@@ -99,8 +99,8 @@ TEST_8080(M##from, MOV, 0.0f, \
   { x; } \
   ASSERT(tlvmStep(m_data.context, NULL) == TLVM_SUCCESS); \
 }
-#define SET_HIGH_8231A_SVR(x) *svr |=  TLVM_8231A_CMD_##x
-#define SET_LOW_8231A_SVR(x)  *svr &= ~TLVM_8231A_CMD_##x
+#define SET_HIGH_8231A_SVR(x) *svr |=  TLVM_8231A_SVR_##x
+#define SET_LOW_8231A_SVR(x)  *svr &= ~TLVM_8231A_SVR_##x
 #define SET_HIGH_8231A(x) *cmd |=  TLVM_8231A_CMD_##x
 #define SET_LOW_8231A(x)  *cmd &= ~TLVM_8231A_CMD_##x
 
@@ -112,13 +112,16 @@ TEST_8080(M##from, MOV, 0.0f, \
   while((*cmd & TLVM_8231A_CMD_READY))				\
     STEP({});							\
   STEP(*db = x);						\
-  STEP(SET_HIGH_8231A(R));					\
+  STEP(SET_HIGH_8231A(WR));					\
   ASSERT(m_data.context->m_Registers[TLVM_8231A_COMMAND] == x); \
   STEP(SET_LOW_8231A(A0));					\
   STEP(SET_HIGH_8231A(CS));					\
-  while((*cmd | ~TLVM_8231A_CMD_END))				\
+  while((*cmd & TLVM_8231A_CMD_END))				\
     STEP({});							\
-  STEP(SET_LOW_8231A_SVR(EACK)));				\
+  STEP(SET_LOW_8231A_SVR(EACK));				\
+  while(!(*cmd & TLVM_8231A_CMD_END)) \
+    STEP({}); \
+  STEP(SET_HIGH_8231A_SVR(EACK)); \
  }
 
 #define WRITE_DATA_8231A(x) \
@@ -141,8 +144,8 @@ TEST_8080(M##from, MOV, 0.0f, \
   STEP(SET_LOW_8231A(RD)); \
   while((*cmd & TLVM_8231A_CMD_READY)) \
     STEP({}); \
-  x = *db; \
   STEP(SET_HIGH_8231A(RD)); \
+  x = *db; \
   STEP(SET_HIGH_8231A(A0)); \
   STEP(SET_HIGH_8231A(CS)); \
 }

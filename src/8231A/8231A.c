@@ -26,7 +26,9 @@ tlvmReturn tlvmInit8231A(tlvmContext* context)
     context->m_Ports = tlvmMallocArray(tlvmByte, 3);
 
     context->m_StepFunction = tlvm8231Step;
-    context->m_StackPointer = TLVM_8231A_STACK_START;
+    // start the stack at the end so that the first time
+    // we push, it will push onto the beginning
+    context->m_StackPointer = TLVM_8231A_STACK_END;
 
     TLVM_8231A_SET_PIN_HIGH(SVR,EACK);
     TLVM_8231A_SET_PIN_LOW(SVR,SVACK);
@@ -65,10 +67,13 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
     if(TLVM_8231A_PIN_LOW(CMD, END))
     {
         if(TLVM_8231A_PIN_LOW(SVR, EACK))
-	{
-	    TLVM_8231A_SET_PIN_HIGH(CMD, END);
-	}
-	tlvmReturnCode(SUCCESS);
+    	{
+    	    TLVM_8231A_SET_PIN_HIGH(CMD, END);
+            {
+                int x = 0;
+            }
+    	}
+	    tlvmReturnCode(SUCCESS);
     }
 
     // first, handle toggling CS pin
@@ -87,7 +92,8 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
     {
         if(context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]] != NULL)
         {
-	    
+            if(context->m_Registers[TLVM_8231A_COMMAND] == TLVM_8231A_NOP)
+                tlvmReturnCode(SUCCESS);
             context->m_InstructionSet[context->m_Registers[TLVM_8231A_COMMAND]](context, cycles);
             TLVM_8231A_SET_PIN_LOW(CMD, END);
             tlvmReturn();
@@ -158,7 +164,6 @@ void tlvm8231AStackPush(tlvmContext* context, tlvmByte val)
     if(context == NULL) return;
 
     context->m_StackPointer++;
-    printf("v");
 
     // wrap
     if(context->m_StackPointer > TLVM_8231A_STACK_END)
@@ -172,8 +177,6 @@ tlvmByte tlvm8231AStackPop(tlvmContext* context)
     if(context == NULL) return 0;
 
     tlvmByte val = context->m_Registers[context->m_StackPointer];
-
-    printf("^");
 
     // wrap
     if(context->m_StackPointer == TLVM_8231A_STACK_START)
