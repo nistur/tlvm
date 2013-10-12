@@ -55,6 +55,7 @@ tlvmReturn tlvmAdd8231AInstructions(tlvmContext* context)
     context->m_InstructionSet[TLVM_8231A_PTOS] = tlvm8231APTOS;
     context->m_InstructionSet[TLVM_8231A_SADD] = tlvm8231ASADD;
     context->m_InstructionSet[TLVM_8231A_SSUB] = tlvm8231ASSUB;
+    context->m_InstructionSet[TLVM_8231A_SDIV] = tlvm8231ASDIV;
 
     tlvmReturnCode(SUCCESS);
 }

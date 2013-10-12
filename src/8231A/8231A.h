@@ -96,12 +96,14 @@
  #define TLVM_8231A_PTOS  0x77
  #define TLVM_8231A_SADD  0x6C
  #define TLVM_8231A_SSUB  0x6D
+ #define TLVM_8231A_SDIV  0x6F
 
 tlvmReturn tlvm8231ANOP (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm8231APOPS(tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm8231APTOS(tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm8231ASADD(tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm8231ASSUB(tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvm8231ASDIV(tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * tlvmAdd8080
