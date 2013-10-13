@@ -1,6 +1,8 @@
 #include "../tlvm-tests.h"
 #include <stdio.h>
 
+#include <pthread.h>
+
 #define START_PROGRAM() int _programCounter = 0;
 // technically we don't need the address here, as the program counter
 // handles that, but if we ommit it, it's very difficult to work out
@@ -13,7 +15,12 @@
   _programCounter++; \
 }
 
-TEST_8231(SADD, Smoke, 0.0f,
+void* processor_thread(void* data)
+{
+  tlvmRun((tlvmContext*)data);
+}
+
+TEST_8231(SADD, Smoke, 0.1f,
 {
   tlvmInitContext(&m_data.CPU);
   tlvmInitContext(&m_data.APU);
@@ -204,6 +211,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x0000, TLVM_JMP); // JMP MAIN
   NEXT(0x0001, 0xF7);
   NEXT(0x0002, 0x00);
+
   NEXT(0x0003, TLVM_PUSH_B); // SET_LOW
   NEXT(0x0004, TLVM_PUSH_PSW);
   NEXT(0x0005, TLVM_MVI_A);
@@ -216,12 +224,14 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x000C, TLVM_POP_PSW);
   NEXT(0x000D, TLVM_POP_B);
   NEXT(0x000E, TLVM_RET);
+
   NEXT(0x000F, TLVM_PUSH_PSW); // SET_HIGH
   NEXT(0x0010, TLVM_MOV_AM);
   NEXT(0x0011, TLVM_ORA_B);
   NEXT(0x0012, TLVM_MOV_MA);
   NEXT(0x0013, TLVM_POP_PSW);
   NEXT(0x0014, TLVM_RET);
+
   NEXT(0x0015, TLVM_PUSH_B); // WAIT_FOR_LOW
   NEXT(0x0016, TLVM_PUSH_PSW);
   NEXT(0x0017, TLVM_MOV_BA);
@@ -233,6 +243,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x001D, TLVM_POP_PSW);
   NEXT(0x001E, TLVM_POP_B);
   NEXT(0x001F, TLVM_RET);
+
   NEXT(0x0020, TLVM_PUSH_B); // WAIT_FOR_HIGH
   NEXT(0x0021, TLVM_MOV_BA);
   NEXT(0x0022, TLVM_PUSH_PSW);
@@ -244,6 +255,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x0028, TLVM_POP_PSW);
   NEXT(0x0029, TLVM_POP_B);
   NEXT(0x002A, TLVM_RET);
+
   NEXT(0x002B, TLVM_PUSH_PSW); // START_WRITE_DATA
   NEXT(0x002C, TLVM_PUSH_H);
   NEXT(0x002D, TLVM_LXI_H);
@@ -272,6 +284,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x0044, TLVM_POP_H);
   NEXT(0x0045, TLVM_POP_PSW);
   NEXT(0x0046, TLVM_RET);
+
   NEXT(0x0047, TLVM_PUSH_PSW); // START_WRITE_CMD
   NEXT(0x0048, TLVM_PUSH_H);
   NEXT(0x0049, TLVM_LXI_H);
@@ -300,6 +313,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x0060, TLVM_POP_H);
   NEXT(0x0061, TLVM_POP_PSW);
   NEXT(0x0062, TLVM_RET); 
+
   NEXT(0x0063, TLVM_PUSH_PSW); // END_WRITE_DATA
   NEXT(0x0064, TLVM_PUSH_H);
   NEXT(0x0065, TLVM_LXI_H);
@@ -323,6 +337,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x0077, TLVM_POP_H);
   NEXT(0x0078, TLVM_POP_PSW);
   NEXT(0x0079, TLVM_RET);
+
   NEXT(0x007A, TLVM_PUSH_PSW); // END_WRITE_CMD
   NEXT(0x007B, TLVM_PUSH_H);
   NEXT(0x007C, TLVM_LXI_H);
@@ -375,6 +390,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x00AB, TLVM_POP_H);
   NEXT(0x00AC, TLVM_POP_PSW);
   NEXT(0x00AD, TLVM_RET);
+
   NEXT(0x00AE, TLVM_PUSH_PSW); // WRITE
   NEXT(0x00AF, TLVM_MOV_AC);
   NEXT(0x00B0, TLVM_CPI);
@@ -404,6 +420,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x00C8, 0x00);
   NEXT(0x00C9, TLVM_POP_PSW);
   NEXT(0x00CA, TLVM_RET);
+
   NEXT(0x00CB, TLVM_PUSH_H); // READ
   NEXT(0x00CC, TLVM_LXI_H);
   NEXT(0x00CD, 0x02);
@@ -448,6 +465,7 @@ TEST_8231(SADD, Smoke, 0.0f,
   NEXT(0x00F4, 0x00);
   NEXT(0x00F5, TLVM_POP_H);
   NEXT(0x00F6, TLVM_RET);
+
   NEXT(0x00F7, TLVM_STA); // MAIN
   NEXT(0x00F8, 0xFF);
   NEXT(0x00F9, 0x01);
@@ -493,7 +511,14 @@ TEST_8231(SADD, Smoke, 0.0f,
   tlvmTerminateContext(&m_data.APU);
 },
 {
-  tlvmRun(m_data.CPU);
+  // spin up the APU thread
+  pthread_t apu;
+  pthread_create(&apu, NULL, processor_thread, m_data.APU);
+  //tlvmRun(m_data.CPU);
+  pthread_cancel(apu);
+  tlvmByte* output = NULL;
+  ASSERT(tlvmGetPort(m_data.CPU, 1, &output) == TLVM_SUCCESS);
+  ASSERT(*output == 99); // value not correct, but currently doesn't run so...
 },
 {
   tlvmContext* CPU;

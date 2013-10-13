@@ -1,6 +1,6 @@
 solution "tlvm"
 language "C++"
-configurations { "Debug", "Release" }
+configurations { "Debug", "DebugNoTest", "Release" }
 includedirs { "include", "src/include" }
 files { "include/**.h" }
 
@@ -10,6 +10,11 @@ defines { "TLVM_BUILD" }
 defines { "TLVM_HAS_8080", "TLVM_HAS_8231A" }
 
 configuration "Debug"
+defines { "DEBUG" }
+flags { "Symbols" }
+targetdir "build/debug"
+
+configuration "DebugNoTest"
 defines { "DEBUG" }
 flags { "Symbols" }
 targetdir "build/debug"
@@ -34,7 +39,7 @@ files { "src/**.c", "src/**.cpp" }
 project "tests"
 kind "ConsoleApp"
 files { "tests/**.cpp" }
-links { "tlvm" }
+links { "tlvm", "pthread" }
 defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
 configuration "Debug"
 postbuildcommands("build/debug/tests")

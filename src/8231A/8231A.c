@@ -70,9 +70,6 @@ tlvmReturn tlvm8231Step(tlvmContext* context, tlvmByte* cycles)
         if(TLVM_8231A_PIN_LOW(SVR, EACK))
     	{
     	    TLVM_8231A_SET_PIN_HIGH(CMD, END);
-            {
-                int x = 0;
-            }
     	}
 	    tlvmReturnCode(SUCCESS);
     }
