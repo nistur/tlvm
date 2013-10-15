@@ -30,7 +30,7 @@ tlvmReturn tlvmSleepUntil(tlvmContext* context, tlvmLong cycles)
 		tlvmReturnCode(INVALID_INPUT);
 
 	tlvmLong time = tlvmGetTime();
-	tlvmLong dt = time - context->m_StartTime;
+	tlvmLong dt = time - context->m_StartTime - context->m_TimeOffset;
 	tlvmLong mhz = context->m_Clockspeed >> 10;
 	tlvmLong khz = context->m_Clockspeed & 0x3FF;
 
@@ -46,6 +46,26 @@ tlvmReturn tlvmSleepUntil(tlvmContext* context, tlvmLong cycles)
 
 	if(desiredTime > 0)
 		usleep(desiredTime);
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmPauseClock(tlvmContext* context)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	context->m_TimeOffset -= tlvmGetTime();
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmResumeClock(tlvmContext* context)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	context->m_TimeOffset += tlvmGetTime();
 
 	tlvmReturnCode(SUCCESS);
 }

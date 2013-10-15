@@ -109,6 +109,11 @@ typedef struct _tlvmContext tlvmContext;
 #include "tlvm_8080.h"
 
 /*********************************************
+ * TLVM DEBUGGER SUPPORT
+ *********************************************/
+#include "tlvm_debug.h"
+
+/*********************************************
  * tlvmInitContext
  *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context);

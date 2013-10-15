@@ -9,4 +9,8 @@ tlvmReturn tlvmResetClock(tlvmContext* context);
 
 tlvmReturn tlvmSleepUntil(tlvmContext* context, tlvmLong cycles);
 
+tlvmReturn tlvmPauseClock(tlvmContext* context);
+
+tlvmReturn tlvmResumeClock(tlvmContext* context);
+
 #endif/*__TLVM_TIME_H__*/

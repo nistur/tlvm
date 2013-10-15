@@ -150,6 +150,10 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);
 
+#ifdef  TLVM_DEBUG
+    tlvmDebugCheck(context);
+#endif/*TLVM_DEBUG*/
+
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);
     if(opcode == NULL)
         tlvmReturnCode(INVALID_INPUT);

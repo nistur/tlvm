@@ -4,6 +4,7 @@
 
 #include "tlvm.h"
 #include "tlvm_time.h"
+#include "tlvm_debug_internal.h"
 
 #include "../8080/8080.h"
 
@@ -94,6 +95,13 @@ struct _tlvmContext
 	tlvmShort  m_Clockspeed;
 
 	tlvmLong   m_StartTime;
+
+	tlvmLong   m_TimeOffset;
+
+#ifdef  TLVM_DEBUG
+	tlvmDebugBreakpoint* 	m_Breakpoints;
+	tlvmByte				m_DebugState;
+#endif/*TLVM_DEBUG*/
 };
 
 struct _tlvmMemoryBuffer
