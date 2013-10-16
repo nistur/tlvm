@@ -18,7 +18,11 @@ struct Memory
 struct State
 {
 	Memory* memory;
+
+	bool    quit;
 };
+
+State g_state;
 
 char* loadFile(string filename, int& filesize)
 {
@@ -55,10 +59,67 @@ int parseAddress(string str)
 	return addr;
 }
 
-void breakpoint(tlvmByte message, tlvmShort addr)
+#define HANDLE_INPUT_START() \
+while(true) \
+{ \
+	string val; \
+	cout << "> "; \
+	cin >> val;
+
+#define HANDLE_INPUT_END() \
+}
+
+#define HANDLE_INPUT_OPTION(opt, shortopt) \
+if(val == #opt || val == #shortopt)
+
+void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 {
-	cout << "Breakpoint " << addr << endl;
-	while(1);
+	tlvmChar* instruction = new tlvmChar[256];
+	instruction[0] = 0;
+	tlvmDebugGetInstruction(context, &instruction);
+	printf("0x%x\t%s\n", addr, instruction);
+	delete[] instruction;
+
+	HANDLE_INPUT_START();
+		HANDLE_INPUT_OPTION(step, s)
+		{
+			tlvmDebugStep(context, breakpoint);
+			return;
+		}
+		HANDLE_INPUT_OPTION(continue, c)
+		{
+			tlvmDebugContinue(context);
+			return;
+		}
+		HANDLE_INPUT_OPTION(quit, q)
+		{
+			cout << "Program is still running, are you sure? yes/no: ";
+			while(true)
+			{
+				string confirm;
+				cin >> confirm;
+				if(confirm == "yes")
+				{
+					g_state.quit = true;
+					return;
+				}
+				else if(confirm == "no")
+				{
+					break;
+				}
+				else
+				{
+					cout << "Please answer yes or no: ";
+				}
+			}
+		}
+		HANDLE_INPUT_OPTION(breakpoint, b)
+		{
+			string address;
+			cin >> address;
+			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
+		}
+	HANDLE_INPUT_END();
 }
 
 /* 8080 Debugger
@@ -70,23 +131,18 @@ void breakpoint(tlvmByte message, tlvmShort addr)
  */
 int main(int argc, char** argv)
 {
-	State state;
-	state.memory = NULL;
+	g_state.memory = NULL;
+	g_state.quit = false;
 
 	tlvmContext* context;
 	tlvmInitContext(&context);
 	tlvmInit8080(context);
 	tlvmSetClockspeed(context, TLVM_MHZ(2,0));
-	while(true)
-	{
-		string val;
-		cout << "> ";
-		cin >> val;
-		if(val == "q" || val == "quit")
-		{
+
+	HANDLE_INPUT_START();
+		HANDLE_INPUT_OPTION(quit, q)
 			break;
-		}
-		if(val == "f" || val == "file")
+		HANDLE_INPUT_OPTION(file, f)
 		{
 			string filename;
 			string addressStr;
@@ -107,29 +163,37 @@ int main(int argc, char** argv)
 				mem->buffer = file;
 				mem->buffersize = size;
 				mem->address = address;
-				if(state.memory == NULL)
-					state.memory = mem;
+				if(g_state.memory == NULL)
+					g_state.memory = mem;
 				else
 				{
-					Memory* prev = state.memory;
+					Memory* prev = g_state.memory;
 					while(prev->next != NULL) prev = prev->next;
 					prev->next = mem;
 				}
+
+				printf("Loaded file %s into memory at 0x%x\n", filename.c_str(), address);
 			}
 		}
-		if(val == "r" || val == "run")
+		HANDLE_INPUT_OPTION(run, r)
 		{
-			tlvmRun(context);
+			tlvmReturn ret = tlvmRun(context);
+			if(g_state.quit)
+			{
+				break;
+			}
+			cout << "Program quit with code: " << ret << endl;
 		}
-		if(val == "b" || val == "break" || val == "breakpoint")
+		HANDLE_INPUT_OPTION(breakpoint, b)
 		{
 			string address;
 			cin >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
 		}
-	}
+	HANDLE_INPUT_END();
 
-	Memory* mem = state.memory;
+	// Remove all the memory allocated
+	Memory* mem = g_state.memory;
 	while(mem)
 	{
 		Memory* next = mem->next;

@@ -101,6 +101,7 @@ struct _tlvmContext
 #ifdef  TLVM_DEBUG
 	tlvmDebugBreakpoint* 	m_Breakpoints;
 	tlvmByte				m_DebugState;
+	tlvmDebugCallbackFn     m_StepCallback;
 #endif/*TLVM_DEBUG*/
 };
 

@@ -8,8 +8,9 @@
 #endif
 
 #define TLVM_DEBUG_BREAKPOINT 0x00
+#define TLVM_DEBUG_STEP       0x01
 
-typedef void(*tlvmDebugCallbackFn)(tlvmByte message, tlvmShort addr);
+typedef void(*tlvmDebugCallbackFn)(tlvmContext* context, tlvmByte message, tlvmShort addr);
 
 /*********************************************
  * tlvmDebugAddBreakpoint
@@ -26,7 +27,15 @@ typedef void(*tlvmDebugCallbackFn)(tlvmByte message, tlvmShort addr);
  *     callback - the function to call when
  *  the breakpoint is hit
  *********************************************/
-TLVM_EXPORT tlvmReturn  tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback);
+TLVM_EXPORT tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback);
+
+TLVM_EXPORT tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback);
+
+TLVM_EXPORT tlvmReturn tlvmDebugContinue(tlvmContext* context);
+
+TLVM_EXPORT tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction);
+
+TLVM_EXPORT tlvmReturn tlvmDebugHalt(tlvmContext* context);
 
 #endif/*TLVM_DEBUG*/
 

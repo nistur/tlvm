@@ -26,22 +26,80 @@ tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebu
 	tlvmReturnCode(SUCCESS);
 }
 
+tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	// for now, we only have the 8080
+	return tlvm8080DebugGetInstruction(context, instuction);
+}
+
+tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	context->m_StepCallback = callback;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmDebugContinue(tlvmContext* context)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	context->m_StepCallback = NULL;
+	context->m_DebugState = TLVM_DEBUG_STATE_RUN;
+
+	tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvmDebugHalt(tlvmContext* context)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	context->m_DebugState = TLVM_DEBUG_STATE_HALT;
+
+	tlvmReturnCode(SUCCESS);	
+}
+
 tlvmReturn tlvmDebugCheck(tlvmContext* context)
 {
 	if(context == NULL)
 		tlvmReturnCode(NO_CONTEXT);
 
 	tlvmPauseClock(context);
-
-	tlvmDebugBreakpoint* breakpoint = context->m_Breakpoints;
-	while(breakpoint)
+	if(context->m_DebugState == TLVM_DEBUG_STATE_BREAK)
 	{
-		if(breakpoint->m_Address == context->m_ProgramCounter)
+		if(context->m_StepCallback != NULL)
 		{
-			context->m_DebugState = TLVM_DEBUG_STATE_BREAK;
-			breakpoint->m_Callback(TLVM_DEBUG_BREAKPOINT, breakpoint->m_Address);
+			context->m_StepCallback(context, TLVM_DEBUG_STEP, context->m_ProgramCounter);
 		}
-		breakpoint = breakpoint->m_Next;
+		else
+		{
+			context->m_DebugState = TLVM_DEBUG_STATE_RUN;
+		}
+	}
+	else if(context->m_DebugState == TLVM_DEBUG_STATE_RUN)
+	{
+		tlvmDebugBreakpoint* breakpoint = context->m_Breakpoints;
+		while(breakpoint)
+		{
+			if(breakpoint->m_Address == context->m_ProgramCounter)
+			{
+				context->m_DebugState = TLVM_DEBUG_STATE_BREAK;
+				breakpoint->m_Callback(context, TLVM_DEBUG_BREAKPOINT, breakpoint->m_Address);
+			}
+			breakpoint = breakpoint->m_Next;
+		}
+	}
+	else if(context->m_DebugState == TLVM_DEBUG_STATE_HALT)
+	{
+		tlvmResumeClock(context); // make sure the clock doesn't stay paused
+		tlvmReturnCode(EXIT);
 	}
 
 	tlvmResumeClock(context);

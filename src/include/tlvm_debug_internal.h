@@ -5,6 +5,7 @@
 
 #define TLVM_DEBUG_STATE_RUN 	0x00
 #define TLVM_DEBUG_STATE_BREAK	0x01
+#define TLVM_DEBUG_STATE_HALT   0xFF
 
 typedef struct _tlvmDebugBreakpoint
 {

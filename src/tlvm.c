@@ -151,7 +151,8 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
         tlvmReturnCode(NO_CONTEXT);
 
 #ifdef  TLVM_DEBUG
-    tlvmDebugCheck(context);
+    if(tlvmDebugCheck(context) != TLVM_SUCCESS)
+        tlvmReturn();
 #endif/*TLVM_DEBUG*/
 
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);
