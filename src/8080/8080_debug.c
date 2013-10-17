@@ -18,7 +18,17 @@ if(opcode == TLVM_##op) \
 if(opcode == TLVM_##op) \
 { \
 	TLVM_GET_OP(operand, 1); \
-	sprintf((char*)*instruction, "%s 0x%x", instr, operand); \
+	sprintf((char*)*instruction, "%s 0x%02x", instr, operand); \
+	tlvmReturnCode(SUCCESS); \
+}
+
+#define TLVM_DEBUG_16BIT_OP(op, instr) \
+if(opcode == TLVM_##op) \
+{ \
+	TLVM_GET_OP(opLow, 1); \
+	TLVM_GET_OP(opHigh, 2); \
+	tlvmShort operand = (tlvmShort)opHigh << 8 | (tlvmShort)opLow; \
+	sprintf((char*)*instruction, "%s 0x%04x", instr, operand); \
 	tlvmReturnCode(SUCCESS); \
 }
 
@@ -110,6 +120,10 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
     TLVM_DEBUG_8BIT_OP(MVI_L, "MVI L");
     TLVM_DEBUG_8BIT_OP(MVI_M, "MVI M");
     TLVM_DEBUG_8BIT_OP(MVI_A, "MVI A");
+
+    TLVM_DEBUG_16BIT_OP(LXI_B, "LXI B");
+    TLVM_DEBUG_16BIT_OP(LXI_D, "LXI D");
+    TLVM_DEBUG_16BIT_OP(LXI_H, "LXI H");
 
     sprintf((char*)*instruction, "UNKNOWN");
     tlvmReturnCode(UNKNOWN_INSTRUCTION);
