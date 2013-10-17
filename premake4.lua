@@ -42,7 +42,7 @@ postbuildcommands("build/debug/tests")
 configuration "Release"
 postbuildcommands("build/release/tests")
 
-project "8080-dbg"
+project "tlvm-dbg"
 language "C++"
 kind "ConsoleApp"
 files { "dbg/**.cpp" }
