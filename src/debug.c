@@ -66,6 +66,27 @@ tlvmReturn tlvmDebugHalt(tlvmContext* context)
 	tlvmReturnCode(SUCCESS);	
 }
 
+tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst)
+{
+	tlvmByte* target = *dst;
+	tlvmShort address;
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	if(dst == NULL)
+		tlvmReturnCode(NO_MEMORY);
+	for(address = addr; address != addr + size; ++addr)
+	{
+		tlvmByte* mem = tlvmGetMemory(context, address, TLVM_FLAG_READ);
+		if(mem == NULL)
+			tlvmReturnCode(INVALID_INPUT);
+		*target = *mem;
+		target++;
+	}
+
+	tlvmReturnCode(SUCCESS);
+}
+
 tlvmReturn tlvmDebugCheck(tlvmContext* context)
 {
 	if(context == NULL)

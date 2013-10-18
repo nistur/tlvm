@@ -35,6 +35,8 @@ TLVM_EXPORT tlvmReturn tlvmDebugContinue(tlvmContext* context);
 
 TLVM_EXPORT tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction);
 
+TLVM_EXPORT tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst);
+
 TLVM_EXPORT tlvmReturn tlvmDebugHalt(tlvmContext* context);
 
 #endif/*TLVM_DEBUG*/

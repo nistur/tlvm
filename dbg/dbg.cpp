@@ -119,6 +119,28 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 			cin >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
 		}
+		HANDLE_INPUT_OPTION(print, p)
+		{
+			string addressStr;
+			string sizeStr;
+			tlvmShort address, size;
+			tlvmByte* mem;
+			int iMem;
+
+			cin >> addressStr;
+			cin >> sizeStr;
+
+			address = parseAddress(addressStr);
+			size = parseAddress(sizeStr);
+			mem = new tlvmByte[size];
+			tlvmDebugGetMemory(context, address, size, &mem);
+			for(iMem = 0; iMem < size; ++iMem)
+			{
+				printf("0x%02x%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
+			}
+			cout << endl;
+			delete [] mem;
+		}
 	HANDLE_INPUT_END();
 }
 
@@ -196,6 +218,13 @@ int main(int argc, char** argv)
 		}
 		HANDLE_INPUT_OPTION(continue, c)
 		{
+			cout << "Program not running" << endl;
+		}
+		HANDLE_INPUT_OPTION(print, p)
+		{
+			string dummy;
+			cin >> dummy; 
+			cin >> dummy;
 			cout << "Program not running" << endl;
 		}
 	HANDLE_INPUT_END();
