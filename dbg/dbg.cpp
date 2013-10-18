@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 					prev->next = mem;
 				}
 
-				printf("Loaded file %s into memory at 0x%x\n", filename.c_str(), address);
+				printf("Loaded file %s into memory at 0x%04x\n", filename.c_str(), address);
 			}
 		}
 		HANDLE_INPUT_OPTION(run, r)
@@ -189,6 +189,14 @@ int main(int argc, char** argv)
 			string address;
 			cin >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
+		}
+		HANDLE_INPUT_OPTION(step, s)
+		{
+			cout << "Program not running" << endl;
+		}
+		HANDLE_INPUT_OPTION(continue, c)
+		{
+			cout << "Program not running" << endl;
 		}
 	HANDLE_INPUT_END();
 
