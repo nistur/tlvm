@@ -21,6 +21,10 @@ tlvmReturn tlvmInit8080(tlvmContext* context)
         tlvmFree(context->m_Ports);
     context->m_Ports = tlvmMallocArray(tlvmByte, 255);
 
+    if(context->m_ProcessorData)
+        tlvmFree(context->m_ProcessorData);
+    context->m_ProcessorData = (tlvmProcessorData*)tlvmMalloc(tlvm8080data);
+
     return tlvmAdd8080Instructions(context);
 }
 tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
@@ -311,6 +315,26 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
         if(context->m_InstructionSet[i] != NULL)
         t++;
 
+    tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+
+    ((tlvm8080data*)context->m_ProcessorData)->m_IOCallback = callback;
+
+    tlvmReturnCode(SUCCESS);
+}
+
+tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+    if(outPort == NULL)
+        tlvmReturnCode(INVALID_INPUT);
+    *outPort = context->m_Ports[port];
     tlvmReturnCode(SUCCESS);
 }
 

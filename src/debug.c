@@ -87,6 +87,28 @@ tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort si
 	tlvmReturnCode(SUCCESS);
 }
 
+tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+
+	return tlvm8080DebugParseRegister(context, regstr, outreg);
+}
+
+tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* outval)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+	if(outval == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+	if(context->m_Registers == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+
+	*outval = context->m_Registers[regid];
+
+	tlvmReturnCode(SUCCESS);
+}
+
 tlvmReturn tlvmDebugCheck(tlvmContext* context)
 {
 	if(context == NULL)

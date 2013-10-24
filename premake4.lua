@@ -46,5 +46,5 @@ project "tlvm-dbg"
 language "C++"
 kind "ConsoleApp"
 files { "dbg/**.cpp" }
-links { "tlvm" }
+links { "tlvm", "pthread" }
 defines { "TLVM_DEBUG" }

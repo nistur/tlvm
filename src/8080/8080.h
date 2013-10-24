@@ -386,7 +386,15 @@ tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
  *     context - the CPU context to add 8080 
  *     support to
  *********************************************/
-TLVM_EXPORT tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
+tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
+
+tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
+
+typedef struct _tlvm8080data
+{
+	tlvmProcessorData m_Header;
+	tlvm8080IOCallback m_IOCallback;
+} tlvm8080data;
 
 #endif/*TLVM_HAS_8080*/
 #endif/*__8080_H__*/

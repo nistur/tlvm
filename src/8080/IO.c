@@ -16,6 +16,10 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
+	tlvm8080data* data = (tlvm8080data*)context->m_ProcessorData;
+	if(data != NULL && data->m_IOCallback != NULL)
+		data->m_IOCallback(context, dest);
+
 	tlvmReturnCode(SUCCESS);
 }
 

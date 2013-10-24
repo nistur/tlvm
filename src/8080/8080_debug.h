@@ -6,6 +6,8 @@
 
 tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction);
 
+tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg);
+
 #endif/*TLVM_DEBUG*/
 #endif/*TLVM_HAS_8080*/
 

@@ -29,13 +29,37 @@ typedef void(*tlvmDebugCallbackFn)(tlvmContext* context, tlvmByte message, tlvmS
  *********************************************/
 TLVM_EXPORT tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback);
 
+/*********************************************
+ * tlvmDebugStep
+ *     Mark the currently running context to
+ *  step through the instructions. This will
+ *  usually be called from with a breakpoint
+ *  callback just before it returns.
+ * parameters:
+ *     context - the CPU we're stepping through
+ *     callback - the function to call when
+ *  the next instruction is ready
+ *********************************************/
 TLVM_EXPORT tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback);
 
+/*********************************************
+ * tlvmDebugContinue
+ *     Mark the currently running context to
+ *  step through the instructions. This will
+ *  usually be called from with a breakpoint
+ *  callback just before it returns.
+ * parameters:
+ *     context - the CPU we're debugging
+ *********************************************/
 TLVM_EXPORT tlvmReturn tlvmDebugContinue(tlvmContext* context);
 
 TLVM_EXPORT tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction);
 
 TLVM_EXPORT tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst);
+
+TLVM_EXPORT tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* outval);
+
+TLVM_EXPORT tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg);
 
 TLVM_EXPORT tlvmReturn tlvmDebugHalt(tlvmContext* context);
 

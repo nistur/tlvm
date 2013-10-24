@@ -32,6 +32,16 @@ if(opcode == TLVM_##op) \
 	tlvmReturnCode(SUCCESS); \
 }
 
+#define TLVM_DEBUG_REG(reg) \
+(strcmp((const char*)regstr, #reg) == 0)
+
+#define TLVM_DEBUG_CHECK_REG(reg) \
+if(TLVM_DEBUG_REG(reg)) \
+{ \
+	*outreg = TLVM_REG_##reg; \
+	tlvmReturnCode(SUCCESS); \
+}
+
 tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction)
 {
 	if(context == NULL)
@@ -281,6 +291,25 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
 	TLVM_DEBUG_SIMPLE_OP(RST_7, "RST 7");
 
     sprintf((char*)*instruction, "UNKNOWN");
+    tlvmReturnCode(UNKNOWN_INSTRUCTION);
+}
+
+tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
+{
+	if(context == NULL)
+		tlvmReturnCode(NO_CONTEXT);
+	if(outreg == NULL)
+		tlvmReturnCode(INVALID_INPUT);
+
+	TLVM_DEBUG_CHECK_REG(B);
+	TLVM_DEBUG_CHECK_REG(C);
+	TLVM_DEBUG_CHECK_REG(D);
+	TLVM_DEBUG_CHECK_REG(E);
+	TLVM_DEBUG_CHECK_REG(H);
+	TLVM_DEBUG_CHECK_REG(L);
+	TLVM_DEBUG_CHECK_REG(A);
+	TLVM_DEBUG_CHECK_REG(F);
+
     tlvmReturnCode(UNKNOWN_INSTRUCTION);
 }
 

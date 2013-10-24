@@ -1,6 +1,7 @@
 #include <tlvm.h>
 
 #include <iostream>
+#include <pthread.h>
 
 using std::cout;
 using std::cin;
@@ -59,6 +60,25 @@ int parseAddress(string str)
 	return addr;
 }
 
+int s_dataPort = -1;
+int s_statPort = -1;
+void onIOWrite(tlvmContext* context, tlvmByte port)
+{
+	tlvmByte val = 0;
+	tlvmGetPort(context, port, &val);
+	if(val == '$')
+		printf("\n");
+	else
+		printf("%c", val);
+}
+
+void startStdIO(tlvmContext* context, int dataPort, int statPort)
+{
+	s_dataPort = dataPort;
+	s_statPort = statPort;
+	tlvm8080SetIOCallback(context, onIOWrite);
+}
+
 #define HANDLE_INPUT_START() \
 while(true) \
 { \
@@ -77,7 +97,7 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 	tlvmChar* instruction = new tlvmChar[256];
 	instruction[0] = 0;
 	tlvmDebugGetInstruction(context, &instruction);
-	printf("0x%x\t%s\n", addr, instruction);
+	printf("0x%X\t%s\n", addr, instruction);
 	delete[] instruction;
 
 	HANDLE_INPUT_START();
@@ -136,10 +156,22 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 			tlvmDebugGetMemory(context, address, size, &mem);
 			for(iMem = 0; iMem < size; ++iMem)
 			{
-				printf("0x%02x%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
+				printf("0x%02X%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
 			}
 			cout << endl;
 			delete [] mem;
+		}
+		HANDLE_INPUT_OPTION(register, x)
+		{
+			string regStr;
+			tlvmByte reg;
+
+			cin >> regStr;
+
+			if(tlvmDebugParseRegister(context, (tlvmChar*)regStr.c_str(), &reg) != TLVM_SUCCESS)
+				reg = parseAddress(regStr);
+			tlvmDebugGetRegister(context, reg, &reg);
+			printf("0x%02X\n", reg);
 		}
 	HANDLE_INPUT_END();
 }
@@ -194,7 +226,7 @@ int main(int argc, char** argv)
 					prev->next = mem;
 				}
 
-				printf("Loaded file %s into memory at 0x%04x\n", filename.c_str(), address);
+				printf("Loaded file %s into memory at 0x%04X\n", filename.c_str(), address);
 			}
 		}
 		HANDLE_INPUT_OPTION(run, r)
@@ -205,6 +237,7 @@ int main(int argc, char** argv)
 				break;
 			}
 			cout << "Program quit with code: " << ret << endl;
+			tlvmReset(context);
 		}
 		HANDLE_INPUT_OPTION(breakpoint, b)
 		{
@@ -223,9 +256,24 @@ int main(int argc, char** argv)
 		HANDLE_INPUT_OPTION(print, p)
 		{
 			string dummy;
+			cin >> dummy;
+			cout << "Program not running" << endl;
+		}
+		HANDLE_INPUT_OPTION(register, x)
+		{
+			string dummy;
 			cin >> dummy; 
 			cin >> dummy;
 			cout << "Program not running" << endl;
+		}
+		HANDLE_INPUT_OPTION(stdio, i)
+		{
+			string dataPortStr;
+			string statPortStr;
+
+			cin >> dataPortStr;
+			cin >> statPortStr;
+			startStdIO(context, parseAddress(dataPortStr), parseAddress(statPortStr));
 		}
 	HANDLE_INPUT_END();
 

@@ -6,6 +6,10 @@
 #include "tlvm_time.h"
 #include "tlvm_debug_internal.h"
 
+typedef struct _tlvmProcessorData
+{
+	tlvmByte m_ProcessorID;
+} tlvmProcessorData;
 #include "../8080/8080.h"
 
 #define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
@@ -103,6 +107,8 @@ struct _tlvmContext
 	tlvmByte				m_DebugState;
 	tlvmDebugCallbackFn     m_StepCallback;
 #endif/*TLVM_DEBUG*/
+
+	tlvmProcessorData* m_ProcessorData;
 };
 
 struct _tlvmMemoryBuffer
