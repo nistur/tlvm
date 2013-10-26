@@ -141,6 +141,9 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
     TLVM_DEBUG_16BIT_OP(LXI_H, "LXI H");
     TLVM_DEBUG_16BIT_OP(LXI_SP, "LXI SP");
 
+    TLVM_DEBUG_SIMPLE_OP(LDAX_B, "LDAX B");
+    TLVM_DEBUG_SIMPLE_OP(LDAX_D, "LDAX D");
+
     TLVM_DEBUG_SIMPLE_OP(STAX_B, "STAX B");
     TLVM_DEBUG_SIMPLE_OP(STAX_D, "STAX D");
 
@@ -302,6 +305,8 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
     TLVM_DEBUG_16BIT_OP(CM,  "CM");
     TLVM_DEBUG_16BIT_OP(CP,  "CP");
 
+    TLVM_DEBUG_16BIT_OP(CALL,  "CALL");
+
 	TLVM_DEBUG_SIMPLE_OP(DAD_B, "DAD_B");
 	TLVM_DEBUG_SIMPLE_OP(DAD_D, "DAD_D");
 	TLVM_DEBUG_SIMPLE_OP(DAD_H, "DAD_H");
@@ -316,7 +321,7 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
 	TLVM_DEBUG_SIMPLE_OP(RST_6, "RST 6");
 	TLVM_DEBUG_SIMPLE_OP(RST_7, "RST 7");
 
-    sprintf((char*)*instruction, "UNKNOWN");
+    sprintf((char*)*instruction, "UNKNOWN 0x%X", opcode);
     tlvmReturnCode(UNKNOWN_INSTRUCTION);
 }
 

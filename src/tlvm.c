@@ -238,6 +238,11 @@ tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
     return tlvm8080GetPort(context, port, outPort);
 }
 
+tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
+{
+    return tlvm8080SetPort(context, port, portval);
+}
+
 // kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c
 tlvmBool tlvmParity(tlvmByte val)
 {

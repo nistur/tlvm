@@ -76,7 +76,25 @@ void startStdIO(tlvmContext* context, int dataPort, int statPort)
 {
 	s_dataPort = dataPort;
 	s_statPort = statPort;
+	tlvmSetPort(context, s_statPort, 0x01); // READY!
 	tlvm8080SetIOCallback(context, onIOWrite);
+}
+
+void setMemory(char* buffer, int address, int size)
+{
+	Memory* mem = new Memory;
+	mem->buffer = buffer;
+	mem->buffersize = size;
+	mem->address = address;
+	mem->next = NULL;
+	if(g_state.memory == NULL)
+		g_state.memory = mem;
+	else
+	{
+		Memory* prev = g_state.memory;
+		while(prev->next != NULL) prev = prev->next;
+		prev->next = mem;
+	}
 }
 
 #define HANDLE_INPUT_START() \
@@ -213,18 +231,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				Memory* mem = new Memory;
-				mem->buffer = file;
-				mem->buffersize = size;
-				mem->address = address;
-				if(g_state.memory == NULL)
-					g_state.memory = mem;
-				else
-				{
-					Memory* prev = g_state.memory;
-					while(prev->next != NULL) prev = prev->next;
-					prev->next = mem;
-				}
+				setMemory(file, address, size);
 
 				printf("Loaded file %s into memory at 0x%04X\n", filename.c_str(), address);
 			}
@@ -274,6 +281,28 @@ int main(int argc, char** argv)
 			cin >> dataPortStr;
 			cin >> statPortStr;
 			startStdIO(context, parseAddress(dataPortStr), parseAddress(statPortStr));
+		}
+		HANDLE_INPUT_OPTION(memory, m)
+		{
+			string addressStr;
+			string sizeStr;
+			cin >> addressStr;
+			cin >> sizeStr;
+
+			int address = parseAddress(addressStr);
+			int size = parseAddress(sizeStr);
+
+			char* buffer = new char[size];
+			if(tlvmSetMemory(context, (tlvmByte*)buffer, address, size, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
+			{
+				delete [] buffer;
+				cout << "Unable to create memory buffer" << endl;
+			}
+			else
+			{
+				setMemory(buffer, address, size);
+				printf("Created %db RAM at 0x%04X\n", size, address);
+			}
 		}
 	HANDLE_INPUT_END();
 

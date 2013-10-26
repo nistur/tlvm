@@ -169,6 +169,10 @@ TLVM_EXPORT tlvmReturn   tlvmGetPort		 (tlvmContext* context,
 											  tlvmByte port,
 											  tlvmByte* outport);
 
+TLVM_EXPORT tlvmReturn   tlvmSetPort		 (tlvmContext* context,
+											  tlvmByte port,
+											  tlvmByte portval);
+
 TLVM_EXPORT tlvmReturn   tlvmStep            (tlvmContext* context, 
 											  tlvmByte* cycles);
 

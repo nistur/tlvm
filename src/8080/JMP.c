@@ -139,12 +139,13 @@ tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
 	case TLVM_CALL:
 	{
 		TLVM_PUSH_PC(addr);
+		context->m_ProgramCounter = addr;
 		cycleCnt = 17;
 	}
 	break;
 	}
 
-    context->m_StackPointer -= 2;
+    //context->m_StackPointer -= 2;
 
     if(cycles)
     	*cycles = cycleCnt;
@@ -166,63 +167,63 @@ tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
 	tlvmByte cycleCnt = 5;
 	switch(opcode)
 	{
-	case TLVM_CNZ:
+	case TLVM_RNZ:
 		if(!TLVM_FLAG_ISSET(Z))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CZ:
+	case TLVM_RZ:
 		if(TLVM_FLAG_ISSET(Z))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CNC:
+	case TLVM_RNC:
 		if(!TLVM_FLAG_ISSET(C))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CC:
+	case TLVM_RC:
 		if(TLVM_FLAG_ISSET(C))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CPO:
+	case TLVM_RPO:
 		if(!TLVM_FLAG_ISSET(P))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CPE:
+	case TLVM_RPE:
 		if(TLVM_FLAG_ISSET(P))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CP:
+	case TLVM_RP:
 		if(!TLVM_FLAG_ISSET(S))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CM:
+	case TLVM_RM:
 		if(TLVM_FLAG_ISSET(S))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
-	case TLVM_CALL:
+	case TLVM_RET:
 	{
 		TLVM_POP_PC();
 		cycleCnt = 10;
@@ -230,7 +231,7 @@ tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
 	break;
 	}
 
-    context->m_StackPointer += 2;
+    //context->m_StackPointer += 2;
 
     if(cycles)
     	*cycles = cycleCnt;

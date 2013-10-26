@@ -338,6 +338,14 @@ tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPor
     tlvmReturnCode(SUCCESS);
 }
 
+tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
+{
+    if(context == NULL)
+        tlvmReturnCode(NO_CONTEXT);
+    context->m_Ports[port] = portval;
+    tlvmReturnCode(SUCCESS);
+}
+
 tlvmReturn tlvmNOP(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)

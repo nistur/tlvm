@@ -273,7 +273,7 @@
  #define TLVM_ACI          0xCE // add immediate to A with carry
  #define TLVM_SUI          0xD6 // subtract immediate from A
  #define TLVM_SBI          0xDE // subtract immediate from A with borrow
- #define TLVM_CPI          0xDE // compare immediate with A
+ #define TLVM_CPI          0xFE // compare immediate with A
 
  #define TLVM_INR_B        0x04
  #define TLVM_INR_C        0x0C
@@ -389,6 +389,7 @@ tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
+tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval);
 
 typedef struct _tlvm8080data
 {
