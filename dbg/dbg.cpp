@@ -62,14 +62,23 @@ int parseAddress(string str)
 
 int s_dataPort = -1;
 int s_statPort = -1;
+int s_numDataPort = -1;
+int s_numStatPort = -1;
 void onIOWrite(tlvmContext* context, tlvmByte port)
 {
 	tlvmByte val = 0;
 	tlvmGetPort(context, port, &val);
-	if(val == '$')
-		printf("\n");
-	else
-		printf("%c", val);
+	if(port == s_dataPort)
+	{
+		if(val == '$')
+			printf("\n");
+		else
+			printf("%c", val);
+	}
+	else if (port == s_numDataPort)
+	{
+		printf("%d\n", val);
+	}
 }
 
 void startStdIO(tlvmContext* context, int dataPort, int statPort)
@@ -77,6 +86,14 @@ void startStdIO(tlvmContext* context, int dataPort, int statPort)
 	s_dataPort = dataPort;
 	s_statPort = statPort;
 	tlvmSetPort(context, s_statPort, 0x01); // READY!
+	tlvm8080SetIOCallback(context, onIOWrite);
+}
+
+void startIOPrint(tlvmContext* context, int dataPort, int statPort)
+{
+	s_numDataPort = dataPort;
+	s_numStatPort = statPort;
+	tlvmSetPort(context, s_numStatPort, 0x01); // READY!
 	tlvm8080SetIOCallback(context, onIOWrite);
 }
 
@@ -139,6 +156,7 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 				if(confirm == "yes")
 				{
 					g_state.quit = true;
+					tlvmDebugHalt(context);
 					return;
 				}
 				else if(confirm == "no")
@@ -233,7 +251,7 @@ int main(int argc, char** argv)
 			{
 				setMemory(file, address, size);
 
-				printf("Loaded file %s into memory at 0x%04X\n", filename.c_str(), address);
+				printf("Loaded file %s into memory at 0x%04X - 0x%04X\n", filename.c_str(), address, address + size);
 			}
 		}
 		HANDLE_INPUT_OPTION(run, r)
@@ -282,6 +300,15 @@ int main(int argc, char** argv)
 			cin >> statPortStr;
 			startStdIO(context, parseAddress(dataPortStr), parseAddress(statPortStr));
 		}
+		HANDLE_INPUT_OPTION(watch, w)
+		{
+			string dataPortStr;
+			string statPortStr;
+
+			cin >> dataPortStr;
+			cin >> statPortStr;
+			startIOPrint(context, parseAddress(dataPortStr), parseAddress(statPortStr));
+		}
 		HANDLE_INPUT_OPTION(memory, m)
 		{
 			string addressStr;
@@ -293,6 +320,7 @@ int main(int argc, char** argv)
 			int size = parseAddress(sizeStr);
 
 			char* buffer = new char[size];
+			memset(buffer, 0, size);
 			if(tlvmSetMemory(context, (tlvmByte*)buffer, address, size, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
 			{
 				delete [] buffer;
@@ -301,7 +329,7 @@ int main(int argc, char** argv)
 			else
 			{
 				setMemory(buffer, address, size);
-				printf("Created %db RAM at 0x%04X\n", size, address);
+				printf("Created %dB RAM at 0x%04X - 0x%04X\n", size, address, address + size);
 			}
 		}
 	HANDLE_INPUT_END();
