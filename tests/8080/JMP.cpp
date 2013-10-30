@@ -4,7 +4,7 @@ TEST(Instructions, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
      },
      // cleanup
      {
@@ -34,7 +34,7 @@ TEST(JMP, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JMP;
@@ -69,7 +69,7 @@ TEST(JNZ, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JNZ;
@@ -111,7 +111,7 @@ TEST(JZ, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JZ;
@@ -153,7 +153,7 @@ TEST(JNC, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JNC;
@@ -195,7 +195,7 @@ TEST(JC, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JC;
@@ -237,7 +237,7 @@ TEST(JPO, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JPO;
@@ -279,7 +279,7 @@ TEST(JPE, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JPE;
@@ -321,7 +321,7 @@ TEST(JP, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JP;
@@ -363,7 +363,7 @@ TEST(JM, JMP, 0.0f,
      // initialisation
      {
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
 
       m_data.bootloader[0x00] = TLVM_JM;

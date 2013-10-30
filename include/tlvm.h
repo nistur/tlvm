@@ -16,7 +16,7 @@
  *    printf("TLVM Error: %s\n", tlvmError());
  *    return();	
  * }
- * if(tlvmInit8080(vm) != TLVM_SUCCESS)
+ * if(tlvm8080Init(vm) != TLVM_SUCCESS)
  * {
  *    printf("TLVM Error: %s\n", tlvmError());
  *    return();	
@@ -111,13 +111,34 @@ typedef struct _tlvmContext tlvmContext;
 
 /*********************************************
  * TLVM DEBUGGER SUPPORT
+ *
+ * Note:
+ *   requires TLVM_DEBUG to build with debugger
+ *  support
  *********************************************/
 #include "tlvm_debug.h"
 
 /*********************************************
  * tlvmInitContext
+ *     Creates a new CPU context
+ *   parameters:
+ *     context - the pointer to where the CPU
+ *       context should be created
+ *   return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - context pointer is NULL
  *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context);
+
+/*********************************************
+ * tlvmTerminateContext
+ *     Cleans up the CPU after use
+ *   parameters:
+ *     context - the CPU context
+ *   return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmTerminateContext(tlvmContext** context);
 
 /*********************************************

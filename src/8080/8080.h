@@ -34,6 +34,7 @@
 /*********************************************
  * INSTRUCTIONS
  *   TODO: Sort these
+ *   TODO: Replace TLVM_ with TLVM_8080_
  *********************************************/
 #define TLVM_NOP           0x00
 #define TLVM_HLT           0x76

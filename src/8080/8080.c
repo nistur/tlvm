@@ -1,7 +1,7 @@
 #ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
-tlvmReturn tlvmInit8080(tlvmContext* context)
+tlvmReturn tlvm8080Init(tlvmContext* context)
 {
     if(context == NULL)
         tlvmReturnCode(NO_CONTEXT);

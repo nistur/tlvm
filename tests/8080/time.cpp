@@ -27,7 +27,7 @@ TEST(Time, Time, 0.0f,
       m_data.memory[1] = TLVM_HLT;
 
       tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvm8080Init(m_data.context);
       tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
       tlvmSetMemory(m_data.context, m_data.memory, 0, 256, TLVM_FLAG_READ);
      },

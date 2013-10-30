@@ -226,7 +226,7 @@ int main(int argc, char** argv)
 
 	tlvmContext* context;
 	tlvmInitContext(&context);
-	tlvmInit8080(context);
+	tlvm8080Init(context);
 	tlvmSetClockspeed(context, TLVM_MHZ(2,0));
 
 	HANDLE_INPUT_START();
