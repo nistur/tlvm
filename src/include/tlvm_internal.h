@@ -11,6 +11,7 @@ typedef struct _tlvmProcessorData
 	tlvmByte m_ProcessorID;
 } tlvmProcessorData;
 #include "../8080/8080.h"
+#include "../6502/6502.h"
 
 #define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
 #define TLVM_FLAG_SET(x) context->m_Registers[TLVM_REG_F] |= TLVM_FLAG_##x

@@ -381,7 +381,7 @@ tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
- * tlvmAdd8080
+ * tlvmAdd8080Instructions
  *     Add Intel 8080 instruction set to CPU
  * parameters:
  *     context - the CPU context to add 8080 

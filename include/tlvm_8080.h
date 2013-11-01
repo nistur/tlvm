@@ -34,4 +34,4 @@ TLVM_EXPORT tlvmReturn  tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCa
 
 #endif/*TLVM_HAS_8080*/
 
-#endif/*__TLVM_ALU_H__*/
+#endif/*__TLVM_6502_H__*/
