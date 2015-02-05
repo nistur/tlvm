@@ -48,3 +48,10 @@ kind "ConsoleApp"
 files { "dbg/**.cpp" }
 links { "tlvm", "pthread" }
 defines { "TLVM_DEBUG" }
+
+project "tlvm-dasm"
+language "C++"
+kind "ConsoleApp"
+files { "dasm/**.cpp" }
+links { "tlvm", "pthread" }
+defines { "TLVM_DEBUG" }

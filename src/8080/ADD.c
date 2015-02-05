@@ -4,7 +4,7 @@
 tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -59,7 +59,11 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     }
 
     if(src == NULL)
-        tlvmReturnCode(INVALID_INPUT);
+        TLVM_RETURN_CODE(INVALID_INPUT);
+
+    static tlvmByte mask = 1<<3;
+    TLVM_FLAG_SET_IF(*src & mask && context->m_Registers[TLVM_REG_A] & mask, H);
+
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)*src + carry;
     TLVM_SET_FLAGS(res);
@@ -70,13 +74,13 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 4;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(operand, 0);
     TLVM_GET_OP(op1,     1);
@@ -84,6 +88,9 @@ tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
     tlvmShort carry = 0;
     if(operand == TLVM_ACI)
         carry = TLVM_FLAG_ISSET(C) ? 1 : 0;
+
+    static tlvmByte mask = 1<<3;
+    TLVM_FLAG_SET_IF(op1 & mask && context->m_Registers[TLVM_REG_A] & mask, H);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)op1 + carry;
     TLVM_SET_FLAGS(res);
@@ -95,6 +102,6 @@ tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 7;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

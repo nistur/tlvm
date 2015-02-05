@@ -53,7 +53,7 @@ TLVM_EXPORT tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn c
  *********************************************/
 TLVM_EXPORT tlvmReturn tlvmDebugContinue(tlvmContext* context);
 
-TLVM_EXPORT tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction);
+TLVM_EXPORT tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, tlvmByte* size);
 
 TLVM_EXPORT tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst);
 
@@ -62,6 +62,8 @@ TLVM_EXPORT tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid
 TLVM_EXPORT tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg);
 
 TLVM_EXPORT tlvmReturn tlvmDebugHalt(tlvmContext* context);
+
+TLVM_EXPORT tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort addr);
 
 #endif/*TLVM_DEBUG*/
 

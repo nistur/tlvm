@@ -4,7 +4,7 @@
 tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -37,13 +37,13 @@ tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles = 11;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -72,24 +72,38 @@ tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 	TLVM_STACK_POP(*dstLo);
 	TLVM_STACK_POP(*dstHi);
 
-	// size of instruction    = 1
-	context->m_ProgramCounter += 1;
+    // size of instruction    = 1
+    context->m_ProgramCounter += 1;
     if(cycles)
-    	*cycles = 10;
+        *cycles = 10;
 
-	tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmSPHL(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    context->m_StackPointer = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+    // size of instruction    = 1
+    context->m_ProgramCounter += 1;
+    if(cycles)
+        *cycles =5;
+
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
 	tlvmByte* dstHi = tlvmGetMemory(context, context->m_StackPointer+1, TLVM_FLAG_WRITE);
 	tlvmByte* dstLo = tlvmGetMemory(context, context->m_StackPointer+0, TLVM_FLAG_WRITE);
 
 	if(dstHi == NULL || dstLo == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	tlvmByte tmpHi = *dstHi;
 	tlvmByte tmpLo = *dstLo;
@@ -105,27 +119,7 @@ tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =18;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
-{
-	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
-
-	TLVM_GET_OP(opLo,  1);
-	TLVM_GET_OP(opHi, 2);
-	tlvmShort addr = ((tlvmShort)opHi) << 8 | opLo;
-
-	context->m_StackPointer = addr;
-
-
-	// size of instruction    = 1
-	// size of address        = 2
-	context->m_ProgramCounter += 3;
-    if(cycles)
-    	*cycles =13;
-
-	tlvmReturnCode(SUCCESS);
-}
 #endif/*TLVM_HAS_8080*/

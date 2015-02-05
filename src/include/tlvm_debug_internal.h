@@ -17,6 +17,8 @@ typedef struct _tlvmDebugBreakpoint
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context);
 
+tlvmReturn tlvmDebugReset(tlvmContext* context);
+
 #endif/*TLVM_DEBUG*/
 
 #endif/*__TLVM_DEBUG_INTERNAL_H__*/

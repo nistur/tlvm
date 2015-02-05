@@ -4,7 +4,7 @@
 tlvmReturn tlvm8080Init(tlvmContext* context)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     // make sure we have enough space for instructions
     if(context->m_InstructionSet)
@@ -30,7 +30,7 @@ tlvmReturn tlvm8080Init(tlvmContext* context)
 tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     
     context->m_InstructionSet[TLVM_NOP]      = tlvmNOP;
     context->m_InstructionSet[TLVM_HLT]      = tlvmHLT;
@@ -174,6 +174,7 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
     context->m_InstructionSet[TLVM_SPHL]     = tlvmSPHL;
     context->m_InstructionSet[TLVM_XTHL]     = tlvmXTHL;
     context->m_InstructionSet[TLVM_XCHG]     = tlvmXCHG;
+    context->m_InstructionSet[TLVM_PCHL]     = tlvmPCHL;
 
     context->m_InstructionSet[TLVM_JNZ]      = tlvmJMP;
     context->m_InstructionSet[TLVM_JZ]       = tlvmJMP;
@@ -306,6 +307,21 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
     context->m_InstructionSet[TLVM_EI]       = tlvmEI;
     context->m_InstructionSet[TLVM_DI]       = tlvmDI;
 
+    context->m_InstructionSet[TLVM_RLC]      = tlvmROT;
+    context->m_InstructionSet[TLVM_RAL]      = tlvmROT;
+    context->m_InstructionSet[TLVM_RRC]      = tlvmROT;
+    context->m_InstructionSet[TLVM_RAR]      = tlvmROT;
+
+    context->m_InstructionSet[TLVM_SHLD]     = tlvmSHLD;
+    context->m_InstructionSet[TLVM_LHLD]     = tlvmLHLD;
+
+    context->m_InstructionSet[TLVM_STC]      = tlvmSTC;
+    context->m_InstructionSet[TLVM_CMC]      = tlvmCMC;
+
+    context->m_InstructionSet[TLVM_CMA]      = tlvmCMA;
+
+    context->m_InstructionSet[TLVM_DAA]      = tlvmDAA;
+
     // TEMPORARY CODE JUST TO CHECK HOW MANY INSTRUCTIONS
     // ARE IMPLEMENTED
     // TODO: REMOVE
@@ -315,65 +331,112 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
         if(context->m_InstructionSet[i] != NULL)
         t++;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     ((tlvm8080data*)context->m_ProcessorData)->m_IOCallback = callback;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     if(outPort == NULL)
-        tlvmReturnCode(INVALID_INPUT);
+        TLVM_RETURN_CODE(INVALID_INPUT);
     *outPort = context->m_Ports[port];
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     context->m_Ports[port] = portval;
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmSTC(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    TLVM_FLAG_SET(C);
+    
+    // size of instruction - 1
+
+    context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles = 4;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmCMC(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    TLVM_FLAG_SET_IF(TLVM_FLAG_ISSET(C) == 0, C);
+    
+    // size of instruction - 1
+
+    context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles = 4;
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmNOP(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
     if(cycles)
     	*cycles =1;
     
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmHLT(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
     if(cycles)
     	*cycles =1;
     
-    tlvmReturnCode(EXIT);
+    TLVM_RETURN_CODE(EXIT);
+}
+
+
+tlvmReturn tlvmCMA(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+    
+    TLVM_REGISTER_COMPLEMENT(TLVM_REG_A);
+
+    context->m_ProgramCounter += 1;
+    if(cycles)
+    	*cycles = 4;
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     
 	TLVM_GET_OP(opcode, 0);
 	TLVM_GET_OP(opLow,  1);
@@ -404,13 +467,13 @@ tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =3;
     
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
     
 	TLVM_GET_OP(opcode, 0);
 
@@ -426,7 +489,7 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
     }
     tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
     if(dst == NULL)
-    	tlvmReturnCode(INVALID_INPUT);
+    	TLVM_RETURN_CODE(INVALID_INPUT);
     *dst = context->m_Registers[TLVM_REG_A];
     
     // size of instruction    = 1
@@ -434,13 +497,13 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =1;
     
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 
 	TLVM_GET_OP(opLow, 1);
@@ -448,9 +511,9 @@ tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 
     tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
     tlvmByte* dstLo = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
-    tlvmByte* dstHi = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
+    tlvmByte* dstHi = tlvmGetMemory(context, addr+1, TLVM_FLAG_WRITE);
     if(dstLo == NULL || dstHi == NULL)
-    	tlvmReturnCode(INVALID_INPUT);
+    	TLVM_RETURN_CODE(INVALID_INPUT);
     *dstLo = context->m_Registers[TLVM_REG_L];
     *dstHi = context->m_Registers[TLVM_REG_H];
 
@@ -458,15 +521,41 @@ tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 	// size of operand        = 2
 	context->m_ProgramCounter += 3;
     if(cycles)
-    	*cycles =3;
+    	*cycles = 16;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmLHLD(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+    
+    
+    TLVM_GET_OP(opLow, 1);
+    TLVM_GET_OP(opHigh, 2);
+    
+    tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
+    tlvmByte* dstLo = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
+    tlvmByte* dstHi = tlvmGetMemory(context, addr+1, TLVM_FLAG_WRITE);
+    if(dstLo == NULL || dstHi == NULL)
+    	TLVM_RETURN_CODE(INVALID_INPUT);
+    context->m_Registers[TLVM_REG_L] = *dstLo;
+    context->m_Registers[TLVM_REG_H] = *dstHi;
+    
+    // size of instruction    = 1
+    // size of operand        = 2
+    context->m_ProgramCounter += 3;
+    if(cycles)
+    	*cycles = 13;
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opLow, 1);
 	TLVM_GET_OP(opHigh, 2);
@@ -475,22 +564,46 @@ tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 
     tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
     if(src == NULL)
-    	tlvmReturnCode(INVALID_INPUT);
+    	TLVM_RETURN_CODE(INVALID_INPUT);
     context->m_Registers[TLVM_REG_A] = *src;
 
-	// size of instruction    = 1
-	// size of operand        = 1
-	context->m_ProgramCounter += 2;
+    // size of instruction    = 1
+    // size of operand        = 2
+    context->m_ProgramCounter += 3;
     if(cycles)
-    	*cycles =3;
+    	*cycles = 13;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
+{
+	if(context == NULL)
+		TLVM_RETURN_CODE(NO_CONTEXT);
+
+	TLVM_GET_OP(opLow, 1);
+	TLVM_GET_OP(opHigh, 2);
+
+    tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
+
+    tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
+    if(dst == NULL)
+    	TLVM_RETURN_CODE(INVALID_INPUT);
+    *dst = context->m_Registers[TLVM_REG_A];
+
+    // size of instruction    = 1
+    // size of operand        = 2
+    context->m_ProgramCounter += 3;
+    if(cycles)
+    	*cycles = 13;
+
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 	tlvmShort addr = 0;
@@ -503,12 +616,12 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 		addr = TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E);
 	break;
 	default:
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 	}
 
 	tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
 	if(src == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] = *src;
 
@@ -517,13 +630,13 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =1;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -561,7 +674,7 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 	}
 
 	if(src == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] &= *src;
 
@@ -570,17 +683,18 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =1;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(operand, 1);
 
 	context->m_Registers[TLVM_REG_A] &= operand;
+    TLVM_SET_FLAGS(context->m_Registers[TLVM_REG_A]);
 
 	// size of instruction    = 1
 	// size of operand        = 1
@@ -588,13 +702,13 @@ tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =2;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -632,7 +746,7 @@ tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
 	}
 
 	if(src == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] |= *src;
 
@@ -641,15 +755,15 @@ tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =1;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmORI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
-	TLVM_GET_OP(operand, 0);
+	TLVM_GET_OP(operand, 1);
 
 	context->m_Registers[TLVM_REG_A] |= operand;
 
@@ -659,13 +773,13 @@ tlvmReturn tlvmORI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =2;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -703,26 +817,30 @@ tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
 	}
 
 	if(src == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] ^= *src;
+    TLVM_FLAG_UNSET(H);
+    TLVM_FLAG_UNSET(C);
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;
     if(cycles)
     	*cycles =1;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmXRI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(operand, 1);
 
 	context->m_Registers[TLVM_REG_A] ^= operand;
+    TLVM_FLAG_UNSET(H);
+    TLVM_FLAG_UNSET(C);
 
 	// size of instruction    = 1
 	// size of operand        = 1
@@ -730,27 +848,13 @@ tlvmReturn tlvmXRI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =2;
 
-	tlvmReturnCode(SUCCESS);
-}
-
-tlvmReturn tlvmSPHL(tlvmContext* context, tlvmByte* cycles)
-{
-	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
-
-	context->m_StackPointer = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
-	// size of instruction    = 1
-	context->m_ProgramCounter += 1;
-    if(cycles)
-    	*cycles =5;
-
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmINR(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -792,47 +896,49 @@ tlvmReturn tlvmINR(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 5;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmDCR(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
+    tlvmByte* val = NULL;
     switch(opcode)
     {
     case TLVM_DCR_B:
-        context->m_Registers[TLVM_REG_B]--;
+        val = &context->m_Registers[TLVM_REG_B];
     break;
     case TLVM_DCR_C:
-        context->m_Registers[TLVM_REG_C]--;
+        val = &context->m_Registers[TLVM_REG_C];
     break;
     case TLVM_DCR_D:
-        context->m_Registers[TLVM_REG_D]--;
+        val = &context->m_Registers[TLVM_REG_D];
     break;
     case TLVM_DCR_E:
-        context->m_Registers[TLVM_REG_E]--;
+        val = &context->m_Registers[TLVM_REG_E];
     break;
     case TLVM_DCR_H:
-        context->m_Registers[TLVM_REG_H]--;
+        val = &context->m_Registers[TLVM_REG_H];
     break;
     case TLVM_DCR_L:
-        context->m_Registers[TLVM_REG_L]--;
+        val = &context->m_Registers[TLVM_REG_L];
     break;
     case TLVM_DCR_M:
-        {
-            tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
-            tlvmByte* val = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
-            if(val != NULL)
-                (*val)--;
-        }
+        val = tlvmGetMemory(context, TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L), TLVM_FLAG_WRITE);
     break;
     case TLVM_DCR_A:
-        context->m_Registers[TLVM_REG_A]--;
+        val = &context->m_Registers[TLVM_REG_A];
     break;
+    }
+
+    if(val != NULL)
+    {
+        (*val)--;
+        TLVM_FLAG_SET_IF((*val == 0), Z);
     }
 
     // size of instruction    = 1
@@ -840,13 +946,13 @@ tlvmReturn tlvmDCR(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 5;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     tlvmShort tmp = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
     TLVM_SET_16BIT(TLVM_REG_H, TLVM_REG_L, TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E));
@@ -856,7 +962,55 @@ tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles =5;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
+
+}
+
+tlvmReturn tlvmPCHL(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    context->m_ProgramCounter = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+
+    // size of instruction    = 1
+    //context->m_ProgramCounter += 1;
+    if(cycles)
+        *cycles =5;
+
+    TLVM_RETURN_CODE(SUCCESS);
+
+}
+
+tlvmReturn tlvmDAA(tlvmContext* context, tlvmByte* cycles)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    tlvmByte nibbleLo = context->m_Registers[TLVM_REG_A] & 0x0F;
+    tlvmByte nibbleHi = (context->m_Registers[TLVM_REG_A] & 0xF0)>>4;
+
+    if(nibbleLo>0x09 || TLVM_FLAG_ISSET(H))
+    {
+        nibbleLo += 0x06;
+        TLVM_FLAG_SET_IF(nibbleLo & 0xF0, H);
+        if(TLVM_FLAG_ISSET(H))
+            nibbleHi += 0x01;
+    }
+    if(nibbleHi>0x09 || TLVM_FLAG_ISSET(C))
+    {
+        nibbleHi += 0x06;
+    }
+    context->m_Registers[TLVM_REG_A] = ((nibbleHi & 0x0F)<<4) | (nibbleLo & 0x0F);
+    TLVM_SET_FLAGS(context->m_Registers[TLVM_REG_A]);
+    TLVM_FLAG_SET_IF(nibbleHi & 0xF0, C);
+
+    // size of instruction    = 1
+    context->m_ProgramCounter += 1;
+    if(cycles)
+        *cycles = 4;
+
+    TLVM_RETURN_CODE(SUCCESS);
 
 }
 #endif/*TLVM_HAS_8080*/

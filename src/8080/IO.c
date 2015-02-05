@@ -4,7 +4,7 @@
 tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(dest, 1);
 
@@ -20,13 +20,13 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
 	if(data != NULL && data->m_IOCallback != NULL)
 		data->m_IOCallback(context, dest);
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(dest, 1);
 
@@ -38,6 +38,6 @@ tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

@@ -4,7 +4,7 @@
 tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -42,7 +42,7 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
     }
 
     if(src == NULL)
-        tlvmReturnCode(INVALID_INPUT);
+        TLVM_RETURN_CODE(INVALID_INPUT);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src;
     TLVM_SET_FLAGS(res);
@@ -52,13 +52,13 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 4;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(op1, 1);
 
@@ -71,6 +71,6 @@ tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 7;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

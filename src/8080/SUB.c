@@ -4,7 +4,7 @@
 tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -59,7 +59,7 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     }
 
     if(src == NULL)
-        tlvmReturnCode(INVALID_INPUT);
+        TLVM_RETURN_CODE(INVALID_INPUT);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src - borrow;
     TLVM_SET_FLAGS(res);
@@ -70,19 +70,19 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 4;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSUI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(operand, 0);
     TLVM_GET_OP(op1,     1);
 
     tlvmShort borrow = 0;
-    if(operand == TLVM_ACI)
+    if(operand == TLVM_SBI)
         borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)op1 - borrow;
@@ -96,6 +96,6 @@ tlvmReturn tlvmSUI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 7;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

@@ -4,7 +4,7 @@
 tlvmReturn tlvmJMP(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 	TLVM_GET_OP(opLow,  1);
@@ -58,13 +58,13 @@ tlvmReturn tlvmJMP(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 	TLVM_GET_OP(opLow,  1);
@@ -150,13 +150,13 @@ tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles = cycleCnt;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -236,6 +236,6 @@ tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles = cycleCnt;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

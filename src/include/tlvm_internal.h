@@ -24,8 +24,11 @@ typedef struct _tlvmProcessorData
 	
 #define TLVM_GET_16BIT(h, l) 	((tlvmShort)context->m_Registers[h]) << 8 | (tlvmShort)context->m_Registers[l]
 #define TLVM_SET_16BIT(h, l, v) \
-	context->m_Registers[h] = (tlvmByte)(v >> 8); \
-	context->m_Registers[l] = (tlvmByte)(v & 0xFF);
+	context->m_Registers[h] = (tlvmByte)((v) >> 8); \
+	context->m_Registers[l] = (tlvmByte)((v) & 0xFF);
+
+#define TLVM_REGISTER_COMPLEMENT(x) \
+    context->m_Registers[x] = ~context->m_Registers[x];
 
 #define TLVM_GET_OP(v, n) \
 	tlvmByte v = 0;\
@@ -37,7 +40,7 @@ typedef struct _tlvmProcessorData
 { \
     tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE); \
     if(dst == NULL) \
-        tlvmReturnCode(INVALID_INPUT); \
+        TLVM_RETURN_CODE(INVALID_INPUT); \
     *dst = v; \
     context->m_StackPointer --; \
 }
@@ -46,7 +49,7 @@ typedef struct _tlvmProcessorData
 { \
     tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
     if(dst == NULL) \
-        tlvmReturnCode(INVALID_INPUT); \
+        TLVM_RETURN_CODE(INVALID_INPUT); \
     v = *dst; \
     context->m_StackPointer ++; \
 }
@@ -124,7 +127,7 @@ struct _tlvmMemoryBuffer
  ***************************************/
 #include <stdlib.h>
 #include <string.h>
-void* tlvmMallocInternal(int size);
+void* tlvmMallocInternal(size_t size);
 void  tlvmFreeInternal(void* ptr);
 #define tlvmMallocArray(x, n)   (x*)tlvmMallocInternal(sizeof(x) * n)
 #define tlvmMalloc(x)           (x*)tlvmMallocInternal(sizeof(x))
@@ -136,12 +139,12 @@ void  tlvmFreeInternal(void* ptr);
  ***************************************/
 extern tlvmReturn  g_tlvmStatus;
 extern const char* g_tlvmStatusMessages[];
-#define tlvmReturnCode(x)				\
+#define TLVM_RETURN_CODE(x)				\
     {						\
 	g_tlvmStatus = TLVM_##x;			\
 	return TLVM_##x;			\
     }
-#define tlvmReturn() \
+#define TLVM_RETURN() \
     {  \
     	return g_tlvmStatus; \
     }

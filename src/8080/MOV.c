@@ -5,7 +5,7 @@
 tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -55,7 +55,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 
 
 	if(src == NULL || dst == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	*dst = *src;
 
@@ -64,13 +64,13 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =cycleCount;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
 	TLVM_GET_OP(opcode,  0);
 	TLVM_GET_OP(operand, 1);
@@ -100,7 +100,7 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 			tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
 			tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
 			if(dst == NULL)
-				tlvmReturnCode(INVALID_INPUT);
+				TLVM_RETURN_CODE(INVALID_INPUT);
 			*dst = operand;
 		}
 	break;
@@ -108,7 +108,7 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 		context->m_Registers[TLVM_REG_A] = operand;
 	break;
 	default:
-		tlvmReturnCode(INVALID_INPUT)
+		TLVM_RETURN_CODE(INVALID_INPUT)
 	}
 
 	// size of instruction    = 1
@@ -117,6 +117,6 @@ tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =2;
 
-	tlvmReturnCode(SUCCESS);
+	TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

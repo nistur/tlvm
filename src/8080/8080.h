@@ -41,21 +41,30 @@
 #define TLVM_LXI_B         0x01
 #define TLVM_STAX_B        0x02
 #define TLVM_MVI_B         0x06
+#define TLVM_RLC           0x07
 #define TLVM_LDAX_B        0x0A
 #define TLVM_MVI_C         0x0E
+#define TLVM_RRC           0x0F
 #define TLVM_LXI_D         0x11
 #define TLVM_STAX_D        0x12
 #define TLVM_MVI_D         0x16
+#define TLVM_RAL           0x17
 #define TLVM_LDAX_D        0x1A
 #define TLVM_MVI_E         0x1E
+#define TLVM_RAR           0x1F
 #define TLVM_LXI_H         0x21
 #define TLVM_SHLD          0x22
 #define TLVM_MVI_H         0x26
+#define TLVM_DAA           0x27
+#define TLVM_LHLD          0x2A
 #define TLVM_MVI_L         0x2E
+#define TLVM_CMA           0x2F
 #define TLVM_LXI_SP        0x31
 #define TLVM_MVI_M         0x36
+#define TLVM_STC           0x37
 #define TLVM_LDA           0x3A
 #define TLVM_MVI_A         0x3E
+#define TLVM_CMC           0x3F
 
 #define TLVM_MOV_BB        (TLVM_MOV_TO_B | TLVM_MOV_FROM_B)
 #define TLVM_MOV_BC        (TLVM_MOV_TO_B | TLVM_MOV_FROM_C)
@@ -201,6 +210,7 @@
 
  #define TLVM_SPHL         0xF9
  #define TLVM_XTHL         0xE3
+ #define TLVM_PCHL         0xE9
  #define TLVM_XCHG         0xEB
 
  #define TLVM_STA          0x32 // set stack pointer
@@ -338,6 +348,7 @@ tlvmReturn tlvmSTAX (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmMVI  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmLDAX (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSHLD (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmLHLD (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmLDA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmMOV  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmANA  (tlvmContext* context, tlvmByte* cycles);
@@ -351,6 +362,7 @@ tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXCHG (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmPCHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmJMP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmCALL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRET  (tlvmContext* context, tlvmByte* cycles);
@@ -360,6 +372,9 @@ tlvmReturn tlvmIN   (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRST  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmEI   (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDI   (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSTC  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCMC  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCMA  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
@@ -379,6 +394,9 @@ tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
+
+tlvmReturn tlvmROT  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmDAA  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * tlvmAdd8080

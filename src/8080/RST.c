@@ -4,7 +4,7 @@
 tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -54,7 +54,7 @@ tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles =11;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 // right now these do nothing... do they disable the RST instructions?
@@ -62,26 +62,26 @@ tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
 tlvmReturn tlvmEI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)
         *cycles =4;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmDI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+        TLVM_RETURN_CODE(NO_CONTEXT);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)
         *cycles =4;
 
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/

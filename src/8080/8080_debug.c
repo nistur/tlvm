@@ -5,11 +5,18 @@
 #ifdef  TLVM_HAS_8080
 #ifdef  TLVM_DEBUG
 
+#define TLVM_DEBUG_SIZE(x) \
+if(size) \
+{ \
+    *size = x;\
+}
+
 #define TLVM_DEBUG_SIMPLE_OP(op, instr) \
 if(opcode == TLVM_##op) \
 { \
 	sprintf((char*)*instruction, instr); \
-	tlvmReturnCode(SUCCESS); \
+    TLVM_DEBUG_SIZE(1); \
+	TLVM_RETURN_CODE(SUCCESS); \
 }
 
 #define TLVM_DEBUG_SIMPLE_OPCODE(op) TLVM_DEBUG_SIMPLE_OP(op, #op)
@@ -19,7 +26,8 @@ if(opcode == TLVM_##op) \
 { \
 	TLVM_GET_OP(operand, 1); \
 	sprintf((char*)*instruction, "%s 0x%02x", instr, operand); \
-	tlvmReturnCode(SUCCESS); \
+    TLVM_DEBUG_SIZE(2); \
+	TLVM_RETURN_CODE(SUCCESS); \
 }
 
 #define TLVM_DEBUG_16BIT_OP(op, instr) \
@@ -29,7 +37,8 @@ if(opcode == TLVM_##op) \
 	TLVM_GET_OP(opHigh, 2); \
 	tlvmShort operand = (tlvmShort)opHigh << 8 | (tlvmShort)opLow; \
 	sprintf((char*)*instruction, "%s 0x%04x", instr, operand); \
-	tlvmReturnCode(SUCCESS); \
+    TLVM_DEBUG_SIZE(3); \
+	TLVM_RETURN_CODE(SUCCESS); \
 }
 
 #define TLVM_DEBUG_REG(reg) \
@@ -39,13 +48,13 @@ if(opcode == TLVM_##op) \
 if(TLVM_DEBUG_REG(reg)) \
 { \
 	*outreg = TLVM_REG_##reg; \
-	tlvmReturnCode(SUCCESS); \
+	TLVM_RETURN_CODE(SUCCESS); \
 }
 
-tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction)
+tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction, tlvmByte* size)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -148,8 +157,10 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
     TLVM_DEBUG_SIMPLE_OP(STAX_D, "STAX D");
 
     TLVM_DEBUG_16BIT_OP(SHLD, "SHLD");
+    TLVM_DEBUG_16BIT_OP(LHLD, "LHLD");
 
     TLVM_DEBUG_16BIT_OP(STA, "STA");
+    TLVM_DEBUG_16BIT_OP(LDA, "LDA");
 
     TLVM_DEBUG_SIMPLE_OP(INX_B, "INX B");
     TLVM_DEBUG_SIMPLE_OP(INX_D, "INX D");
@@ -291,7 +302,10 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
     TLVM_DEBUG_8BIT_OP(IN, "IN");
     TLVM_DEBUG_8BIT_OP(OUT, "OUT");
 
-	TLVM_DEBUG_SIMPLE_OPCODE(XTHL);
+    TLVM_DEBUG_SIMPLE_OPCODE(XTHL);
+    TLVM_DEBUG_SIMPLE_OPCODE(SPHL);
+    TLVM_DEBUG_SIMPLE_OPCODE(XCHG);
+    TLVM_DEBUG_SIMPLE_OPCODE(PCHL);
 
 	TLVM_DEBUG_SIMPLE_OPCODE(EI);
 	TLVM_DEBUG_SIMPLE_OPCODE(DI);
@@ -307,10 +321,10 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
 
     TLVM_DEBUG_16BIT_OP(CALL,  "CALL");
 
-	TLVM_DEBUG_SIMPLE_OP(DAD_B, "DAD_B");
-	TLVM_DEBUG_SIMPLE_OP(DAD_D, "DAD_D");
-	TLVM_DEBUG_SIMPLE_OP(DAD_H, "DAD_H");
-	TLVM_DEBUG_SIMPLE_OP(DAD_SP, "DAD_SP");
+	TLVM_DEBUG_SIMPLE_OP(DAD_B, "DAD B");
+	TLVM_DEBUG_SIMPLE_OP(DAD_D, "DAD D");
+	TLVM_DEBUG_SIMPLE_OP(DAD_H, "DAD H");
+	TLVM_DEBUG_SIMPLE_OP(DAD_SP, "DAD SP");
 
 	TLVM_DEBUG_SIMPLE_OP(RST_0, "RST 0");
 	TLVM_DEBUG_SIMPLE_OP(RST_1, "RST 1");
@@ -321,16 +335,27 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
 	TLVM_DEBUG_SIMPLE_OP(RST_6, "RST 6");
 	TLVM_DEBUG_SIMPLE_OP(RST_7, "RST 7");
 
+        TLVM_DEBUG_SIMPLE_OP(RLC, "RLC");
+        TLVM_DEBUG_SIMPLE_OP(RAL, "RAL");
+        TLVM_DEBUG_SIMPLE_OP(RRC, "RRC");
+        TLVM_DEBUG_SIMPLE_OP(RAR, "RAR");
+
+    TLVM_DEBUG_SIMPLE_OP(STC, "STC");
+    TLVM_DEBUG_SIMPLE_OP(CMC, "CMC");
+
+    TLVM_DEBUG_SIMPLE_OP(CMA, "CMA");
+    TLVM_DEBUG_SIMPLE_OP(DAA, "DAA");
+
     sprintf((char*)*instruction, "UNKNOWN 0x%X", opcode);
-    tlvmReturnCode(UNKNOWN_INSTRUCTION);
+    TLVM_RETURN_CODE(UNKNOWN_INSTRUCTION);
 }
 
 tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
 {
 	if(context == NULL)
-		tlvmReturnCode(NO_CONTEXT);
+		TLVM_RETURN_CODE(NO_CONTEXT);
 	if(outreg == NULL)
-		tlvmReturnCode(INVALID_INPUT);
+		TLVM_RETURN_CODE(INVALID_INPUT);
 
 	TLVM_DEBUG_CHECK_REG(B);
 	TLVM_DEBUG_CHECK_REG(C);
@@ -341,7 +366,7 @@ tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tl
 	TLVM_DEBUG_CHECK_REG(A);
 	TLVM_DEBUG_CHECK_REG(F);
 
-    tlvmReturnCode(UNKNOWN_INSTRUCTION);
+    TLVM_RETURN_CODE(UNKNOWN_INSTRUCTION);
 }
 
 #endif/*TLVM_DEBUG*/

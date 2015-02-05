@@ -30,6 +30,8 @@ Sample tlvm-dbg commands:
 	run
 
 ## TODO:
+- Make sure it builds and runs on Windows
+   - Currently should just be dbg.cpp and time.c that doesn't work
 - Finish the 8080 instructions
 - Write unit tests for every instruction
 - DOCUMENTATION!
