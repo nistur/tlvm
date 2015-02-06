@@ -4,6 +4,10 @@
 #include <sstream>
 #include <map>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 using std::cout;
 using std::cin;
 using std::endl;
