@@ -84,7 +84,7 @@ tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort si
 
 	if(dst == NULL)
 		TLVM_RETURN_CODE(NO_MEMORY);
-	for(address = addr; address != addr + size; ++addr)
+	for(address = addr; address != addr + size; ++address)
 	{
 		tlvmByte* mem = tlvmGetMemory(context, address, TLVM_FLAG_READ);
 		if(mem == NULL)

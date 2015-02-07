@@ -34,7 +34,9 @@ typedef struct _tlvmProcessorData
 	tlvmByte v = 0;\
 	tlvmByte* v##addr = tlvmGetMemory(context, context->m_ProgramCounter+n, TLVM_FLAG_READ); \
 	if(v##addr != NULL) \
-		v = *v##addr;
+		v = *v##addr; \
+    else \
+        TLVM_RETURN_CODE(NO_MEMORY)
 
 #define TLVM_STACK_PUSH(v) \
 { \
