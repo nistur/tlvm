@@ -32,7 +32,7 @@ defines { "TLVM_BUILD" }
 defines { "TLVM_HAS_8080" }
 
 configuration "Debug"
-defines { "DEBUG", "TLVM_DEBUG" }
+defines { "DEBUG" }
 flags { "Symbols" }
 targetdir "build/debug"
 
@@ -44,15 +44,7 @@ flags { "OptimizeSize",
 	"NoFramePointer" }
 targetdir "build/release"
 
-project "tlvm"
-language "C"
-kind "StaticLib"
-files { "src/**.c", "src/**.cpp" }
-
---project "tlvm-dynamic"
---kind "SharedLib"
---files { "src/**.c", "src/**.cpp" }
---targetname "tlvm"
+dofile("buildlib.lua")
 
 project "tests"
 language "C++"
