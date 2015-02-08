@@ -1,7 +1,31 @@
+/*
+Copyright (c) 2015 Philipp Geyer
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgement in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+Philipp Geyer
+nistur@gmail.com
+*/
+
 #include <tlvm.h>
 
 #include <tlvm_internal.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -29,8 +53,10 @@ struct Instruction
     Instruction* next;
     tlvmShort    address;
     tlvmShort    size;
-    tlvmChar     output[16];
+    tlvmChar     output[256];
     int          flags;
+    tlvmChar     label[8];
+    Instruction* dest;
 };
 
 struct State
@@ -67,7 +93,9 @@ Instruction* GetInstruction(tlvmShort address)
     inst = new Instruction;
     inst->address = address;
     inst->next = next;
+    inst->label[0] = 0;
     inst->flags = 0;
+    inst->dest = NULL;
 
     *prev = inst;
     return inst;
@@ -134,6 +162,7 @@ void setMemory(char* buffer, int address, int size)
 
 tlvmShort stack[256];
 tlvmByte  sp = 0;
+tlvmShort labelIndex = 0;
 
 #define POP() \
 if(sp) \
@@ -144,9 +173,8 @@ if(sp) \
 else \
     return TLVM_SUCCESS;
 
-tlvmReturn step(tlvmContext* context)
+tlvmReturn step(tlvmContext* context, tlvmShort address)
 {
-    tlvmShort address = 0x0;
     while(true)
     {
         tlvmSetProgramCounter(context, address);
@@ -190,6 +218,12 @@ tlvmReturn step(tlvmContext* context)
                     tlvmByte* mem = new tlvmByte[2];
                     tlvmDebugGetMemory(context,address + 1, 2, &mem);
                     address = (((tlvmShort)mem[1]) << 8) | (mem[0]);
+                    inst->dest = GetInstruction(address); // point to the place we're jumping to
+                    if(inst->dest->label[0] == 0)
+                        sprintf((char*)inst->dest->label, "LOC%.02d", labelIndex++);
+                    tlvmByte* p = inst->output;
+                    while(!isspace(*p) && *p) ++p;
+                    if(*p) p[1] = 0; // nasty hack to remove the address from the instruction
 
                     delete[] mem;
                 }
@@ -218,58 +252,109 @@ tlvmReturn step(tlvmContext* context)
     return g_tlvmStatus;
 }
 
-void printDisassembly(tlvmContext* context)
+#define PAD(l, w) \
+    while(strlen(l) < w) sprintf(l,"%s ", l);
+
+void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::ostream& stream)
+{
+    tlvmByte* dat = new tlvmByte[size];
+
+    tlvmDebugGetMemory(context, address, size, &dat);
+    char line[255];
+    sprintf(line, "0x%.04X", address);
+    for(int i = 0; i < size; ++i)
+    {
+        if(i && i%8 == 0)
+        {
+            PAD(line, 80);
+            sprintf(line, "%s; ", line);
+            for(int j = 8; j > 0; --j)
+            {
+                tlvmByte c = dat[i-j];
+                sprintf(line, "%s%c", line, c >= 0x20 ? c : '.');
+            }
+            stream << line << std::endl;
+            sprintf(line, "");
+        }
+        PAD(line, 8+((i%8)*8));
+        sprintf(line, "%s0x%.02X", line, dat[i]);
+        if(i == size - 1)
+        {
+            tlvmShort num = 8-i%8;
+            PAD(line, 80);
+            sprintf(line, "%s; ", line);
+            for(int j = 8-num; j >= 0; --j)
+            {
+                tlvmByte c = dat[i-j];
+                sprintf(line, "%s%c", line, c >= 0x20 ? c : '.');
+            }
+            stream << line << std::endl;
+            sprintf(line, "");
+        }
+    }
+
+    delete[] dat;
+}
+
+void printDisassembly(tlvmContext* context, std::ostream& stream)
 {
     Instruction* prev = NULL;
     Instruction* inst = g_state.instructions;
+    char line[256];
     while(inst)
     {
+        line[0] = 0;
         // print any missing memory
         tlvmShort prevEnd = 0;
         if(prev)
             prevEnd = prev->address + prev->size;
         tlvmShort dataSize = inst->address - prevEnd;
         if(dataSize)
-        {
-            tlvmByte* dat = new tlvmByte[dataSize];
-
-            tlvmDebugGetMemory(context, prevEnd, dataSize, &dat);
-            printf("0x%.04X", prevEnd);
-            for(int i = 0; i < dataSize; ++i)
-            {
-                if(i && i%8 == 0)
-                {
-                    printf("\t");
-                    for(int j = 8; j > 0; --j)
-                    {
-                        tlvmByte c = dat[i-j];
-                        printf("%c", c >= 0x20 ? c : '.');
-                    }
-                    printf("\n");
-                }
-
-                printf("\t0x%.02X", dat[i]);
-                if(i == dataSize - 1)
-                {
-                    tlvmShort num = 8-i%8;
-                    for(int _ = 0; _ < num; ++_) printf("\t");
-                    for(int j = 8-num; j >= 0; --j)
-                    {
-                        tlvmByte c = dat[i-j];
-                        printf("%c", c >= 0x20 ? c : '.');
-                    }
-                    printf("\n");
-                }
-            }
-
-            delete[] dat;
-        }
-        printf("0x%.04X\t%s\n", inst->address, inst->output);
+            printMemory(context, prevEnd, dataSize, stream);
+        if(strlen((char*)inst->label))
+            sprintf(line, "%s%s:", line, inst->label);
+        PAD(line, 8);
+        sprintf(line, "%s%s", line, inst->output);
+        PAD(line, 16);
+        sprintf(line, "%s%s", line, inst->dest ? (char*)inst->dest->label : "");
+        PAD(line, 64);
+        sprintf(line, "%s;0x%.04X\n", line, inst->address);
 
         prev = inst;
         inst = inst->next;
+        stream << line;
     }
-    printf("END\n\n");
+    Memory* mem = g_state.memory;
+    Memory* end = mem;
+    while(mem)
+    {
+        tlvmShort prevEnd = end->address+end->buffersize;
+        tlvmShort thisEnd = mem->address+mem->buffersize;
+        if(thisEnd > prevEnd)
+            end = mem;
+        mem = mem->next;
+    }
+    if(prev && end)
+    {
+        tlvmShort memEnd = end->address + end->buffersize - 1;
+        tlvmShort instEnd = prev->address + prev->size;
+        tlvmShort endSize = memEnd - instEnd;
+        printMemory(context, instEnd, endSize, stream);
+    }
+    sprintf(line, "END\n\n");
+    stream << line;
+}
+
+void cleanUpInstructions()
+{
+    Instruction* next = g_state.instructions;
+    while(next)
+    {
+        Instruction* inst = next;
+        next = inst->next;
+        delete inst;
+    }
+    g_state.instructions = NULL;
 }
 
 #define HANDLE_INPUT_START() \
@@ -352,10 +437,15 @@ int main(int argc, char** argv)
         }
         HANDLE_INPUT_OPTION(run, r)
         {
-            tlvmReset(context);
-            tlvmReturn ret = step(context);
+            string addressStr;
+            cin >> addressStr;
+            int address = parseAddress(addressStr);
 
-            printDisassembly(context);
+            tlvmReset(context);
+            tlvmReturn ret = step(context, address);
+
+            printDisassembly(context, cout);
+            
 
             if(g_state.quit)
             {
@@ -364,7 +454,53 @@ int main(int argc, char** argv)
             cout << "Program quit with code: " << ret << endl;
             tlvmReset(context);
         }
+        HANDLE_INPUT_OPTION(cleanup, c)
+        {
+            cleanUpInstructions();
+        }
+        HANDLE_INPUT_OPTION(label, l)
+        {
+            string addressStr;
+            string label;
+            cin >> addressStr;
+            cin >> label;
+
+            int address = parseAddress(addressStr);
+            Instruction* inst = GetInstruction(address);
+            sprintf((char*)inst->label, "%s", label.c_str());
+        }
+        HANDLE_INPUT_OPTION(print, p)
+        {
+            printDisassembly(context, cout);
+        }
+        HANDLE_INPUT_OPTION(write, w)
+        {
+            string filename;
+            cin >> filename;
+            std::ofstream file(filename);
+            printDisassembly(context, file);
+            file.close();
+        }
+        HANDLE_INPUT_OPTION(db, d)
+        {
+            string addressStr;
+            string sizeStr;
+            cin >> addressStr;
+            cin >> sizeStr;
+
+            int address = parseAddress(addressStr);
+            int size = parseAddress(sizeStr);
+            Instruction* inst = GetInstruction(address);
+            inst->flags |= 0x01;
+            inst->size = size;
+            sprintf((char*)inst->output, "DB '");
+            tlvmByte* dat = &inst->output[4];
+            tlvmDebugGetMemory(context, address, size, &dat);
+            dat[size] = '\'';
+        }
     HANDLE_INPUT_END();
+
+    cleanUpInstructions();
 
     // Remove all the memory allocated
     Memory* mem = g_state.memory;
