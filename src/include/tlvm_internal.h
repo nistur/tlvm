@@ -137,6 +137,8 @@ struct _tlvmContext
 #endif/*TLVM_DEBUG*/
 
 	tlvmProcessorData* m_ProcessorData;
+
+    tlvmClockFn        m_ClockFn;
 };
 
 struct _tlvmMemoryBuffer

@@ -38,6 +38,8 @@ nistur@gmail.com
 #define TLVM_REG_D 0x5
 #define TLVM_REG_L 0x6
 #define TLVM_REG_H 0x7
+ // fake register to carry pending interrupts
+#define TLVM_REG_I 0x8
 
 /*********************************************
  * FLAGS
@@ -432,6 +434,8 @@ tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
 tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval);
+tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt);
+tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt);
 
 typedef struct _tlvm8080data
 {

@@ -181,7 +181,12 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
         TLVM_RETURN_CODE(INVALID_INPUT);
     if(context->m_InstructionSet[*opcode] == NULL)
         TLVM_RETURN_CODE(UNKNOWN_INSTRUCTION);
-    context->m_InstructionSet[*opcode](context, cycles);
+    tlvmByte numCycles = 0;
+    context->m_InstructionSet[*opcode](context, &numCycles);
+    if(context->m_ClockFn)
+        for(int i = 0; i < numCycles; ++i)
+            context->m_ClockFn(&numCycles);
+    if(cycles) *cycles = numCycles;
     TLVM_RETURN();
 }
 
@@ -265,6 +270,21 @@ tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
     return tlvm8080SetPort(context, port, portval);
+}
+
+tlvmReturn tlvmSetClock(tlvmContext* context, tlvmClockFn clockFn)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    context->m_ClockFn = clockFn;
+
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
+{
+    return tlvm8080Interrupt(context, interrupt);
 }
 
 // kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c

@@ -345,15 +345,6 @@ tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
 
     context->m_InstructionSet[TLVM_DAA]      = tlvmDAA;
 
-    // TEMPORARY CODE JUST TO CHECK HOW MANY INSTRUCTIONS
-    // ARE IMPLEMENTED
-    // TODO: REMOVE
-    int t = 0;
-    int i = 0;
-    for(i = 0; i < 256; ++i)
-        if(context->m_InstructionSet[i] != NULL)
-        t++;
-
     TLVM_RETURN_CODE(SUCCESS);
 }
 
@@ -382,6 +373,29 @@ tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval
     if(context == NULL)
         TLVM_RETURN_CODE(NO_CONTEXT);
     context->m_Ports[port] = portval;
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    if(TLVM_FLAG_ISSET(I))
+        tlvm8080HandleInterrupt(context, interrupt);
+    else
+        context->m_Registers[TLVM_REG_I] = interrupt;
+
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    TLVM_PUSH_PC(interrupt << 3);
+
     TLVM_RETURN_CODE(SUCCESS);
 }
 

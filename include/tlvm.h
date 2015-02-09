@@ -100,6 +100,8 @@ typedef unsigned char  tlvmBool;
 
 typedef struct _tlvmContext tlvmContext;
 
+typedef void(*tlvmClockFn)(tlvmByte*);
+
 /*********************************************
  * ERROR CODES
  *********************************************/
@@ -222,6 +224,10 @@ TLVM_EXPORT tlvmReturn   tlvmStep            (tlvmContext* context,
 TLVM_EXPORT tlvmReturn   tlvmRun             (tlvmContext* context);
 
 TLVM_EXPORT tlvmReturn   tlvmReset			 (tlvmContext* context);
+
+TLVM_EXPORT tlvmReturn   tlvmSetClock        (tlvmContext* context, tlvmClockFn clockFn);
+
+TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context, tlvmByte interrupt);
 
 TLVM_EXPORT const char*  tlvmError();
 

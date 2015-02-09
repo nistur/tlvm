@@ -80,13 +80,15 @@ tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
     TLVM_RETURN_CODE(SUCCESS);
 }
 
-// right now these do nothing... do they disable the RST instructions?
-// or something else?
 tlvmReturn tlvmEI(tlvmContext* context, tlvmByte* cycles)
 {
     if(context == NULL)
         TLVM_RETURN_CODE(NO_CONTEXT);
 
+    TLVM_FLAG_SET(I);
+    if(context->m_Registers[TLVM_REG_I])
+        tlvm8080HandleInterrupt(context, context->m_Registers[TLVM_REG_I]);
+    context->m_Registers[TLVM_REG_I] = 0x00;
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)
@@ -100,6 +102,7 @@ tlvmReturn tlvmDI(tlvmContext* context, tlvmByte* cycles)
     if(context == NULL)
         TLVM_RETURN_CODE(NO_CONTEXT);
 
+    TLVM_FLAG_UNSET(I);
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)
