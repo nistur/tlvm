@@ -229,6 +229,8 @@ TLVM_EXPORT tlvmReturn   tlvmSetClock        (tlvmContext* context, tlvmClockFn 
 
 TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context, tlvmByte interrupt);
 
+TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
+
 TLVM_EXPORT const char*  tlvmError();
 
 #ifdef __cplusplus

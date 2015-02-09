@@ -139,6 +139,7 @@ struct _tlvmContext
 	tlvmProcessorData* m_ProcessorData;
 
     tlvmClockFn        m_ClockFn;
+    tlvmByte           m_Halt;
 };
 
 struct _tlvmMemoryBuffer

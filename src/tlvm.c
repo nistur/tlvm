@@ -195,6 +195,8 @@ tlvmReturn tlvmRun(tlvmContext* context)
     if(context == NULL)
         TLVM_RETURN_CODE(NO_CONTEXT);
 
+    context->m_Halt = TLVM_FALSE;
+
     if(context->m_Clockspeed == 0)
     {
         tlvmByte empty;
@@ -211,7 +213,7 @@ tlvmReturn tlvmRun(tlvmContext* context)
 
         tlvmResetClock(context);
 
-        while(status == TLVM_SUCCESS)
+        while(status == TLVM_SUCCESS && context->m_Halt == TLVM_FALSE)
         {
             status = tlvmStep(context, &cycles);
 
@@ -285,6 +287,16 @@ tlvmReturn tlvmSetClock(tlvmContext* context, tlvmClockFn clockFn)
 tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
 {
     return tlvm8080Interrupt(context, interrupt);
+}
+
+tlvmReturn tlvmHalt(tlvmContext* context)
+{
+    if(context == NULL)
+        TLVM_RETURN_CODE(NO_CONTEXT);
+
+    context->m_Halt = TLVM_TRUE;
+
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 // kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c
