@@ -185,7 +185,7 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
     context->m_InstructionSet[*opcode](context, &numCycles);
     if(context->m_ClockFn)
         for(int i = 0; i < numCycles; ++i)
-            context->m_ClockFn(&numCycles);
+            context->m_ClockFn(context, &numCycles);
     if(cycles) *cycles = numCycles;
     TLVM_RETURN();
 }

@@ -100,7 +100,7 @@ typedef unsigned char  tlvmBool;
 
 typedef struct _tlvmContext tlvmContext;
 
-typedef void(*tlvmClockFn)(tlvmByte*);
+typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 
 /*********************************************
  * ERROR CODES
