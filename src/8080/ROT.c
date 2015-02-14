@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmROT(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     TLVM_GET_OP(operand,0);
     
     tlvmShort acc = (tlvmShort)context->m_Registers[TLVM_REG_A];

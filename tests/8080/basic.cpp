@@ -34,7 +34,7 @@ TEST(InitTerminate, Basic, 0.0f,
      },
      // test
      {
-      ASSERT(tlvmInitContext(&m_data.context) == TLVM_SUCCESS);
+      ASSERT(tlvmInitContext(&m_data.context, TLVM_CPU_8080) == TLVM_SUCCESS);
       ASSERT(m_data.context != NULL);
       ASSERT(tlvmTerminateContext(&m_data.context) == TLVM_SUCCESS);
      },
@@ -47,7 +47,7 @@ TEST(InitTerminate, Basic, 0.0f,
 TEST(SetMemory, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
      },
      // cleanup
      {
@@ -81,8 +81,7 @@ TEST(SetMemory, Basic, 0.0f,
 TEST(InstructionSet, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       memset(m_data.nullInstructions, 0, 256);
 
       m_data.nullInstructions[0x08] = 1;
@@ -118,7 +117,7 @@ TEST(InstructionSet, Basic, 0.0f,
 TEST(SetClockspeed, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
      },
      // cleanup
      {

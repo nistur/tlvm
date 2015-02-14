@@ -40,6 +40,17 @@ using std::endl;
 using std::string;
 using std::map;
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#elif defined(__cplusplus)
+# define UNUSED(x)
+#else
+# define UNUSED(x) x
+#endif
+
 struct Memory
 {
     Memory* next;
@@ -127,7 +138,7 @@ int parseAddress(string str)
     int addr = 0;
     if(str.find("0x") == 0)
     {
-        for(int i = 2; i < str.length(); ++i)
+        for(unsigned int i = 2; i < str.length(); ++i)
         {
             addr <<= 4;
             char c = str[i];
@@ -377,14 +388,13 @@ if(val == #opt || val == #shortopt)
  * but for now, I'm just making sure
  * it works
  */
-int main(int argc, char** argv)
+int main(int UNUSED(argc), char** UNUSED(argv))
 {
     g_state.memory = NULL;
     g_state.quit = false;
 
     tlvmContext* context;
-    tlvmInitContext(&context);
-    tlvm8080Init(context);
+    tlvmInitContext(&context, TLVM_CPU_8080);
     tlvmSetClockspeed(context, TLVM_MHZ(2,0));
 
     HANDLE_INPUT_START();

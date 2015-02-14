@@ -29,6 +29,8 @@ nistur@gmail.com
 #include "tlvm_time.h"
 #include "tlvm_debug_internal.h"
 
+typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
+
 typedef struct _tlvmProcessorData
 {
 	tlvmByte m_ProcessorID;
@@ -56,16 +58,13 @@ typedef struct _tlvmProcessorData
 #define TLVM_GET_OP(v, n) \
 	tlvmByte v = 0;\
 	tlvmByte* v##addr = tlvmGetMemory(context, context->m_ProgramCounter+n, TLVM_FLAG_READ); \
-	if(v##addr != NULL) \
-		v = *v##addr; \
-    else \
-        TLVM_RETURN_CODE(NO_MEMORY)
+    TLVM_NULL_CHECK(v##addr, NO_MEMORY); \
+	v = *v##addr;
 
 #define TLVM_STACK_PUSH(v) \
 { \
     tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE); \
-    if(dst == NULL) \
-        TLVM_RETURN_CODE(INVALID_INPUT); \
+    TLVM_NULL_CHECK(dst, INVALID_INPUT); \
     *dst = v; \
     context->m_StackPointer --; \
 }
@@ -73,8 +72,7 @@ typedef struct _tlvmProcessorData
 #define TLVM_STACK_POP(v) \
 { \
     tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
-    if(dst == NULL) \
-        TLVM_RETURN_CODE(INVALID_INPUT); \
+    TLVM_NULL_CHECK(dst, INVALID_INPUT); \
     v = *dst; \
     context->m_StackPointer ++; \
 }
@@ -96,8 +94,6 @@ typedef struct _tlvmProcessorData
 	context->m_ProgramCounter = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo; \
 }
 
-typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
-
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
 tlvmBool tlvmParity(tlvmByte val);
@@ -110,10 +106,9 @@ typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
 
 struct _tlvmContext
 {
-	tlvmMemoryBuffer* m_Memory;
+    tlvmInstruction* m_InstructionSet;
 
-	// instrution set
-	tlvmInstruction* m_InstructionSet;
+	tlvmMemoryBuffer* m_Memory;
 
 	tlvmShort  m_ProgramCounter;
 
@@ -177,6 +172,12 @@ extern const char* g_tlvmStatusMessages[];
     	return g_tlvmStatus; \
     }
 
+#ifdef TLVM_UNSAFE
+# define TLVM_NULL_CHECK(x,ret)
+#else/*!TLVM_UNSAFE*/
+# define TLVM_NULL_CHECK(x,ret) \
+    if(x == 0) TLVM_RETURN_CODE(ret);
+#endif/*TLVM_UNSAFE*/
 
 
 #endif/*__TLVM_INTERNAL_H__*/

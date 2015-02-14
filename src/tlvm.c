@@ -39,10 +39,9 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
     TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmInitContext(tlvmContext** context)
+tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
 {
-    if(context == NULL)
-       TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     *context = tlvmMalloc(tlvmContext);
     if(tlvmClearContext(*context) != TLVM_SUCCESS)
@@ -50,14 +49,18 @@ tlvmReturn tlvmInitContext(tlvmContext** context)
 	   (void)tlvmTerminateContext(context);
        TLVM_RETURN();
     }
+#if TLVM_HAS_8080
+    if(cpuid == TLVM_CPU_8080)
+        tlvm8080Init(*context);
+#endif
 
     TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmTerminateContext(tlvmContext** context)
 {
-    if(context == NULL || *context == NULL)
-	   TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(*context, NO_CONTEXT);
 
     if(tlvmClearContext(*context) != TLVM_SUCCESS)
         TLVM_RETURN();
@@ -69,8 +72,7 @@ tlvmReturn tlvmTerminateContext(tlvmContext** context)
 
 tlvmReturn tlvmSetClockspeed(tlvmContext* context, tlvmShort clockspeed)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     context->m_Clockspeed = clockspeed;
 
     TLVM_RETURN_CODE(SUCCESS);
@@ -78,12 +80,9 @@ tlvmReturn tlvmSetClockspeed(tlvmContext* context, tlvmShort clockspeed)
 
 tlvmReturn tlvmSetMemory(tlvmContext* context, tlvmByte* memory, tlvmShort offset, tlvmShort size, tlvmByte flags)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
-    if(memory == NULL)
-        TLVM_RETURN_CODE(NO_MEMORY);
-    if(size == 0)
-        TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(memory, NO_MEMORY);
+    TLVM_NULL_CHECK(size, INVALID_INPUT);
     tlvmShort start = offset;
     tlvmShort end = offset + size - 1;
 
@@ -134,12 +133,9 @@ tlvmReturn tlvmSetMemory(tlvmContext* context, tlvmByte* memory, tlvmShort offse
 
 tlvmReturn tlvmUnsetMemory(tlvmContext* context, tlvmByte* memory)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
-    if(memory == NULL)
-        TLVM_RETURN_CODE(NO_MEMORY);
-    if(context->m_Memory == NULL)
-        TLVM_RETURN_CODE(NO_MEMORY);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(memory, NO_MEMORY);
+    TLVM_NULL_CHECK(context->m_Memory, NO_MEMORY);
 
     if(memory == context->m_Memory->m_Buffer)
     {
@@ -168,8 +164,7 @@ tlvmReturn tlvmUnsetMemory(tlvmContext* context, tlvmByte* memory)
 
 tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 #ifdef  TLVM_DEBUG
     if(tlvmDebugCheck(context) != TLVM_SUCCESS)
@@ -177,10 +172,8 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 #endif/*TLVM_DEBUG*/
 
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);
-    if(opcode == NULL)
-        TLVM_RETURN_CODE(INVALID_INPUT);
-    if(context->m_InstructionSet[*opcode] == NULL)
-        TLVM_RETURN_CODE(UNKNOWN_INSTRUCTION);
+    TLVM_NULL_CHECK(opcode, INVALID_INPUT);
+    TLVM_NULL_CHECK(context->m_InstructionSet[*opcode], UNKNOWN_INSTRUCTION);
     tlvmByte numCycles = 0;
     context->m_InstructionSet[*opcode](context, &numCycles);
     if(context->m_ClockFn)
@@ -192,8 +185,7 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmRun(tlvmContext* context)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_Halt = TLVM_FALSE;
 
@@ -230,8 +222,7 @@ tlvmReturn tlvmRun(tlvmContext* context)
 
 tlvmReturn tlvmReset(tlvmContext* context)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     context->m_ProgramCounter = 0;
     memset(context->m_Registers, 0, 8);
     context->m_StackPointer = 0;
@@ -276,8 +267,7 @@ tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 
 tlvmReturn tlvmSetClock(tlvmContext* context, tlvmClockFn clockFn)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_ClockFn = clockFn;
 
@@ -291,8 +281,7 @@ tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
 
 tlvmReturn tlvmHalt(tlvmContext* context)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_Halt = TLVM_TRUE;
 

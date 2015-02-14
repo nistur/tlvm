@@ -27,8 +27,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	tlvmDebugBreakpoint* breakpoint = tlvmMalloc(tlvmDebugBreakpoint);
 	breakpoint->m_Address = addr;
@@ -51,8 +50,7 @@ tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebu
 
 tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, tlvmByte* size)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	// for now, we only have the 8080
 	return tlvm8080DebugGetInstruction(context, instuction, size);
@@ -60,8 +58,7 @@ tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, 
 
 tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	context->m_StepCallback = callback;
 
@@ -70,8 +67,7 @@ tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback)
 
 tlvmReturn tlvmDebugContinue(tlvmContext* context)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	context->m_StepCallback = NULL;
 	context->m_DebugState = TLVM_DEBUG_STATE_RUN;
@@ -81,8 +77,7 @@ tlvmReturn tlvmDebugContinue(tlvmContext* context)
 
 tlvmReturn tlvmDebugHalt(tlvmContext* context)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	context->m_DebugState = TLVM_DEBUG_STATE_HALT;
 
@@ -91,8 +86,7 @@ tlvmReturn tlvmDebugHalt(tlvmContext* context)
 
 tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort addr)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 	context->m_ProgramCounter = addr;
 
 	TLVM_RETURN_CODE(SUCCESS);
@@ -102,16 +96,13 @@ tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort si
 {
 	tlvmByte* target = *dst;
 	tlvmShort address;
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-	if(dst == NULL)
-		TLVM_RETURN_CODE(NO_MEMORY);
+    TLVM_NULL_CHECK(dst, NO_MEMORY);
 	for(address = addr; address != addr + size; ++address)
 	{
 		tlvmByte* mem = tlvmGetMemory(context, address, TLVM_FLAG_READ);
-		if(mem == NULL)
-			TLVM_RETURN_CODE(INVALID_INPUT);
+    	TLVM_NULL_CHECK(mem, INVALID_INPUT);
 		*target = *mem;
 		target++;
 	}
@@ -121,20 +112,16 @@ tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort si
 
 tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	return tlvm8080DebugParseRegister(context, regstr, outreg);
 }
 
 tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* outval)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
-	if(outval == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
-	if(context->m_Registers == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(outval, INVALID_INPUT);
+    TLVM_NULL_CHECK(context->m_Registers, INVALID_INPUT);
 
 	*outval = context->m_Registers[regid];
 
@@ -143,8 +130,7 @@ tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* 
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	tlvmPauseClock(context);
 	if(context->m_DebugState == TLVM_DEBUG_STATE_BREAK)
@@ -184,8 +170,7 @@ tlvmReturn tlvmDebugCheck(tlvmContext* context)
 
 tlvmReturn tlvmDebugReset(tlvmContext* context)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_DebugState = TLVM_DEBUG_STATE_RUN;
     

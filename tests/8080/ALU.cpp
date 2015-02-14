@@ -26,8 +26,7 @@ nistur@gmail.com
 TEST(ADI, ALU, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
       m_data.bootloader[0] = TLVM_ADI;
       m_data.bootloader[1] = 99;

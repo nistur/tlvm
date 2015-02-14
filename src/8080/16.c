@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -67,8 +66,7 @@ tlvmReturn tlvmINX  (tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -108,8 +106,7 @@ tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmDAD(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 

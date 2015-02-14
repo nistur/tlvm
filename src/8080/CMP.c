@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -64,8 +63,7 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
     break;
     }
 
-    if(src == NULL)
-        TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src;
     TLVM_SET_FLAGS(res);
@@ -80,8 +78,7 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(op1, 1);
 

@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -81,8 +80,7 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     break;
     }
 
-    if(src == NULL)
-        TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
     static tlvmByte mask = 1<<3;
     TLVM_FLAG_SET_IF(*src & mask && context->m_Registers[TLVM_REG_A] & mask, H);
@@ -102,8 +100,7 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(operand, 0);
     TLVM_GET_OP(op1,     1);

@@ -76,8 +76,7 @@ if(TLVM_DEBUG_REG(reg)) \
 
 tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction, tlvmByte* size)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -375,10 +374,8 @@ tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruct
 
 tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
-	if(outreg == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(outreg, INVALID_INPUT);
 
 	TLVM_DEBUG_CHECK_REG(B);
 	TLVM_DEBUG_CHECK_REG(C);

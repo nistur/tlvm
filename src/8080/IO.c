@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(dest, 1);
 
@@ -48,8 +47,7 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(dest, 1);
 

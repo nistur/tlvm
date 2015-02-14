@@ -24,15 +24,17 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
+tlvm8080data g_8080Data;
+
 tlvmReturn tlvm8080Init(tlvmContext* context)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    // make sure we have enough space for instructions
-    if(context->m_InstructionSet)
-        tlvmFree(context->m_InstructionSet);
-    context->m_InstructionSet = tlvmMallocArray(tlvmInstruction, 256);
+    if(g_8080Data.m_Header.m_ProcessorID == 0)
+        tlvm8080SetupData();
+
+    context->m_ProcessorData = &g_8080Data.m_Header;
+    context->m_InstructionSet = g_8080Data.m_InstructionSet;
 
     // initialise all the 8080 registers
     if(context->m_Registers)
@@ -44,314 +46,307 @@ tlvmReturn tlvm8080Init(tlvmContext* context)
         tlvmFree(context->m_Ports);
     context->m_Ports = tlvmMallocArray(tlvmByte, 255);
 
-    if(context->m_ProcessorData)
-        tlvmFree(context->m_ProcessorData);
-    context->m_ProcessorData = (tlvmProcessorData*)tlvmMalloc(tlvm8080data);
-
-    return tlvmAdd8080Instructions(context);
-}
-tlvmReturn tlvmAdd8080Instructions(tlvmContext* context)
-{
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
-    
-    context->m_InstructionSet[TLVM_NOP]      = tlvmNOP;
-    context->m_InstructionSet[TLVM_HLT]      = tlvmHLT;
-      
-    context->m_InstructionSet[TLVM_LXI_B]    = tlvmLXI;
-    context->m_InstructionSet[TLVM_LXI_D]    = tlvmLXI;
-    context->m_InstructionSet[TLVM_LXI_H]    = tlvmLXI;
-    context->m_InstructionSet[TLVM_LXI_SP]   = tlvmLXI;
-      
-    context->m_InstructionSet[TLVM_LDAX_B]   = tlvmLDAX;
-    context->m_InstructionSet[TLVM_LDAX_D]   = tlvmLDAX;
-  
-    context->m_InstructionSet[TLVM_STAX_B]   = tlvmSTAX;
-    context->m_InstructionSet[TLVM_STAX_D]   = tlvmSTAX;
-      
-    context->m_InstructionSet[TLVM_MVI_B]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_C]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_D]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_E]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_H]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_L]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_M]    = tlvmMVI;
-    context->m_InstructionSet[TLVM_MVI_A]    = tlvmMVI;
-  
-    context->m_InstructionSet[TLVM_LDA]      = tlvmLDA;
-    
-    context->m_InstructionSet[TLVM_MOV_BB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_BA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_CB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_CA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_DB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_DA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_EB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_ED]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_EA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_HB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_HA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_LB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_LA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_MB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_MC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_MD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_ME]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_MH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_ML]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_MA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_MOV_AB]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AC]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AD]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AE]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AH]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AL]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AM]   = tlvmMOV;
-    context->m_InstructionSet[TLVM_MOV_AA]   = tlvmMOV;
-    
-    context->m_InstructionSet[TLVM_ANA_B]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_C]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_D]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_E]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_H]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_L]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_M]    = tlvmANA;
-    context->m_InstructionSet[TLVM_ANA_A]    = tlvmANA;
-    
-    context->m_InstructionSet[TLVM_ANI]      = tlvmANI;
-    
-    context->m_InstructionSet[TLVM_ORA_B]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_C]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_D]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_E]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_H]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_L]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_M]    = tlvmORA;
-    context->m_InstructionSet[TLVM_ORA_A]    = tlvmORA;
-    
-    context->m_InstructionSet[TLVM_ORI]      = tlvmORI;
-    
-    context->m_InstructionSet[TLVM_XRA_B]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_C]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_D]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_E]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_H]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_L]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_M]    = tlvmXRA;
-    context->m_InstructionSet[TLVM_XRA_A]    = tlvmXRA;
-   
-    context->m_InstructionSet[TLVM_XRI]      = tlvmXRI;
-
-    context->m_InstructionSet[TLVM_PUSH_B]   = tlvmPUSH;
-    context->m_InstructionSet[TLVM_PUSH_D]   = tlvmPUSH;
-    context->m_InstructionSet[TLVM_PUSH_H]   = tlvmPUSH;
-    context->m_InstructionSet[TLVM_PUSH_PSW] = tlvmPUSH;
-
-    context->m_InstructionSet[TLVM_POP_B]    = tlvmPOP;
-    context->m_InstructionSet[TLVM_POP_D]    = tlvmPOP;
-    context->m_InstructionSet[TLVM_POP_H]    = tlvmPOP;
-    context->m_InstructionSet[TLVM_POP_PSW]  = tlvmPOP;
-
-    context->m_InstructionSet[TLVM_SPHL]     = tlvmSPHL;
-    context->m_InstructionSet[TLVM_XTHL]     = tlvmXTHL;
-    context->m_InstructionSet[TLVM_XCHG]     = tlvmXCHG;
-    context->m_InstructionSet[TLVM_PCHL]     = tlvmPCHL;
-
-    context->m_InstructionSet[TLVM_JNZ]      = tlvmJMP;
-    context->m_InstructionSet[TLVM_JZ]       = tlvmJMP;
-    context->m_InstructionSet[TLVM_JNC]      = tlvmJMP;
-    context->m_InstructionSet[TLVM_JC]       = tlvmJMP;
-    context->m_InstructionSet[TLVM_JPO]      = tlvmJMP;
-    context->m_InstructionSet[TLVM_JPE]      = tlvmJMP;
-    context->m_InstructionSet[TLVM_JP]       = tlvmJMP;
-    context->m_InstructionSet[TLVM_JM]       = tlvmJMP;
-    context->m_InstructionSet[TLVM_JMP]      = tlvmJMP;
-
-    context->m_InstructionSet[TLVM_CNZ]      = tlvmCALL;
-    context->m_InstructionSet[TLVM_CZ]       = tlvmCALL;
-    context->m_InstructionSet[TLVM_CNC]      = tlvmCALL;
-    context->m_InstructionSet[TLVM_CC]       = tlvmCALL;
-    context->m_InstructionSet[TLVM_CPO]      = tlvmCALL;
-    context->m_InstructionSet[TLVM_CPE]      = tlvmCALL;
-    context->m_InstructionSet[TLVM_CP]       = tlvmCALL;
-    context->m_InstructionSet[TLVM_CM]       = tlvmCALL;
-    context->m_InstructionSet[TLVM_CALL]     = tlvmCALL;
-
-    context->m_InstructionSet[TLVM_RNZ]      = tlvmRET;
-    context->m_InstructionSet[TLVM_RZ]       = tlvmRET;
-    context->m_InstructionSet[TLVM_RNC]      = tlvmRET;
-    context->m_InstructionSet[TLVM_RC]       = tlvmRET;
-    context->m_InstructionSet[TLVM_RPO]      = tlvmRET;
-    context->m_InstructionSet[TLVM_RPE]      = tlvmRET;
-    context->m_InstructionSet[TLVM_RP]       = tlvmRET;
-    context->m_InstructionSet[TLVM_RM]       = tlvmRET;
-    context->m_InstructionSet[TLVM_RET]      = tlvmRET;
-
-    context->m_InstructionSet[TLVM_ADD_B]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_C]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_D]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_E]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_H]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_L]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_M]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADD_A]    = tlvmADD;
-   
-    context->m_InstructionSet[TLVM_ADC_B]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_C]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_D]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_E]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_H]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_L]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_M]    = tlvmADD;
-    context->m_InstructionSet[TLVM_ADC_A]    = tlvmADD;
-   
-    context->m_InstructionSet[TLVM_SUB_B]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_C]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_D]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_E]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_H]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_L]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_M]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SUB_A]    = tlvmSUB;
-   
-    context->m_InstructionSet[TLVM_SBB_B]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_C]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_D]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_E]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_H]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_L]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_M]    = tlvmSUB;
-    context->m_InstructionSet[TLVM_SBB_A]    = tlvmSUB;
-   
-    context->m_InstructionSet[TLVM_CMP_B]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_C]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_D]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_E]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_H]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_L]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_M]    = tlvmCMP;
-    context->m_InstructionSet[TLVM_CMP_A]    = tlvmCMP;
-   
-    context->m_InstructionSet[TLVM_INR_B]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_C]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_D]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_E]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_H]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_L]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_M]    = tlvmINR;
-    context->m_InstructionSet[TLVM_INR_A]    = tlvmINR;
-   
-    context->m_InstructionSet[TLVM_INX_B]    = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_D]    = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_H]    = tlvmINX;
-    context->m_InstructionSet[TLVM_INX_SP]   = tlvmINX;
-   
-    context->m_InstructionSet[TLVM_DCR_B]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_C]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_D]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_E]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_H]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_L]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_M]    = tlvmDCR;
-    context->m_InstructionSet[TLVM_DCR_A]    = tlvmDCR;
-   
-    context->m_InstructionSet[TLVM_DCX_B]    = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_D]    = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_H]    = tlvmDCX;
-    context->m_InstructionSet[TLVM_DCX_SP]   = tlvmDCX;
-   
-    context->m_InstructionSet[TLVM_ADI]      = tlvmADI;
-    context->m_InstructionSet[TLVM_ACI]      = tlvmADI;
-    context->m_InstructionSet[TLVM_SUI]      = tlvmSUI;
-    context->m_InstructionSet[TLVM_SBI]      = tlvmSUI;
-    context->m_InstructionSet[TLVM_CPI]      = tlvmCPI;
-   
-    context->m_InstructionSet[TLVM_DAD_B]    = tlvmDAD;
-    context->m_InstructionSet[TLVM_DAD_D]    = tlvmDAD;
-    context->m_InstructionSet[TLVM_DAD_H]    = tlvmDAD;
-    context->m_InstructionSet[TLVM_DAD_SP]   = tlvmDAD;
-   
-    context->m_InstructionSet[TLVM_STA]      = tlvmSTA;
-   
-    context->m_InstructionSet[TLVM_OUT]      = tlvmOUT;
-    context->m_InstructionSet[TLVM_IN]       = tlvmIN;
-
-    context->m_InstructionSet[TLVM_RST_0]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_1]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_2]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_3]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_4]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_5]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_6]    = tlvmRST;
-    context->m_InstructionSet[TLVM_RST_7]    = tlvmRST;
-
-    context->m_InstructionSet[TLVM_EI]       = tlvmEI;
-    context->m_InstructionSet[TLVM_DI]       = tlvmDI;
-
-    context->m_InstructionSet[TLVM_RLC]      = tlvmROT;
-    context->m_InstructionSet[TLVM_RAL]      = tlvmROT;
-    context->m_InstructionSet[TLVM_RRC]      = tlvmROT;
-    context->m_InstructionSet[TLVM_RAR]      = tlvmROT;
-
-    context->m_InstructionSet[TLVM_SHLD]     = tlvmSHLD;
-    context->m_InstructionSet[TLVM_LHLD]     = tlvmLHLD;
-
-    context->m_InstructionSet[TLVM_STC]      = tlvmSTC;
-    context->m_InstructionSet[TLVM_CMC]      = tlvmCMC;
-
-    context->m_InstructionSet[TLVM_CMA]      = tlvmCMA;
-
-    context->m_InstructionSet[TLVM_DAA]      = tlvmDAA;
-
     TLVM_RETURN_CODE(SUCCESS);
+}
+
+void tlvm8080SetupData()
+{
+    g_8080Data.m_Header.m_ProcessorID = TLVM_CPU_8080;
+
+    g_8080Data.m_InstructionSet[TLVM_NOP]      = tlvmNOP;
+    g_8080Data.m_InstructionSet[TLVM_HLT]      = tlvmHLT;
+      
+    g_8080Data.m_InstructionSet[TLVM_LXI_B]    = tlvmLXI;
+    g_8080Data.m_InstructionSet[TLVM_LXI_D]    = tlvmLXI;
+    g_8080Data.m_InstructionSet[TLVM_LXI_H]    = tlvmLXI;
+    g_8080Data.m_InstructionSet[TLVM_LXI_SP]   = tlvmLXI;
+      
+    g_8080Data.m_InstructionSet[TLVM_LDAX_B]   = tlvmLDAX;
+    g_8080Data.m_InstructionSet[TLVM_LDAX_D]   = tlvmLDAX;
+  
+    g_8080Data.m_InstructionSet[TLVM_STAX_B]   = tlvmSTAX;
+    g_8080Data.m_InstructionSet[TLVM_STAX_D]   = tlvmSTAX;
+      
+    g_8080Data.m_InstructionSet[TLVM_MVI_B]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_C]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_D]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_E]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_H]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_L]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_M]    = tlvmMVI;
+    g_8080Data.m_InstructionSet[TLVM_MVI_A]    = tlvmMVI;
+  
+    g_8080Data.m_InstructionSet[TLVM_LDA]      = tlvmLDA;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_BB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_BA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_CB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_CA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_DB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_DA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_EB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_ED]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_EA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_HB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_HA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_LB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_LA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_MB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_MC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_MD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_ME]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_MH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_ML]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_MA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_MOV_AB]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AC]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AD]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AE]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AH]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AL]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AM]   = tlvmMOV;
+    g_8080Data.m_InstructionSet[TLVM_MOV_AA]   = tlvmMOV;
+    
+    g_8080Data.m_InstructionSet[TLVM_ANA_B]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_C]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_D]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_E]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_H]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_L]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_M]    = tlvmANA;
+    g_8080Data.m_InstructionSet[TLVM_ANA_A]    = tlvmANA;
+    
+    g_8080Data.m_InstructionSet[TLVM_ANI]      = tlvmANI;
+    
+    g_8080Data.m_InstructionSet[TLVM_ORA_B]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_C]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_D]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_E]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_H]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_L]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_M]    = tlvmORA;
+    g_8080Data.m_InstructionSet[TLVM_ORA_A]    = tlvmORA;
+    
+    g_8080Data.m_InstructionSet[TLVM_ORI]      = tlvmORI;
+    
+    g_8080Data.m_InstructionSet[TLVM_XRA_B]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_C]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_D]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_E]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_H]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_L]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_M]    = tlvmXRA;
+    g_8080Data.m_InstructionSet[TLVM_XRA_A]    = tlvmXRA;
+   
+    g_8080Data.m_InstructionSet[TLVM_XRI]      = tlvmXRI;
+
+    g_8080Data.m_InstructionSet[TLVM_PUSH_B]   = tlvmPUSH;
+    g_8080Data.m_InstructionSet[TLVM_PUSH_D]   = tlvmPUSH;
+    g_8080Data.m_InstructionSet[TLVM_PUSH_H]   = tlvmPUSH;
+    g_8080Data.m_InstructionSet[TLVM_PUSH_PSW] = tlvmPUSH;
+
+    g_8080Data.m_InstructionSet[TLVM_POP_B]    = tlvmPOP;
+    g_8080Data.m_InstructionSet[TLVM_POP_D]    = tlvmPOP;
+    g_8080Data.m_InstructionSet[TLVM_POP_H]    = tlvmPOP;
+    g_8080Data.m_InstructionSet[TLVM_POP_PSW]  = tlvmPOP;
+
+    g_8080Data.m_InstructionSet[TLVM_SPHL]     = tlvmSPHL;
+    g_8080Data.m_InstructionSet[TLVM_XTHL]     = tlvmXTHL;
+    g_8080Data.m_InstructionSet[TLVM_XCHG]     = tlvmXCHG;
+    g_8080Data.m_InstructionSet[TLVM_PCHL]     = tlvmPCHL;
+
+    g_8080Data.m_InstructionSet[TLVM_JNZ]      = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JZ]       = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JNC]      = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JC]       = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JPO]      = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JPE]      = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JP]       = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JM]       = tlvmJMP;
+    g_8080Data.m_InstructionSet[TLVM_JMP]      = tlvmJMP;
+
+    g_8080Data.m_InstructionSet[TLVM_CNZ]      = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CZ]       = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CNC]      = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CC]       = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CPO]      = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CPE]      = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CP]       = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CM]       = tlvmCALL;
+    g_8080Data.m_InstructionSet[TLVM_CALL]     = tlvmCALL;
+
+    g_8080Data.m_InstructionSet[TLVM_RNZ]      = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RZ]       = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RNC]      = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RC]       = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RPO]      = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RPE]      = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RP]       = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RM]       = tlvmRET;
+    g_8080Data.m_InstructionSet[TLVM_RET]      = tlvmRET;
+
+    g_8080Data.m_InstructionSet[TLVM_ADD_B]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_C]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_D]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_E]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_H]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_L]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_M]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADD_A]    = tlvmADD;
+   
+    g_8080Data.m_InstructionSet[TLVM_ADC_B]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_C]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_D]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_E]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_H]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_L]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_M]    = tlvmADD;
+    g_8080Data.m_InstructionSet[TLVM_ADC_A]    = tlvmADD;
+   
+    g_8080Data.m_InstructionSet[TLVM_SUB_B]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_C]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_D]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_E]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_H]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_L]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_M]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SUB_A]    = tlvmSUB;
+   
+    g_8080Data.m_InstructionSet[TLVM_SBB_B]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_C]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_D]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_E]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_H]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_L]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_M]    = tlvmSUB;
+    g_8080Data.m_InstructionSet[TLVM_SBB_A]    = tlvmSUB;
+   
+    g_8080Data.m_InstructionSet[TLVM_CMP_B]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_C]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_D]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_E]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_H]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_L]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_M]    = tlvmCMP;
+    g_8080Data.m_InstructionSet[TLVM_CMP_A]    = tlvmCMP;
+   
+    g_8080Data.m_InstructionSet[TLVM_INR_B]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_C]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_D]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_E]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_H]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_L]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_M]    = tlvmINR;
+    g_8080Data.m_InstructionSet[TLVM_INR_A]    = tlvmINR;
+   
+    g_8080Data.m_InstructionSet[TLVM_INX_B]    = tlvmINX;
+    g_8080Data.m_InstructionSet[TLVM_INX_D]    = tlvmINX;
+    g_8080Data.m_InstructionSet[TLVM_INX_H]    = tlvmINX;
+    g_8080Data.m_InstructionSet[TLVM_INX_SP]   = tlvmINX;
+   
+    g_8080Data.m_InstructionSet[TLVM_DCR_B]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_C]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_D]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_E]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_H]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_L]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_M]    = tlvmDCR;
+    g_8080Data.m_InstructionSet[TLVM_DCR_A]    = tlvmDCR;
+   
+    g_8080Data.m_InstructionSet[TLVM_DCX_B]    = tlvmDCX;
+    g_8080Data.m_InstructionSet[TLVM_DCX_D]    = tlvmDCX;
+    g_8080Data.m_InstructionSet[TLVM_DCX_H]    = tlvmDCX;
+    g_8080Data.m_InstructionSet[TLVM_DCX_SP]   = tlvmDCX;
+   
+    g_8080Data.m_InstructionSet[TLVM_ADI]      = tlvmADI;
+    g_8080Data.m_InstructionSet[TLVM_ACI]      = tlvmADI;
+    g_8080Data.m_InstructionSet[TLVM_SUI]      = tlvmSUI;
+    g_8080Data.m_InstructionSet[TLVM_SBI]      = tlvmSUI;
+    g_8080Data.m_InstructionSet[TLVM_CPI]      = tlvmCPI;
+   
+    g_8080Data.m_InstructionSet[TLVM_DAD_B]    = tlvmDAD;
+    g_8080Data.m_InstructionSet[TLVM_DAD_D]    = tlvmDAD;
+    g_8080Data.m_InstructionSet[TLVM_DAD_H]    = tlvmDAD;
+    g_8080Data.m_InstructionSet[TLVM_DAD_SP]   = tlvmDAD;
+   
+    g_8080Data.m_InstructionSet[TLVM_STA]      = tlvmSTA;
+   
+    g_8080Data.m_InstructionSet[TLVM_OUT]      = tlvmOUT;
+    g_8080Data.m_InstructionSet[TLVM_IN]       = tlvmIN;
+
+    g_8080Data.m_InstructionSet[TLVM_RST_0]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_1]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_2]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_3]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_4]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_5]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_6]    = tlvmRST;
+    g_8080Data.m_InstructionSet[TLVM_RST_7]    = tlvmRST;
+
+    g_8080Data.m_InstructionSet[TLVM_EI]       = tlvmEI;
+    g_8080Data.m_InstructionSet[TLVM_DI]       = tlvmDI;
+
+    g_8080Data.m_InstructionSet[TLVM_RLC]      = tlvmROT;
+    g_8080Data.m_InstructionSet[TLVM_RAL]      = tlvmROT;
+    g_8080Data.m_InstructionSet[TLVM_RRC]      = tlvmROT;
+    g_8080Data.m_InstructionSet[TLVM_RAR]      = tlvmROT;
+
+    g_8080Data.m_InstructionSet[TLVM_SHLD]     = tlvmSHLD;
+    g_8080Data.m_InstructionSet[TLVM_LHLD]     = tlvmLHLD;
+
+    g_8080Data.m_InstructionSet[TLVM_STC]      = tlvmSTC;
+    g_8080Data.m_InstructionSet[TLVM_CMC]      = tlvmCMC;
+
+    g_8080Data.m_InstructionSet[TLVM_CMA]      = tlvmCMA;
+
+    g_8080Data.m_InstructionSet[TLVM_DAA]      = tlvmDAA;
 }
 
 tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     ((tlvm8080data*)context->m_ProcessorData)->m_IOCallback = callback;
 
@@ -360,26 +355,22 @@ tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callba
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
-    if(outPort == NULL)
-        TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(outPort, INVALID_INPUT);
     *outPort = context->m_Ports[port];
     TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     context->m_Ports[port] = portval;
     TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     if(TLVM_FLAG_ISSET(I))
         tlvm8080HandleInterrupt(context, interrupt);
@@ -391,8 +382,7 @@ tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt)
 
 tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_PUSH_PC(interrupt << 3);
 
@@ -401,8 +391,7 @@ tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt)
 
 tlvmReturn tlvmSTC(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_FLAG_SET(C);
     
@@ -417,8 +406,7 @@ tlvmReturn tlvmSTC(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmCMC(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_FLAG_SET_IF(TLVM_FLAG_ISSET(C) == 0, C);
     
@@ -433,8 +421,7 @@ tlvmReturn tlvmCMC(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmNOP(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
     if(cycles)
@@ -445,8 +432,7 @@ tlvmReturn tlvmNOP(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmHLT(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
     if(cycles)
@@ -458,8 +444,7 @@ tlvmReturn tlvmHLT(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmCMA(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
     TLVM_REGISTER_COMPLEMENT(TLVM_REG_A);
 
@@ -472,8 +457,7 @@ tlvmReturn tlvmCMA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
 	TLVM_GET_OP(opcode, 0);
 	TLVM_GET_OP(opLow,  1);
@@ -509,8 +493,7 @@ tlvmReturn tlvmLXI(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
 	TLVM_GET_OP(opcode, 0);
 
@@ -525,8 +508,7 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
 	break;
     }
     tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_WRITE);
-    if(dst == NULL)
-    	TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(dst, INVALID_INPUT);
     *dst = context->m_Registers[TLVM_REG_A];
     
     // size of instruction    = 1
@@ -539,8 +521,7 @@ tlvmReturn tlvmSTAX(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 
 	TLVM_GET_OP(opLow, 1);
@@ -549,8 +530,8 @@ tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
     tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
     tlvmByte* dstLo = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
     tlvmByte* dstHi = tlvmGetMemory(context, addr+1, TLVM_FLAG_WRITE);
-    if(dstLo == NULL || dstHi == NULL)
-    	TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(dstHi, INVALID_INPUT);
+    TLVM_NULL_CHECK(dstLo, INVALID_INPUT);
     *dstLo = context->m_Registers[TLVM_REG_L];
     *dstHi = context->m_Registers[TLVM_REG_H];
 
@@ -565,8 +546,7 @@ tlvmReturn tlvmSHLD(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmLHLD(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
     
     TLVM_GET_OP(opLow, 1);
@@ -575,8 +555,8 @@ tlvmReturn tlvmLHLD(tlvmContext* context, tlvmByte* cycles)
     tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
     tlvmByte* dstLo = tlvmGetMemory(context, addr+0, TLVM_FLAG_WRITE);
     tlvmByte* dstHi = tlvmGetMemory(context, addr+1, TLVM_FLAG_WRITE);
-    if(dstLo == NULL || dstHi == NULL)
-    	TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(dstHi, INVALID_INPUT);
+    TLVM_NULL_CHECK(dstLo, INVALID_INPUT);
     context->m_Registers[TLVM_REG_L] = *dstLo;
     context->m_Registers[TLVM_REG_H] = *dstHi;
     
@@ -591,8 +571,7 @@ tlvmReturn tlvmLHLD(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opLow, 1);
 	TLVM_GET_OP(opHigh, 2);
@@ -600,8 +579,7 @@ tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
     tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
 
     tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
-    if(src == NULL)
-    	TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
     context->m_Registers[TLVM_REG_A] = *src;
 
     // size of instruction    = 1
@@ -615,8 +593,7 @@ tlvmReturn tlvmLDA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opLow, 1);
 	TLVM_GET_OP(opHigh, 2);
@@ -624,8 +601,7 @@ tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
     tlvmShort addr = (tlvmShort)opHigh << 8 | (tlvmShort)opLow;
 
     tlvmByte* dst = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
-    if(dst == NULL)
-    	TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(dst, INVALID_INPUT);
     *dst = context->m_Registers[TLVM_REG_A];
 
     // size of instruction    = 1
@@ -639,8 +615,7 @@ tlvmReturn tlvmSTA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 	tlvmShort addr = 0;
@@ -657,8 +632,7 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 	}
 
 	tlvmByte* src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
-	if(src == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] = *src;
 
@@ -672,8 +646,7 @@ tlvmReturn tlvmLDAX(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -710,8 +683,7 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 	break;
 	}
 
-	if(src == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] &= *src;
 
@@ -725,8 +697,7 @@ tlvmReturn tlvmANA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(operand, 1);
 
@@ -744,8 +715,7 @@ tlvmReturn tlvmANI(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -782,8 +752,7 @@ tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
 	break;
 	}
 
-	if(src == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] |= *src;
 
@@ -797,8 +766,7 @@ tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmORI(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(operand, 1);
 
@@ -815,8 +783,7 @@ tlvmReturn tlvmORI(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -853,8 +820,7 @@ tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
 	break;
 	}
 
-	if(src == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
 
 	context->m_Registers[TLVM_REG_A] ^= *src;
     TLVM_FLAG_UNSET(H);
@@ -870,8 +836,7 @@ tlvmReturn tlvmXRA(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmXRI(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(operand, 1);
 
@@ -890,8 +855,7 @@ tlvmReturn tlvmXRI(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmINR(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -938,8 +902,7 @@ tlvmReturn tlvmINR(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmDCR(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -988,8 +951,7 @@ tlvmReturn tlvmDCR(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     tlvmShort tmp = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
     TLVM_SET_16BIT(TLVM_REG_H, TLVM_REG_L, TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E));
@@ -1005,8 +967,7 @@ tlvmReturn tlvmXCHG(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmPCHL(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_ProgramCounter = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
 
@@ -1021,8 +982,7 @@ tlvmReturn tlvmPCHL(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmDAA(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     tlvmByte nibbleLo = context->m_Registers[TLVM_REG_A] & 0x0F;
     tlvmByte nibbleHi = (context->m_Registers[TLVM_REG_A] & 0xF0)>>4;

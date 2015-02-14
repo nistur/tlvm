@@ -27,8 +27,7 @@ nistur@gmail.com
 #define TEST_MOV(x) ((opcode & x) == x)
 tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -76,9 +75,8 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 	else if( (TEST_MOV(TLVM_MOV_FROM_B)) )
 		src = &context->m_Registers[TLVM_REG_B];
 
-
-	if(src == NULL || dst == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(src, INVALID_INPUT);
+    TLVM_NULL_CHECK(dst, INVALID_INPUT);
 
 	*dst = *src;
 
@@ -92,8 +90,7 @@ tlvmReturn tlvmMOV(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmMVI(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode,  0);
 	TLVM_GET_OP(operand, 1);

@@ -40,6 +40,17 @@ using std::cin;
 using std::endl;
 using std::string;
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#elif defined(__cplusplus)
+# define UNUSED(x)
+#else
+# define UNUSED(x) x
+#endif
+
 struct Memory
 {
 	Memory* next;
@@ -83,7 +94,7 @@ int parseAddress(string str)
 	int addr = 0;
 	if(str.find("0x") == 0)
 	{
-		for(int i = 2; i < str.length(); ++i)
+		for(unsigned int i = 2; i < str.length(); ++i)
 		{
 			addr <<= 4;
 			char c = str[i];
@@ -157,14 +168,14 @@ void onIOWrite(tlvmContext* context, tlvmByte port)
 void startStdIO(tlvmContext* context, int outDataPort, int inDataPort, int statPort)
 {
 	g_outDataPort = outDataPort;
-	g_inDataPort = outDataPort;
+	g_inDataPort = inDataPort;
 	g_statPort = statPort;
 	tlvmSetPort(context, g_statPort, 0x01); // READY!
 	g_inputThreadState = Halt; // dont start running now, instead let resume take over
 	tlvm8080SetIOCallback(context, onIOWrite);
 }
 
-void pauseStdIO(tlvmContext* context)
+void pauseStdIO(tlvmContext* UNUSED(context))
 {
 	if(g_inputThreadState == Running)
 	{
@@ -220,7 +231,7 @@ while(true) \
 #define HANDLE_INPUT_OPTION(opt, shortopt) \
 if(val == #opt || val == #shortopt)
 
-void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
+void breakpoint(tlvmContext* context, tlvmByte UNUSED(message), tlvmShort addr)
 {
 	pauseStdIO(context);
 	tlvmChar* instruction = new tlvmChar[256];
@@ -318,14 +329,13 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
  * but for now, I'm just making sure
  * it works
  */
-int main(int argc, char** argv)
+int main(int UNUSED(argc), char** UNUSED(argv))
 {
 	g_state.memory = NULL;
 	g_state.quit = false;
 
 	tlvmContext* context;
-	tlvmInitContext(&context);
-	tlvm8080Init(context);
+	tlvmInitContext(&context, TLVM_CPU_8080);
 	tlvmSetClockspeed(context, TLVM_MHZ(2,0));
 
 	HANDLE_INPUT_START();

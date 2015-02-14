@@ -131,6 +131,7 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 /*********************************************
  * PROCESSOR INSTRUCTION SETS
  *********************************************/
+ #define TLVM_CPU_8080          1
 #include "tlvm_8080.h"
 
 /*********************************************
@@ -148,11 +149,13 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  *   parameters:
  *     context - the pointer to where the CPU
  *       context should be created
+ *     cpuid - the type of CPU to create
+ *             - TLVM_CPU_8080
  *   return:
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - context pointer is NULL
  *********************************************/
-TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context);
+TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context, tlvmByte cpuid);
 
 /*********************************************
  * tlvmTerminateContext

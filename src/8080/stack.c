@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -65,8 +64,7 @@ tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 {
-	if(context == NULL)
-		TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	TLVM_GET_OP(opcode, 0);
 
@@ -105,8 +103,7 @@ tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmSPHL(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     context->m_StackPointer = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
     // size of instruction    = 1
@@ -119,14 +116,13 @@ tlvmReturn tlvmSPHL(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
 	tlvmByte* dstHi = tlvmGetMemory(context, context->m_StackPointer+1, TLVM_FLAG_WRITE);
 	tlvmByte* dstLo = tlvmGetMemory(context, context->m_StackPointer+0, TLVM_FLAG_WRITE);
 
-	if(dstHi == NULL || dstLo == NULL)
-		TLVM_RETURN_CODE(INVALID_INPUT);
+    TLVM_NULL_CHECK(dstHi, INVALID_INPUT);
+    TLVM_NULL_CHECK(dstLo, INVALID_INPUT);
 
 	tlvmByte tmpHi = *dstHi;
 	tlvmByte tmpLo = *dstLo;

@@ -424,13 +424,10 @@ tlvmReturn tlvmROT  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDAA  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
- * tlvmAdd8080
+ * tlvm8080SetupData
  *     Add Intel 8080 instruction set to CPU
- * parameters:
- *     context - the CPU context to add 8080 
- *     support to
  *********************************************/
-tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
+void       tlvm8080SetupData();
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
 tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval);
@@ -441,6 +438,9 @@ typedef struct _tlvm8080data
 {
 	tlvmProcessorData m_Header;
 	tlvm8080IOCallback m_IOCallback;
+
+    // instrution set
+    tlvmInstruction     m_InstructionSet[256];
 } tlvm8080data;
 
 #endif/*TLVM_HAS_8080*/

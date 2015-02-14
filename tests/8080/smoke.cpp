@@ -29,8 +29,7 @@ nistur@gmail.com
 TEST(HelloWorld, Smoke, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
       tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
@@ -108,8 +107,7 @@ TEST(HelloWorld, Smoke, 0.0f,
 TEST(HelloWorld2, Smoke, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
       tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));

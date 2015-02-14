@@ -26,8 +26,7 @@ nistur@gmail.com
 
 tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_GET_OP(opcode, 0);
 
@@ -82,8 +81,7 @@ tlvmReturn tlvmRST(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmEI(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_FLAG_SET(I);
     if(context->m_Registers[TLVM_REG_I])
@@ -99,8 +97,7 @@ tlvmReturn tlvmEI(tlvmContext* context, tlvmByte* cycles)
 
 tlvmReturn tlvmDI(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        TLVM_RETURN_CODE(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     TLVM_FLAG_UNSET(I);
     // size of instruction    = 1

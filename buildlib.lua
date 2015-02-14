@@ -11,7 +11,10 @@ project "tlvm-lite"
 language "C"
 kind "StaticLib"
 includedirs { "include", "src/include" }
+excludes{ "src/debug.c", "src/8080/8080_debug.c" }
 files { "src/**.c", "src/**.cpp" }
+configuration "Release"
+defines{ "TLVM_UNSAFE" }
 
 --project "tlvm-dynamic"
 --kind "SharedLib"

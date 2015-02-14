@@ -26,8 +26,7 @@ nistur@gmail.com
 TEST(Instructions, MOV, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
      },
      // cleanup
      {
@@ -165,8 +164,7 @@ TEST_MOV_MEM_REG(E);
 TEST_MOV_MEM_REG(H);
 TEST(ML, MOV, 0.0f,
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 0xFF, TLVM_FLAG_READ|TLVM_FLAG_WRITE);
       m_data.bootloader[0x00] = TLVM_MOV_ML;
