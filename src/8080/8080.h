@@ -424,6 +424,17 @@ tlvmReturn tlvmROT  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDAA  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
+ * tlvm8080Init
+ *     Setup the entire 8080 CPU. This will
+ * initialise all the registers and I/O ports 
+ * and then setup the instruction set
+ * parameters:
+ *     context - the CPU context to add 8080 
+ * support to
+ *********************************************/
+TLVM_EXPORT tlvmReturn  tlvm8080Init  (tlvmContext** context);
+
+/*********************************************
  * tlvm8080SetupData
  *     Add Intel 8080 instruction set to CPU
  *********************************************/
@@ -434,14 +445,22 @@ tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval
 tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt);
 tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt);
 
-typedef struct _tlvm8080data
+typedef struct _tlvmContext_8080
+{
+    tlvmContext m_Header;
+
+    tlvmByte    m_Registers[9];
+    tlvmByte    m_Ports[256];
+} tlvmContext_8080;
+
+typedef struct _tlvmProcessorData_8080
 {
 	tlvmProcessorData m_Header;
 	tlvm8080IOCallback m_IOCallback;
 
     // instrution set
     tlvmInstruction     m_InstructionSet[256];
-} tlvm8080data;
+} tlvmProcessorData_8080;
 
 #endif/*TLVM_HAS_8080*/
 #endif/*__8080_H__*/

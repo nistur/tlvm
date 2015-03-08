@@ -42,16 +42,9 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
 tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    *context = tlvmMalloc(tlvmContext);
-    if(tlvmClearContext(*context) != TLVM_SUCCESS)
-    {
-	   (void)tlvmTerminateContext(context);
-       TLVM_RETURN();
-    }
 #if TLVM_HAS_8080
     if(cpuid == TLVM_CPU_8080)
-        tlvm8080Init(*context);
+        tlvm8080Init(context);
 #endif
 
     TLVM_RETURN_CODE(SUCCESS);

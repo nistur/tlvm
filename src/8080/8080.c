@@ -24,27 +24,23 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_8080
 #include "tlvm_internal.h"
 
-tlvm8080data g_8080Data;
+tlvmProcessorData_8080 g_8080Data;
 
-tlvmReturn tlvm8080Init(tlvmContext* context)
+tlvmReturn tlvm8080Init(tlvmContext** context)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    tlvmContext_8080* cpu = tlvmMalloc(tlvmContext_8080);
+    *context = &cpu->m_Header;
 
     if(g_8080Data.m_Header.m_ProcessorID == 0)
         tlvm8080SetupData();
 
-    context->m_ProcessorData = &g_8080Data.m_Header;
-    context->m_InstructionSet = g_8080Data.m_InstructionSet;
+    (*context)->m_ProcessorData = &g_8080Data.m_Header;
+    (*context)->m_InstructionSet = g_8080Data.m_InstructionSet;
 
-    // initialise all the 8080 registers
-    if(context->m_Registers)
-        tlvmFree(context->m_Registers);
-    context->m_Registers = tlvmMallocArray(tlvmByte, 8);
-
-    // create default I/O ports
-    if(context->m_Ports)
-        tlvmFree(context->m_Ports);
-    context->m_Ports = tlvmMallocArray(tlvmByte, 255);
+    (*context)->m_Registers = cpu->m_Registers;
+    (*context)->m_Ports = cpu->m_Ports;
 
     TLVM_RETURN_CODE(SUCCESS);
 }
@@ -348,7 +344,7 @@ tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callba
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    ((tlvm8080data*)context->m_ProcessorData)->m_IOCallback = callback;
+    ((tlvmProcessorData_8080*)context->m_ProcessorData)->m_IOCallback = callback;
 
     TLVM_RETURN_CODE(SUCCESS);
 }

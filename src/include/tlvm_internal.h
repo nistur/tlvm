@@ -35,11 +35,10 @@ typedef struct _tlvmProcessorData
 {
 	tlvmByte m_ProcessorID;
 } tlvmProcessorData;
-#include "../8080/8080.h"
 
-#define TLVM_FLAG_ISSET(x) (context->m_Registers[TLVM_REG_F] & TLVM_FLAG_##x)
-#define TLVM_FLAG_SET(x) context->m_Registers[TLVM_REG_F] |= TLVM_FLAG_##x
-#define TLVM_FLAG_UNSET(x) context->m_Registers[TLVM_REG_F] &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
+#define TLVM_FLAG_ISSET(x) (TLVM_REGISTER(TLVM_REG_F) & TLVM_FLAG_##x)
+#define TLVM_FLAG_SET(x) TLVM_REGISTER(TLVM_REG_F) |= TLVM_FLAG_##x
+#define TLVM_FLAG_UNSET(x) TLVM_REGISTER(TLVM_REG_F) &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
 #define TLVM_FLAG_SET_IF(test, x) if(test){ TLVM_FLAG_SET(x); }else{ TLVM_FLAG_UNSET(x); }
 #define TLVM_SET_FLAGS(res) \
 	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); \
@@ -47,13 +46,16 @@ typedef struct _tlvmProcessorData
 	TLVM_FLAG_SET_IF(res > 0xFF, C); \
 	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P);
 	
-#define TLVM_GET_16BIT(h, l) 	((tlvmShort)context->m_Registers[h]) << 8 | (tlvmShort)context->m_Registers[l]
+#define TLVM_GET_16BIT(h, l) 	((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l)
 #define TLVM_SET_16BIT(h, l, v) \
 	context->m_Registers[h] = (tlvmByte)((v) >> 8); \
 	context->m_Registers[l] = (tlvmByte)((v) & 0xFF);
 
 #define TLVM_REGISTER_COMPLEMENT(x) \
-    context->m_Registers[x] = ~context->m_Registers[x];
+    TLVM_REGISTER(x) = ~TLVM_REGISTER(x);
+
+#define TLVM_REGISTER(x) \
+    (context->m_Registers[x])
 
 #define TLVM_GET_OP(v, n) \
 	tlvmByte v = 0;\
@@ -117,7 +119,7 @@ struct _tlvmContext
 	// registers
 	tlvmByte*  m_Registers;
 
-	tlvmByte*  m_Ports; // for now, just hardcode this in
+	tlvmByte*  m_Ports;
 
 	tlvmShort  m_Clockspeed;
 
@@ -145,6 +147,8 @@ struct _tlvmMemoryBuffer
 	tlvmByte*         m_Buffer;
 	tlvmByte		  m_Flags;
 };
+
+#include "../8080/8080.h"
 /***************************************
  * Some basic memory management wrappers
  ***************************************/
