@@ -66,7 +66,7 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
     TLVM_NULL_CHECK(src, INVALID_INPUT);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src;
-    TLVM_SET_FLAGS(res);
+    TLVM_SET_FLAGS(res, 8080);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
@@ -83,7 +83,7 @@ tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
     TLVM_GET_OP(op1, 1);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)op1;
-    TLVM_SET_FLAGS(res);
+    TLVM_SET_FLAGS(res, 8080);
 
     // size of instruction    = 1
     // size of operand        = 1

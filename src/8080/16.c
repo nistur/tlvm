@@ -130,8 +130,8 @@ tlvmReturn tlvmDAD(tlvmContext* context, tlvmByte* cycles)
 
     TLVM_SET_16BIT(TLVM_REG_H, TLVM_REG_L, (tlvmShort)(val & 0xFFFF));
 
-    TLVM_FLAG_SET_IF(val ^ 0xFFFF, C);
-    TLVM_FLAG_SET_IF(val & 0xFFFF, Z);
+    TLVM_FLAG_SET_IF(val ^ 0xFFFF, C, 8080);
+    TLVM_FLAG_SET_IF(val & 0xFFFF, Z, 8080);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;

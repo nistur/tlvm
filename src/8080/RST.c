@@ -83,7 +83,7 @@ tlvmReturn tlvmEI(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    TLVM_FLAG_SET(I);
+    TLVM_FLAG_SET(I, 8080);
     if(context->m_Registers[TLVM_REG_I])
         tlvm8080HandleInterrupt(context, context->m_Registers[TLVM_REG_I]);
     context->m_Registers[TLVM_REG_I] = 0x00;
@@ -99,7 +99,7 @@ tlvmReturn tlvmDI(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    TLVM_FLAG_UNSET(I);
+    TLVM_FLAG_UNSET(I, 8080);
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)

@@ -21,29 +21,30 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#ifndef __TLVM_8080_H__
-#define __TLVM_8080_H__
+#include "../tlvm-tests.h"
 
-#ifdef  TLVM_HAS_8080
-
-#ifndef __TLVM_H__
-#error Do not #include tlvm_8080.h manually, please use tlvm.h
-#endif
-
-typedef void(*tlvm8080IOCallback)(tlvmContext* context, tlvmByte port);
-
-/*********************************************
- * tlvm8080SetIOCallback
- *     Provides a callback for when any of the
- *   8080's ports have been written to.
- * parameters:
- *     context - the CPU context to add the
- *   callback to
- *     callback - the function pointer of the
- *   callback
- *********************************************/
-TLVM_EXPORT tlvmReturn  tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback);
-
-#endif/*TLVM_HAS_8080*/
-
-#endif/*__TLVM_8080_H__*/
+TEST(InstLSRD, CPU_6303, 0.0f,
+     // initialisation
+     {
+      tlvmInitContext(&m_data.context, TLVM_CPU_6303);
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 1, TLVM_FLAG_READ);
+      m_data.bootloader[0] = TLVM_6303_LSRD;
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+          // reload the program so each time we start from 0x0
+          tlvmReset(m_data.context);
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
+          ASSERT(cycle == 1);
+     },
+     // data
+     {
+      tlvmContext* context;
+      tlvmByte     bootloader[1];
+     }
+    );

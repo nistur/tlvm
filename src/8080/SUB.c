@@ -36,37 +36,37 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     switch(opcode)
     {
     case TLVM_SBB_B:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_B:
         src = &context->m_Registers[TLVM_REG_B];
     break;
     case TLVM_SBB_C:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_C:
         src = &context->m_Registers[TLVM_REG_C];
     break;
     case TLVM_SBB_D:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_D:
         src = &context->m_Registers[TLVM_REG_D];
     break;
     case TLVM_SBB_E:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_E:
         src = &context->m_Registers[TLVM_REG_E];
     break;
     case TLVM_SBB_H:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_H:
         src = &context->m_Registers[TLVM_REG_H];
     break;
     case TLVM_SBB_L:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_L:
         src = &context->m_Registers[TLVM_REG_L];
     break;
     case TLVM_SBB_M:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_M:
         {
             tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
@@ -74,7 +74,7 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
         }
     break;
     case TLVM_SBB_A:
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_SUB_A:
         src = &context->m_Registers[TLVM_REG_A];
     break;
@@ -83,7 +83,7 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     TLVM_NULL_CHECK(src, INVALID_INPUT);
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src - borrow;
-    TLVM_SET_FLAGS(res);
+    TLVM_SET_FLAGS(res, 8080);
     context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
 
     // size of instruction    = 1
@@ -103,10 +103,10 @@ tlvmReturn tlvmSUI(tlvmContext* context, tlvmByte* cycles)
 
     tlvmShort borrow = 0;
     if(operand == TLVM_SBI)
-        borrow = TLVM_FLAG_ISSET(C) ? 1 : 0;
+        borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
 
     tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)op1 - borrow;
-    TLVM_SET_FLAGS(res);
+    TLVM_SET_FLAGS(res, 8080);
     context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
 
 

@@ -44,17 +44,23 @@ nistur@gmail.com
 /*********************************************
  * FLAGS
  *********************************************/
-#define TLVM_FLAG_S 	(1<<7) // Sign
-#define TLVM_FLAG_Z 	(1<<6) // Zero
-#define TLVM_FLAG_I 	(1<<5) // Interrupt
-#define TLVM_FLAG_H 	(1<<4) // Auxiliary Carry
-#define TLVM_FLAG_P 	(1<<2) // Parity
-#define TLVM_FLAG_C 	(1<<0) // Carry
+#define TLVM_8080_FLAG_S 	(1<<7) // Sign
+#define TLVM_8080_FLAG_Z 	(1<<6) // Zero
+#define TLVM_8080_FLAG_I 	(1<<5) // Interrupt
+#define TLVM_8080_FLAG_H 	(1<<4) // Auxiliary Carry
+#define TLVM_8080_FLAG_P 	(1<<2) // Parity
+#define TLVM_8080_FLAG_C 	(1<<0) // Carry
 
-#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_I| TLVM_FLAG_H | TLVM_FLAG_P | TLVM_FLAG_C)
+#define TLVM_8080_FLAG_ALL 	\
+       (TLVM_8080_FLAG_S | \
+        TLVM_8080_FLAG_Z | \
+        TLVM_8080_FLAG_I | \
+        TLVM_8080_FLAG_H | \
+        TLVM_8080_FLAG_P | \
+        TLVM_8080_FLAG_C)
 
 // TLVM_FLAG_NONE is not just 0, as some of the bits are not used as flags
-#define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
+#define TLVM_8080_FLAG_NONE 	~TLVM_8080_FLAG_ALL
 
 /*********************************************
  * INSTRUCTIONS
@@ -432,7 +438,7 @@ tlvmReturn tlvmDAA  (tlvmContext* context, tlvmByte* cycles);
  *     context - the CPU context to add 8080 
  * support to
  *********************************************/
-TLVM_EXPORT tlvmReturn  tlvm8080Init  (tlvmContext** context);
+tlvmReturn  tlvm8080Init  (tlvmContext** context);
 
 /*********************************************
  * tlvm8080SetupData

@@ -41,35 +41,35 @@ tlvmReturn tlvmJMP(tlvmContext* context, tlvmByte* cycles)
 	switch(opcode)
 	{
 	case TLVM_JNZ:
-		if(!TLVM_FLAG_ISSET(Z))
+		if(!TLVM_FLAG_ISSET(Z, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JZ:
-		if(TLVM_FLAG_ISSET(Z))
+		if(TLVM_FLAG_ISSET(Z, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JNC:
-		if(!TLVM_FLAG_ISSET(C))
+		if(!TLVM_FLAG_ISSET(C, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JC:
-		if(TLVM_FLAG_ISSET(C))
+		if(TLVM_FLAG_ISSET(C, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JPO:
-		if(!TLVM_FLAG_ISSET(P))
+		if(!TLVM_FLAG_ISSET(P, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JPE:
-		if(TLVM_FLAG_ISSET(P))
+		if(TLVM_FLAG_ISSET(P, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JP:
-		if(!TLVM_FLAG_ISSET(S))
+		if(!TLVM_FLAG_ISSET(S, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JM:
-		if(TLVM_FLAG_ISSET(S))
+		if(TLVM_FLAG_ISSET(S, 8080))
 			context->m_ProgramCounter = addr;
 	break;
 	case TLVM_JMP:
@@ -102,56 +102,56 @@ tlvmReturn tlvmCALL(tlvmContext* context, tlvmByte* cycles)
 	switch(opcode)
 	{
 	case TLVM_CNZ:
-		if(!TLVM_FLAG_ISSET(Z))
+		if(!TLVM_FLAG_ISSET(Z, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CZ:
-		if(TLVM_FLAG_ISSET(Z))
+		if(TLVM_FLAG_ISSET(Z, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CNC:
-		if(!TLVM_FLAG_ISSET(C))
+		if(!TLVM_FLAG_ISSET(C, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CC:
-		if(TLVM_FLAG_ISSET(C))
+		if(TLVM_FLAG_ISSET(C, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CPO:
-		if(!TLVM_FLAG_ISSET(P))
+		if(!TLVM_FLAG_ISSET(P, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CPE:
-		if(TLVM_FLAG_ISSET(P))
+		if(TLVM_FLAG_ISSET(P, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CP:
-		if(!TLVM_FLAG_ISSET(S))
+		if(!TLVM_FLAG_ISSET(S, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
 		}
 	break;
 	case TLVM_CM:
-		if(TLVM_FLAG_ISSET(S))
+		if(TLVM_FLAG_ISSET(S, 8080))
 		{
 			TLVM_PUSH_PC(addr);
 			cycleCnt = 17;
@@ -188,56 +188,56 @@ tlvmReturn tlvmRET(tlvmContext* context, tlvmByte* cycles)
 	switch(opcode)
 	{
 	case TLVM_RNZ:
-		if(!TLVM_FLAG_ISSET(Z))
+		if(!TLVM_FLAG_ISSET(Z, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RZ:
-		if(TLVM_FLAG_ISSET(Z))
+		if(TLVM_FLAG_ISSET(Z, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RNC:
-		if(!TLVM_FLAG_ISSET(C))
+		if(!TLVM_FLAG_ISSET(C, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RC:
-		if(TLVM_FLAG_ISSET(C))
+		if(TLVM_FLAG_ISSET(C, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RPO:
-		if(!TLVM_FLAG_ISSET(P))
+		if(!TLVM_FLAG_ISSET(P, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RPE:
-		if(TLVM_FLAG_ISSET(P))
+		if(TLVM_FLAG_ISSET(P, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RP:
-		if(!TLVM_FLAG_ISSET(S))
+		if(!TLVM_FLAG_ISSET(S, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;
 		}
 	break;
 	case TLVM_RM:
-		if(TLVM_FLAG_ISSET(S))
+		if(TLVM_FLAG_ISSET(S, 8080))
 		{
 			TLVM_POP_PC();
 			cycleCnt = 11;

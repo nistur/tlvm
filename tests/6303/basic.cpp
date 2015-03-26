@@ -21,29 +21,25 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#ifndef __TLVM_8080_H__
-#define __TLVM_8080_H__
+#include "../tlvm-tests.h"
 
-#ifdef  TLVM_HAS_8080
-
-#ifndef __TLVM_H__
-#error Do not #include tlvm_8080.h manually, please use tlvm.h
-#endif
-
-typedef void(*tlvm8080IOCallback)(tlvmContext* context, tlvmByte port);
-
-/*********************************************
- * tlvm8080SetIOCallback
- *     Provides a callback for when any of the
- *   8080's ports have been written to.
- * parameters:
- *     context - the CPU context to add the
- *   callback to
- *     callback - the function pointer of the
- *   callback
- *********************************************/
-TLVM_EXPORT tlvmReturn  tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback);
-
-#endif/*TLVM_HAS_8080*/
-
-#endif/*__TLVM_8080_H__*/
+TEST(InitTerminate, CPU_6303, 0.0f,
+     // initialisation
+     {
+      m_data.context = 0;
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+      ASSERT(tlvmInitContext(&m_data.context, TLVM_CPU_6303) == TLVM_SUCCESS);
+      ASSERT(m_data.context != NULL);
+      ASSERT(tlvmTerminateContext(&m_data.context) == TLVM_SUCCESS);
+     },
+     // data
+     {
+      tlvmContext* context;
+     }
+    );

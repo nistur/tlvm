@@ -37,11 +37,11 @@ tlvmReturn tlvmROT(tlvmContext* context, tlvmByte* cycles)
         if(acc & (1<<8))
         {
             acc |= 1;
-            TLVM_FLAG_SET(C);
+            TLVM_FLAG_SET(C, 8080);
         }
         else
         {
-            TLVM_FLAG_UNSET(C);
+            TLVM_FLAG_UNSET(C, 8080);
         }
     }
     else if(operand == TLVM_RRC)
@@ -49,26 +49,26 @@ tlvmReturn tlvmROT(tlvmContext* context, tlvmByte* cycles)
         if(acc & 1)
         {
             acc |= 1<<8;
-            TLVM_FLAG_SET(C);
+            TLVM_FLAG_SET(C, 8080);
         }
         else
         {
-            TLVM_FLAG_UNSET(C);
+            TLVM_FLAG_UNSET(C, 8080);
         }
         acc >>= 1;
     }
     else if(operand == TLVM_RAL)
     {
         acc <<= 1;
-        if(TLVM_FLAG_ISSET(C))
+        if(TLVM_FLAG_ISSET(C, 8080))
             acc |= 1;
-        TLVM_FLAG_SET_IF(acc > 0xFF, C);
+        TLVM_FLAG_SET_IF(acc > 0xFF, C, 8080);
     }
     else if(operand == TLVM_RAR)
     {
-        if(TLVM_FLAG_ISSET(C))
+        if(TLVM_FLAG_ISSET(C, 8080))
             acc |= 1<<8;
-        TLVM_FLAG_SET_IF(acc & 1, C);
+        TLVM_FLAG_SET_IF(acc & 1, C, 8080);
         acc >>= 1;
     }
 

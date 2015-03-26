@@ -36,15 +36,36 @@ typedef struct _tlvmProcessorData
 	tlvmByte m_ProcessorID;
 } tlvmProcessorData;
 
-#define TLVM_FLAG_ISSET(x) (TLVM_REGISTER(TLVM_REG_F) & TLVM_FLAG_##x)
-#define TLVM_FLAG_SET(x) TLVM_REGISTER(TLVM_REG_F) |= TLVM_FLAG_##x
-#define TLVM_FLAG_UNSET(x) TLVM_REGISTER(TLVM_REG_F) &= (TLVM_FLAG_ALL ^ TLVM_FLAG_##x)
-#define TLVM_FLAG_SET_IF(test, x) if(test){ TLVM_FLAG_SET(x); }else{ TLVM_FLAG_UNSET(x); }
-#define TLVM_SET_FLAGS(res) \
-	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z); \
-	TLVM_FLAG_SET_IF(res & 0x80, S); \
-	TLVM_FLAG_SET_IF(res > 0xFF, C); \
-	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P);
+
+#define TLVM_INSTRUCTION_DECLARE(cpu, mnem, hex) \
+extern const tlvmByte TLVM_##cpu##_##mnem; \
+tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
+
+#define TLVM_INSTRUCTION_BASE(cpu, mnem) \
+tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
+
+#define TLVM_INSTRUCTION_VARIATION(cpu, mnem, hex) \
+extern const tlvmByte TLVM_##cpu##_##mnem;
+
+#define TLVM_INSTRUCTION_DEFINE(cpu, mnem, hex) \
+const tlvmByte TLVM_##cpu##_##mnem = hex;
+
+#define TLVM_INSTRUCTION_ADD(set, cpu, mnem) \
+    set[TLVM_##cpu##_##mnem] = tlvm##cpu##mnem;
+
+#define TLVM_INSTRUCTION_ADD_VARIATION(set, cpu, mnem, base) \
+    set[TLVM_##cpu##_##mnem] = tlvm##cpu##base;
+
+
+#define TLVM_FLAG_ISSET(x, cpu) (TLVM_REGISTER(TLVM_REG_F) & TLVM_##cpu##_FLAG_##x)
+#define TLVM_FLAG_SET(x, cpu) TLVM_REGISTER(TLVM_REG_F) |= TLVM_##cpu##_FLAG_##x
+#define TLVM_FLAG_UNSET(x, cpu) TLVM_REGISTER(TLVM_REG_F) &= (TLVM_##cpu##_FLAG_ALL ^ TLVM_##cpu##_FLAG_##x)
+#define TLVM_FLAG_SET_IF(test, x, cpu) if(test){ TLVM_FLAG_SET(x, cpu); }else{ TLVM_FLAG_UNSET(x, cpu); }
+#define TLVM_SET_FLAGS(res, cpu) \
+	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z, cpu); \
+	TLVM_FLAG_SET_IF(res & 0x80, S, cpu); \
+	TLVM_FLAG_SET_IF(res > 0xFF, C, cpu); \
+	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P, cpu);
 	
 #define TLVM_GET_16BIT(h, l) 	((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l)
 #define TLVM_SET_16BIT(h, l, v) \
@@ -149,6 +170,7 @@ struct _tlvmMemoryBuffer
 };
 
 #include "../8080/8080.h"
+#include "../6303/6303.h"
 /***************************************
  * Some basic memory management wrappers
  ***************************************/

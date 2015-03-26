@@ -106,13 +106,13 @@ TEST(JNZ, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_UNSET(Z);
+          TLVM_FLAG_UNSET(Z, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_SET(Z);
+          TLVM_FLAG_SET(Z, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -147,13 +147,13 @@ TEST(JZ, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_SET(Z);
+          TLVM_FLAG_SET(Z, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_UNSET(Z);
+          TLVM_FLAG_UNSET(Z, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -188,13 +188,13 @@ TEST(JNC, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_UNSET(C);
+          TLVM_FLAG_UNSET(C, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_SET(C);
+          TLVM_FLAG_SET(C, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -229,13 +229,13 @@ TEST(JC, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_SET(C);
+          TLVM_FLAG_SET(C, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_UNSET(C);
+          TLVM_FLAG_UNSET(C, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -270,13 +270,13 @@ TEST(JPO, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_UNSET(P);
+          TLVM_FLAG_UNSET(P, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_SET(P);
+          TLVM_FLAG_SET(P, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -311,13 +311,13 @@ TEST(JPE, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_SET(P);
+          TLVM_FLAG_SET(P, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_UNSET(P);
+          TLVM_FLAG_UNSET(P, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -352,13 +352,13 @@ TEST(JP, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_UNSET(S);
+          TLVM_FLAG_UNSET(S, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_SET(S);
+          TLVM_FLAG_SET(S, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
@@ -393,13 +393,13 @@ TEST(JM, JMP, 0.0f,
           tlvmReset(m_data.context);
 
           tlvmByte cycles = 0;
-          TLVM_FLAG_SET(S);
+          TLVM_FLAG_SET(S, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0000);
 
           cycles = 0;
-          TLVM_FLAG_UNSET(S);
+          TLVM_FLAG_UNSET(S, 8080);
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS);
           ASSERT(cycles == 10);
           ASSERT(m_data.context->m_ProgramCounter == 0x0003);
