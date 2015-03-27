@@ -487,7 +487,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         {
             string filename;
             cin >> filename;
-            std::ofstream file(filename);
+            std::ofstream file(filename.c_str());
             printDisassembly(context, file);
             file.close();
         }
