@@ -170,8 +170,11 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
     tlvmByte numCycles = 0;
     context->m_InstructionSet[*opcode](context, &numCycles);
     if(context->m_ClockFn)
-        for(int i = 0; i < numCycles; ++i)
+    {
+        int i;
+        for(i = 0; i < numCycles; ++i)
             context->m_ClockFn(context, &numCycles);
+    }
     if(cycles) *cycles = numCycles;
     TLVM_RETURN();
 }
