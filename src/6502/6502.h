@@ -33,11 +33,14 @@
 
 tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles);
 
-typedef struct _tlvm6502data
+tlvmReturn tlvm6502Init(tlvmContext** context);
+void tlvm6502SetupData();
+
+typedef struct _tlvmProcessorData_6502
 {
     tlvmProcessorData m_Header;
     tlvmInstruction m_InstructionSet[256];
-} tlvm6502data;
+} tlvmProcessorData_6502;
 
 #endif/*TLVM_HAS_6502*/
 #endif/*__6502_H__*/

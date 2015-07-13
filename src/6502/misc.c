@@ -1,7 +1,6 @@
 #ifdef  TLVM_HAS_6502
 #include "tlvm_internal.h"
 
-
 tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
@@ -10,7 +9,7 @@ tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
         *cycles = 2;
     
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 #endif/*TLVM_HAS_6502*/
