@@ -338,6 +338,8 @@ void tlvm8080SetupData()
     g_8080Data.m_InstructionSet[TLVM_CMA]      = tlvmCMA;
 
     g_8080Data.m_InstructionSet[TLVM_DAA]      = tlvmDAA;
+
+    g_8080Data.m_Header.m_Interrupt = tlvmInterrupt;
 }
 
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)

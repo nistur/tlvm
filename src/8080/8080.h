@@ -461,8 +461,8 @@ typedef struct _tlvmContext_8080
 
 typedef struct _tlvmProcessorData_8080
 {
-	tlvmProcessorData m_Header;
-
+    tlvmProcessorData m_Header;
+    
     // instrution set
     tlvmInstruction     m_InstructionSet[256];
 } tlvmProcessorData_8080;

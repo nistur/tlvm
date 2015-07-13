@@ -30,10 +30,12 @@ nistur@gmail.com
 #include "tlvm_debug_internal.h"
 
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
+typedef tlvmReturn(*tlvmInterruptFn)(tlvmContext*, tlvmByte);
 
 typedef struct _tlvmProcessorData
 {
-    tlvmByte m_ProcessorID;
+    tlvmByte        m_ProcessorID;
+    tlvmInterruptFn m_Interrupt;
 } tlvmProcessorData;
 
 #define TLVM_INSTRUCTION_BASE(cpu, mnem) \

@@ -276,7 +276,9 @@ tlvmReturn tlvmSetClock(tlvmContext* context, tlvmClockFn clockFn)
 
 tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
 {
-    return tlvm8080Interrupt(context, interrupt);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    return context->m_ProcessorData->m_Interrupt(context, interrupt);
 }
 
 tlvmReturn tlvmHalt(tlvmContext* context)
