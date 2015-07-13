@@ -257,12 +257,17 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
 
 tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
-    return tlvm8080GetPort(context, port, outPort);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(outPort, INVALID_INPUT);
+    *outPort = context->m_Ports[port];
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
-    return tlvm8080SetPort(context, port, portval);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    context->m_Ports[port] = portval;
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSetClock(tlvmContext* context, tlvmClockFn clockFn)

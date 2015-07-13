@@ -342,21 +342,6 @@ void tlvm8080SetupData()
     g_8080Data.m_Header.m_Interrupt = tlvmInterrupt;
 }
 
-tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
-{
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-    TLVM_NULL_CHECK(outPort, INVALID_INPUT);
-    *outPort = context->m_Ports[port];
-    TLVM_RETURN_CODE(SUCCESS);
-}
-
-tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
-{
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-    context->m_Ports[port] = portval;
-    TLVM_RETURN_CODE(SUCCESS);
-}
-
 tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);

@@ -446,8 +446,6 @@ tlvmReturn  tlvm8080Init  (tlvmContext** context);
  *********************************************/
 void       tlvm8080SetupData();
 
-tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
-tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval);
 tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt);
 tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt);
 
