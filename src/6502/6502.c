@@ -1,20 +1,16 @@
 #ifdef  TLVM_HAS_6502
 #include "tlvm_internal.h"
 
+tlvmProcessorData_6502 g_6502Data;
+
 tlvmReturn tlvm6502Init(tlvmContext* context)
 {
-    if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
-
-    // make sure we have enough space for instructions
-    if(context->m_InstructionSet)
-        tlvmFree(context->m_InstructionSet);
-    context->m_InstructionSet = tlvmMallocArray(tlvmInstruction, 256);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
 
     // initialise all the 6502 registers
     if(context->m_Registers)
         tlvmFree(context->m_Registers);
-    context->m_Registers = tlvmMallocArray(tlvmByte, 5);
+    context->m_Registers = tlvmMallocArray(tlvmByte, 8);
 
     // create default I/O ports
     if(context->m_Ports)
@@ -27,17 +23,18 @@ tlvmReturn tlvm6502Init(tlvmContext* context)
     // 6502 stack pointer is hard wired to range 0x0100 -> 0x01FF
     context->m_Registers[TLVM_6502_REG_SP_H] = 0x01;
 
-    return tlvmAdd6502Instructions(context);
+    if(g_6502Data.m_Header.m_ProcessorID == 0)
+        tlvm6502SetupData();
+
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmAdd6502Instructions(tlvmContext* context)
+void tlvm6502SetupData();
 {
-    if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+    g_6502Data.m_Header.m_ProcessorID = TLVM_CPU_6502;
+    g_6502Data.m_Header.m_InstructionSet = g_6502Data.m_InstructionSet;
 
-    context->m_InstructionSet[TLVM_6502_NOP] = tlvm6502NOP;
-
-    tlvmReturnCode(SUCCESS);
+    TLVM_INSTRUCTION_ADD( g_6502Data.m_InstructionSet, 6502, NOP);
 }
 
 #endif/*TLVM_HAS_6502*/

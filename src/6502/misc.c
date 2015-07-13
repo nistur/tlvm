@@ -4,12 +4,11 @@
 
 tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles)
 {
-    if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
     
     context->m_ProgramCounter += 1;
     if(cycles)
-        *cycles =2;
+        *cycles = 2;
     
     tlvmReturnCode(SUCCESS);
 }

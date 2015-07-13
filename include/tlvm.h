@@ -138,6 +138,10 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  * Hitachi 6303 Processor
  */
 #define TLVM_CPU_6303          2
+/* TLVM_CPU_6502
+ * MOS Technology 6502 Processor
+ */
+#define TLVM_CPU_6502          3
 
 /*********************************************
  * CALLBACK DEFINITIONS
@@ -162,6 +166,7 @@ typedef void(*tlvmIOCallback)(tlvmContext* context, tlvmByte port);
  *     cpuid - the type of CPU to create
  *             - TLVM_CPU_8080 - Intel 8080
  *             - TLVM_CPU_6303 - Hitachi 6303
+ *             - TLVM_CPU_6502 - MOS Technology 6502
  *   return:
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - context pointer is NULL

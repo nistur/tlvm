@@ -12,6 +12,7 @@
 #define TLVM_6502_REG_SP_H 0x3 // Stack Pointer High byte
 #define TLVM_6502_REG_SP_L 0x4 // Stack Pointer Low byte
 #define TLVM_6502_REG_P    0x5 // Processor flags
+#define TLVM_6502_REG_F    0x6 // Flags
 
 /*********************************************
  * FLAGS
@@ -32,19 +33,10 @@
 
 tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles);
 
-/*********************************************
- * tlvmAdd6502Instructions
- *     Add MOS Technology 6502 instruction set
- *   to CPU
- * parameters:
- *     context - the CPU context to add 6502 
- *     support to
- *********************************************/
-tlvmReturn  tlvmAdd6502Instructions(tlvmContext* context);
-
 typedef struct _tlvm6502data
 {
-	tlvmProcessorData m_Header;
+    tlvmProcessorData m_Header;
+    tlvmInstruction m_InstructionSet[256];
 } tlvm6502data;
 
 #endif/*TLVM_HAS_6502*/
