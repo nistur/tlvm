@@ -30,16 +30,23 @@ Sample tlvm-dbg commands:
 	run
 
 ## TODO:
+- Make sure it builds and runs on Windows
+   - Currently should just be dbg.cpp and time.c that doesn't work
 - Finish the 8080 instructions
 - Write unit tests for every instruction
 - DOCUMENTATION!
 - Add cpudiag from CP/M to the smoke tests
+   - cpudiag runs cleanly for all 8080 instructions, but I don't think I can add it to the smoke tests, I can't seem to find which license it was provided under. I don't think it's something I can use
 - Refactor all the unit tests to make more sense with the processor
 - Add the z80 extensions
    - Allow variable sized 8 bit register array
    - Allow variable sized 16 bit registers (ie not just SP/PC)
 - Add 6502 instuctions
    - Research what these are first!
+- Add 6303 instructions
+   - Try and find documentation for this
+- Make tlvm threadsafe.
+   - This should be safe enough to do by putting a byte in the context and checking it when something changes the state (interrupt, reset, step)
 
 ## What I will not do:
 - Write an assembler for this processor

@@ -1,3 +1,26 @@
+/*
+Copyright (c) 2015 Philipp Geyer
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgement in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+Philipp Geyer
+nistur@gmail.com
+*/
+
 #pragma once
 #ifndef __8080_H__
 #define __8080_H__
@@ -7,29 +30,37 @@
 /*********************************************
  * REGISTERS
  *********************************************/
-#define TLVM_REG_F 0x0
-#define TLVM_REG_A 0x1
-#define TLVM_REG_C 0x2
-#define TLVM_REG_B 0x3
-#define TLVM_REG_E 0x4
-#define TLVM_REG_D 0x5
-#define TLVM_REG_L 0x6
-#define TLVM_REG_H 0x7
+#define TLVM_8080_REG_F 0x0
+#define TLVM_8080_REG_A 0x1
+#define TLVM_8080_REG_C 0x2
+#define TLVM_8080_REG_B 0x3
+#define TLVM_8080_REG_E 0x4
+#define TLVM_8080_REG_D 0x5
+#define TLVM_8080_REG_L 0x6
+#define TLVM_8080_REG_H 0x7
+ // fake register to carry pending interrupts
+#define TLVM_8080_REG_I 0x8
 
 /*********************************************
  * FLAGS
  *********************************************/
-#define TLVM_FLAG_S 	(1<<7) // Sign
-#define TLVM_FLAG_Z 	(1<<6) // Zero
-#define TLVM_FLAG_I 	(1<<5) // Interrupt
-#define TLVM_FLAG_H 	(1<<4) // Auxiliary Carry
-#define TLVM_FLAG_P 	(1<<2) // Parity
-#define TLVM_FLAG_C 	(1<<0) // Carry
+#define TLVM_8080_FLAG_S 	(1<<7) // Sign
+#define TLVM_8080_FLAG_Z 	(1<<6) // Zero
+#define TLVM_8080_FLAG_I 	(1<<5) // Interrupt
+#define TLVM_8080_FLAG_H 	(1<<4) // Auxiliary Carry
+#define TLVM_8080_FLAG_P 	(1<<2) // Parity
+#define TLVM_8080_FLAG_C 	(1<<0) // Carry
 
-#define TLVM_FLAG_ALL 	(TLVM_FLAG_S | TLVM_FLAG_Z | TLVM_FLAG_I| TLVM_FLAG_H | TLVM_FLAG_P | TLVM_FLAG_C)
+#define TLVM_8080_FLAG_ALL 	\
+       (TLVM_8080_FLAG_S | \
+        TLVM_8080_FLAG_Z | \
+        TLVM_8080_FLAG_I | \
+        TLVM_8080_FLAG_H | \
+        TLVM_8080_FLAG_P | \
+        TLVM_8080_FLAG_C)
 
 // TLVM_FLAG_NONE is not just 0, as some of the bits are not used as flags
-#define TLVM_FLAG_NONE 	~TLVM_FLAG_ALL
+#define TLVM_8080_FLAG_NONE 	~TLVM_8080_FLAG_ALL
 
 /*********************************************
  * INSTRUCTIONS
@@ -41,21 +72,30 @@
 #define TLVM_LXI_B         0x01
 #define TLVM_STAX_B        0x02
 #define TLVM_MVI_B         0x06
+#define TLVM_RLC           0x07
 #define TLVM_LDAX_B        0x0A
 #define TLVM_MVI_C         0x0E
+#define TLVM_RRC           0x0F
 #define TLVM_LXI_D         0x11
 #define TLVM_STAX_D        0x12
 #define TLVM_MVI_D         0x16
+#define TLVM_RAL           0x17
 #define TLVM_LDAX_D        0x1A
 #define TLVM_MVI_E         0x1E
+#define TLVM_RAR           0x1F
 #define TLVM_LXI_H         0x21
 #define TLVM_SHLD          0x22
 #define TLVM_MVI_H         0x26
+#define TLVM_DAA           0x27
+#define TLVM_LHLD          0x2A
 #define TLVM_MVI_L         0x2E
+#define TLVM_CMA           0x2F
 #define TLVM_LXI_SP        0x31
 #define TLVM_MVI_M         0x36
+#define TLVM_STC           0x37
 #define TLVM_LDA           0x3A
 #define TLVM_MVI_A         0x3E
+#define TLVM_CMC           0x3F
 
 #define TLVM_MOV_BB        (TLVM_MOV_TO_B | TLVM_MOV_FROM_B)
 #define TLVM_MOV_BC        (TLVM_MOV_TO_B | TLVM_MOV_FROM_C)
@@ -201,6 +241,7 @@
 
  #define TLVM_SPHL         0xF9
  #define TLVM_XTHL         0xE3
+ #define TLVM_PCHL         0xE9
  #define TLVM_XCHG         0xEB
 
  #define TLVM_STA          0x32 // set stack pointer
@@ -338,6 +379,7 @@ tlvmReturn tlvmSTAX (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmMVI  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmLDAX (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSHLD (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmLHLD (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmLDA  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmMOV  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmANA  (tlvmContext* context, tlvmByte* cycles);
@@ -351,6 +393,7 @@ tlvmReturn tlvmPOP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmSPHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXTHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmXCHG (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmPCHL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmJMP  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmCALL (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRET  (tlvmContext* context, tlvmByte* cycles);
@@ -360,6 +403,9 @@ tlvmReturn tlvmIN   (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmRST  (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmEI   (tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvmDI   (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmSTC  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCMC  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmCMA  (tlvmContext* context, tlvmByte* cycles);
 
 /*********************************************
  * ALU instructions
@@ -380,23 +426,44 @@ tlvmReturn tlvmDCX  (tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvmDAD  (tlvmContext* context, tlvmByte* cycles);
 
+tlvmReturn tlvmROT  (tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvmDAA  (tlvmContext* context, tlvmByte* cycles);
+
 /*********************************************
- * tlvmAdd8080Instructions
- *     Add Intel 8080 instruction set to CPU
+ * tlvm8080Init
+ *     Setup the entire 8080 CPU. This will
+ * initialise all the registers and I/O ports 
+ * and then setup the instruction set
  * parameters:
  *     context - the CPU context to add 8080 
- *     support to
+ * support to
  *********************************************/
-tlvmReturn  tlvmAdd8080Instructions(tlvmContext* context);
+tlvmReturn  tlvm8080Init  (tlvmContext** context);
 
-tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort);
-tlvmReturn tlvm8080SetPort(tlvmContext* context, tlvmByte port, tlvmByte portval);
+/*********************************************
+ * tlvm8080SetupData
+ *     Add Intel 8080 instruction set to CPU
+ *********************************************/
+void       tlvm8080SetupData();
 
-typedef struct _tlvm8080data
+tlvmReturn tlvm8080Interrupt(tlvmContext* context, tlvmByte interrupt);
+tlvmReturn tlvm8080HandleInterrupt(tlvmContext* context, tlvmByte interrupt);
+
+typedef struct _tlvmContext_8080
 {
-	tlvmProcessorData m_Header;
-	tlvm8080IOCallback m_IOCallback;
-} tlvm8080data;
+    tlvmContext m_Header;
+
+    tlvmByte    m_Registers[9];
+    tlvmByte    m_Ports[256];
+} tlvmContext_8080;
+
+typedef struct _tlvmProcessorData_8080
+{
+    tlvmProcessorData m_Header;
+    
+    // instrution set
+    tlvmInstruction     m_InstructionSet[256];
+} tlvmProcessorData_8080;
 
 #endif/*TLVM_HAS_8080*/
 #endif/*__8080_H__*/

@@ -1,3 +1,26 @@
+/*
+Copyright (c) 2015 Philipp Geyer
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgement in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+Philipp Geyer
+nistur@gmail.com
+*/
+
 #include "../tlvm-tests.h"
 
 TEST(InitTerminate, Basic, 0.0f,
@@ -11,7 +34,7 @@ TEST(InitTerminate, Basic, 0.0f,
      },
      // test
      {
-      ASSERT(tlvmInitContext(&m_data.context) == TLVM_SUCCESS);
+      ASSERT(tlvmInitContext(&m_data.context, TLVM_CPU_8080) == TLVM_SUCCESS);
       ASSERT(m_data.context != NULL);
       ASSERT(tlvmTerminateContext(&m_data.context) == TLVM_SUCCESS);
      },
@@ -24,7 +47,7 @@ TEST(InitTerminate, Basic, 0.0f,
 TEST(SetMemory, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
      },
      // cleanup
      {
@@ -58,8 +81,7 @@ TEST(SetMemory, Basic, 0.0f,
 TEST(InstructionSet, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvm8080Init(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       memset(m_data.nullInstructions, 0, 256);
 
       m_data.nullInstructions[0x08] = 1;
@@ -83,7 +105,7 @@ TEST(InstructionSet, Basic, 0.0f,
      {
         for(unsigned int i = 0; i < 256; ++i)
           if(m_data.nullInstructions[i] == 0)
-            ASSERT(((_tlvmContext*)m_data.context)->m_InstructionSet[i] != NULL);
+            ASSERT(((_tlvmContext*)m_data.context)->m_ProcessorData->m_InstructionSet[i] != NULL);
      },
      // data
      {
@@ -95,7 +117,7 @@ TEST(InstructionSet, Basic, 0.0f,
 TEST(SetClockspeed, Basic, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
      },
      // cleanup
      {

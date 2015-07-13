@@ -23,10 +23,12 @@ nistur@gmail.com
 
 #include "../tlvm-tests.h"
 
-TEST(SetClockspeed, Time, 0.0f,
+TEST(InstNOP, CPU_6303, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
+      tlvmInitContext(&m_data.context, TLVM_CPU_6303);
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 1, TLVM_FLAG_READ);
+      m_data.bootloader[0] = TLVM_6303_NOP;
      },
      // cleanup
      {
@@ -34,37 +36,17 @@ TEST(SetClockspeed, Time, 0.0f,
      },
      // test
      {
-          ASSERT(tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0)) == TLVM_SUCCESS);
-          ASSERT(m_data.context->m_Clockspeed == TLVM_MHZ(2, 0));
+          // reload the program so each time we start from 0x0
+          tlvmReset(m_data.context);
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
+          ASSERT(cycle == 1);
+          ASSERT(m_data.context->m_Registers[TLVM_6303_REG_F] == 0);     // check that no flags have 
+                                                                    // been affected
      },
      // data
      {
       tlvmContext* context;
-     }
-    );
-
-TEST(Time, Time, 0.0f,
-     // initialisation
-     {
-      m_data.memory[0] = TLVM_NOP;
-      m_data.memory[1] = TLVM_HLT;
-
-      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
-      tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
-      tlvmSetMemory(m_data.context, m_data.memory, 0, 256, TLVM_FLAG_READ);
-     },
-     // cleanup
-     {
-      tlvmTerminateContext(&m_data.context);
-     },
-     // test
-     {
-      // Um. This should really test how long it takes to run some random program with known execution time
-      tlvmRun(m_data.context);
-     },
-     // data
-     {
-      tlvmContext* context;
-      tlvmByte     memory[256];
+      tlvmByte     bootloader[1];
      }
     );
