@@ -29,10 +29,10 @@ extern "C" {
 
 #include "testsuite/tests.h"
 
-#define TEST_MOV_REG_REG(to, from) \
+#define TEST_MOV_REG_REG(to, from, cpu)             \
 TEST(to##from, MOV, 0.0f, \
      { \
-      tlvmInitContext(&m_data.context, TLVM_CPU_8080); \
+      tlvmInitContext(&m_data.context, TLVM_CPU_##cpu); \
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ); \
       m_data.bootloader[0x00] = TLVM_MOV_##to##from; \
      }, \
@@ -42,9 +42,9 @@ TEST(to##from, MOV, 0.0f, \
      { \
           tlvmReset(m_data.context); \
           tlvmByte cycles = 0; \
-          m_data.context->m_Registers[TLVM_REG_##from] = 99; \
+          m_data.context->m_Registers[TLVM_##cpu##_REG_##from] = 99; \
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS); \
-          ASSERT(m_data.context->m_Registers[TLVM_REG_##to] == 99); \
+          ASSERT(m_data.context->m_Registers[TLVM_##cpu##_REG_##to] == 99); \
           ASSERT(cycles == 5); \
      }, \
      { \
@@ -53,10 +53,10 @@ TEST(to##from, MOV, 0.0f, \
      } \
     );
 
-#define TEST_MOV_REG_MEM(to) \
+#define TEST_MOV_REG_MEM(to, cpu)                   \
 TEST(to##M, MOV, 0.0f, \
      { \
-      tlvmInitContext(&m_data.context, TLVM_CPU_8080); \
+      tlvmInitContext(&m_data.context, TLVM_CPU_##cpu); \
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ); \
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 0xFF, TLVM_FLAG_READ|TLVM_FLAG_WRITE); \
       m_data.bootloader[0x00] = TLVM_MOV_##to##M; \
@@ -67,10 +67,10 @@ TEST(to##M, MOV, 0.0f, \
      { \
           tlvmReset(m_data.context); \
           tlvmByte cycles = 0; \
-          m_data.context->m_Registers[TLVM_REG_H] = 0x01; \
+          m_data.context->m_Registers[TLVM_##cpu##_REG_H] = 0x01; \
           m_data.memory[0x00] = 99; \
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS); \
-          ASSERT(m_data.context->m_Registers[TLVM_REG_##to] == 99); \
+          ASSERT(m_data.context->m_Registers[TLVM_##cpu##_REG_##to] == 99); \
           ASSERT(cycles == 7); \
      }, \
      { \
@@ -80,10 +80,10 @@ TEST(to##M, MOV, 0.0f, \
      } \
     );
 
-#define TEST_MOV_MEM_REG(from) \
+#define TEST_MOV_MEM_REG(from, cpu)                 \
 TEST(M##from, MOV, 0.0f, \
      { \
-      tlvmInitContext(&m_data.context, TLVM_CPU_8080); \
+      tlvmInitContext(&m_data.context, TLVM_CPU_##cpu); \
       tlvmSetMemory(m_data.context, m_data.bootloader, 0, 0xFF, TLVM_FLAG_READ); \
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 0xFF, TLVM_FLAG_READ|TLVM_FLAG_WRITE); \
       m_data.bootloader[0x00] = TLVM_MOV_M##from; \
@@ -94,8 +94,8 @@ TEST(M##from, MOV, 0.0f, \
      { \
           tlvmReset(m_data.context); \
           tlvmByte cycles = 0; \
-          m_data.context->m_Registers[TLVM_REG_##from] = 0x01; \
-          m_data.context->m_Registers[TLVM_REG_H] = 0x01; \
+          m_data.context->m_Registers[TLVM_##cpu##_REG_##from] = 0x01; \
+          m_data.context->m_Registers[TLVM_##cpu##_REG_H] = 0x01; \
           ASSERT(tlvmStep(m_data.context, &cycles) == TLVM_SUCCESS); \
           ASSERT(m_data.memory[0x00] == 0x01); \
           ASSERT(cycles == 7); \

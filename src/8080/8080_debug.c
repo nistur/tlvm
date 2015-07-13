@@ -70,7 +70,7 @@ if(opcode == TLVM_##op) \
 #define TLVM_DEBUG_CHECK_REG(reg) \
 if(TLVM_DEBUG_REG(reg)) \
 { \
-	*outreg = TLVM_REG_##reg; \
+	*outreg = TLVM_8080_REG_##reg; \
 	TLVM_RETURN_CODE(SUCCESS); \
 }
 

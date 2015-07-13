@@ -30,7 +30,7 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
 
 	TLVM_GET_OP(dest, 1);
 
-	context->m_Ports[dest] = context->m_Registers[TLVM_REG_A];
+	context->m_Ports[dest] = context->m_Registers[TLVM_8080_REG_A];
 
     // size of instruction    = 1
     // size of operand        = 1
@@ -51,7 +51,7 @@ tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
 
 	TLVM_GET_OP(dest, 1);
 
-	context->m_Registers[TLVM_REG_A] = context->m_Ports[dest];
+	context->m_Registers[TLVM_8080_REG_A] = context->m_Ports[dest];
 
     // size of instruction    = 1
     // size of operand        = 1

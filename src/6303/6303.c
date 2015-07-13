@@ -70,6 +70,8 @@ tlvmReturn tlvm6303TRAP(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
+    if(cycles)
+        *cycles = 1;
 
     context->m_ProgramCounter += 1;
     TLVM_RETURN_CODE(EXIT); // TRAP should bail. Don't exit successfully
@@ -96,19 +98,19 @@ tlvmReturn tlvm6303LSR(tlvmContext* context, tlvmByte* cycles)
     tlvmByte length = 1;
     if(opcode == TLVM_6303_LSRD)
     {
-        tlvmShort val = TLVM_GET_16BIT(TLVM_REG_D, TLVM_REG_E);
+        tlvmShort val = TLVM_GET_16BIT(TLVM_6303_REG_D, TLVM_6303_REG_E);
         TLVM_FLAG_SET_IF(val & 1<<15,C, 6303);
         val <<= 1;
         TLVM_FLAG_SET_IF(val == 0, Z, 6303);
-        TLVM_SET_16BIT(TLVM_REG_D, TLVM_REG_E, val);
+        TLVM_SET_16BIT(TLVM_6303_REG_D, TLVM_6303_REG_E, val);
     }
     else if(opcode == TLVM_6303_LSRA)
     {
-        TLVM_REGISTER(TLVM_REG_A) <<= 1;
+        TLVM_REGISTER(TLVM_6303_REG_A) <<= 1;
     }
     else if(opcode == TLVM_6303_LSRB)
     {
-        TLVM_REGISTER(TLVM_REG_B) <<= 1;
+        TLVM_REGISTER(TLVM_6303_REG_B) <<= 1;
     }
     else if(opcode == TLVM_6303_LSRdX)
     {

@@ -38,57 +38,57 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     case TLVM_ADC_B:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_B:
-        src = &context->m_Registers[TLVM_REG_B];
+        src = &context->m_Registers[TLVM_8080_REG_B];
     break;
     case TLVM_ADC_C:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_C:
-        src = &context->m_Registers[TLVM_REG_C];
+        src = &context->m_Registers[TLVM_8080_REG_C];
     break;
     case TLVM_ADC_D:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_D:
-        src = &context->m_Registers[TLVM_REG_D];
+        src = &context->m_Registers[TLVM_8080_REG_D];
     break;
     case TLVM_ADC_E:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_E:
-        src = &context->m_Registers[TLVM_REG_E];
+        src = &context->m_Registers[TLVM_8080_REG_E];
     break;
     case TLVM_ADC_H:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_H:
-        src = &context->m_Registers[TLVM_REG_H];
+        src = &context->m_Registers[TLVM_8080_REG_H];
     break;
     case TLVM_ADC_L:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_L:
-        src = &context->m_Registers[TLVM_REG_L];
+        src = &context->m_Registers[TLVM_8080_REG_L];
     break;
     case TLVM_ADC_M:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_M:
         {
-            tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+            tlvmShort addr = TLVM_GET_16BIT(TLVM_8080_REG_H, TLVM_8080_REG_L);
             src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
         }
     break;
     case TLVM_ADC_A:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
     case TLVM_ADD_A:
-        src = &context->m_Registers[TLVM_REG_A];
+        src = &context->m_Registers[TLVM_8080_REG_A];
     break;
     }
 
     TLVM_NULL_CHECK(src, INVALID_INPUT);
 
     static tlvmByte mask = 1<<3;
-    TLVM_FLAG_SET_IF(*src & mask && context->m_Registers[TLVM_REG_A] & mask, H, 8080);
+    TLVM_FLAG_SET_IF(*src & mask && context->m_Registers[TLVM_8080_REG_A] & mask, H, 8080);
 
 
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)*src + carry;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_8080_REG_A] + (tlvmShort)*src + carry;
     TLVM_SET_FLAGS(res, 8080);
-    context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
+    context->m_Registers[TLVM_8080_REG_A] = (tlvmByte)(res & 0xFF);
 
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
@@ -110,11 +110,11 @@ tlvmReturn tlvmADI(tlvmContext* context, tlvmByte* cycles)
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
 
     static tlvmByte mask = 1<<3;
-    TLVM_FLAG_SET_IF(op1 & mask && context->m_Registers[TLVM_REG_A] & mask, H, 8080);
+    TLVM_FLAG_SET_IF(op1 & mask && context->m_Registers[TLVM_8080_REG_A] & mask, H, 8080);
 
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] + (tlvmShort)op1 + carry;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_8080_REG_A] + (tlvmShort)op1 + carry;
     TLVM_SET_FLAGS(res, 8080);
-    context->m_Registers[TLVM_REG_A] = (tlvmByte)(res & 0xFF);
+    context->m_Registers[TLVM_8080_REG_A] = (tlvmByte)(res & 0xFF);
 
     // size of instruction    = 1
     // size of operand        = 1

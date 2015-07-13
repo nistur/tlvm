@@ -35,20 +35,20 @@ tlvmReturn tlvmPUSH(tlvmContext* context, tlvmByte* cycles)
 	switch(opcode)
 	{
 	case TLVM_PUSH_B:
-    	srcHi = context->m_Registers[TLVM_REG_B];
-    	srcLo = context->m_Registers[TLVM_REG_C];
+    	srcHi = context->m_Registers[TLVM_8080_REG_B];
+    	srcLo = context->m_Registers[TLVM_8080_REG_C];
 	break;
 	case TLVM_PUSH_D:
-    	srcHi = context->m_Registers[TLVM_REG_D];
-    	srcLo = context->m_Registers[TLVM_REG_E];
+    	srcHi = context->m_Registers[TLVM_8080_REG_D];
+    	srcLo = context->m_Registers[TLVM_8080_REG_E];
 	break;
 	case TLVM_PUSH_H:
-    	srcHi = context->m_Registers[TLVM_REG_H];
-    	srcLo = context->m_Registers[TLVM_REG_L];
+    	srcHi = context->m_Registers[TLVM_8080_REG_H];
+    	srcLo = context->m_Registers[TLVM_8080_REG_L];
 	break;
 	case TLVM_PUSH_PSW:
-    	srcHi = context->m_Registers[TLVM_REG_A];
-    	srcLo = context->m_Registers[TLVM_REG_F];
+    	srcHi = context->m_Registers[TLVM_8080_REG_A];
+    	srcLo = context->m_Registers[TLVM_8080_REG_F];
 	break;
 	}
 	TLVM_STACK_PUSH(srcHi);
@@ -73,20 +73,20 @@ tlvmReturn tlvmPOP(tlvmContext* context, tlvmByte* cycles)
 	switch(opcode)
 	{
 	case TLVM_POP_B:
-    	dstHi = &context->m_Registers[TLVM_REG_B];
-    	dstLo = &context->m_Registers[TLVM_REG_C];
+    	dstHi = &context->m_Registers[TLVM_8080_REG_B];
+    	dstLo = &context->m_Registers[TLVM_8080_REG_C];
 	break;
 	case TLVM_POP_D:
-    	dstHi = &context->m_Registers[TLVM_REG_D];
-    	dstLo = &context->m_Registers[TLVM_REG_E];
+    	dstHi = &context->m_Registers[TLVM_8080_REG_D];
+    	dstLo = &context->m_Registers[TLVM_8080_REG_E];
 	break;
 	case TLVM_POP_H:
-    	dstHi = &context->m_Registers[TLVM_REG_H];
-    	dstLo = &context->m_Registers[TLVM_REG_L];
+    	dstHi = &context->m_Registers[TLVM_8080_REG_H];
+    	dstLo = &context->m_Registers[TLVM_8080_REG_L];
 	break;
 	case TLVM_POP_PSW:
-    	dstHi = &context->m_Registers[TLVM_REG_A];
-    	dstLo = &context->m_Registers[TLVM_REG_F];
+    	dstHi = &context->m_Registers[TLVM_8080_REG_A];
+    	dstLo = &context->m_Registers[TLVM_8080_REG_F];
 	break;
 	}
 
@@ -105,7 +105,7 @@ tlvmReturn tlvmSPHL(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_StackPointer = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+    context->m_StackPointer = TLVM_GET_16BIT(TLVM_8080_REG_H, TLVM_8080_REG_L);
     // size of instruction    = 1
     context->m_ProgramCounter += 1;
     if(cycles)
@@ -127,11 +127,11 @@ tlvmReturn tlvmXTHL(tlvmContext* context, tlvmByte* cycles)
 	tlvmByte tmpHi = *dstHi;
 	tlvmByte tmpLo = *dstLo;
 
-	*dstHi = context->m_Registers[TLVM_REG_H];
-	*dstLo = context->m_Registers[TLVM_REG_L];
+	*dstHi = context->m_Registers[TLVM_8080_REG_H];
+	*dstLo = context->m_Registers[TLVM_8080_REG_L];
 
-	context->m_Registers[TLVM_REG_H] = tmpHi;
-	context->m_Registers[TLVM_REG_L] = tmpLo;
+	context->m_Registers[TLVM_8080_REG_H] = tmpHi;
+	context->m_Registers[TLVM_8080_REG_L] = tmpLo;
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;

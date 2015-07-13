@@ -41,7 +41,7 @@ TEST(InstNOP, CPU_6303, 0.0f,
           tlvmByte cycle = 0;
           ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
           ASSERT(cycle == 1);
-          ASSERT(m_data.context->m_Registers[TLVM_REG_F] == 0);     // check that no flags have 
+          ASSERT(m_data.context->m_Registers[TLVM_6303_REG_F] == 0);     // check that no flags have 
                                                                     // been affected
      },
      // data

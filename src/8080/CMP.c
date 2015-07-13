@@ -35,37 +35,37 @@ tlvmReturn tlvmCMP(tlvmContext* context, tlvmByte* cycles)
     switch(opcode)
     {
     case TLVM_CMP_B:
-        src = &context->m_Registers[TLVM_REG_B];
+        src = &context->m_Registers[TLVM_8080_REG_B];
     break;
     case TLVM_CMP_C:
-        src = &context->m_Registers[TLVM_REG_C];
+        src = &context->m_Registers[TLVM_8080_REG_C];
     break;
     case TLVM_CMP_D:
-        src = &context->m_Registers[TLVM_REG_D];
+        src = &context->m_Registers[TLVM_8080_REG_D];
     break;
     case TLVM_CMP_E:
-        src = &context->m_Registers[TLVM_REG_E];
+        src = &context->m_Registers[TLVM_8080_REG_E];
     break;
     case TLVM_CMP_H:
-        src = &context->m_Registers[TLVM_REG_H];
+        src = &context->m_Registers[TLVM_8080_REG_H];
     break;
     case TLVM_CMP_L:
-        src = &context->m_Registers[TLVM_REG_L];
+        src = &context->m_Registers[TLVM_8080_REG_L];
     break;
     case TLVM_CMP_M:
         {
-            tlvmShort addr = TLVM_GET_16BIT(TLVM_REG_H, TLVM_REG_L);
+            tlvmShort addr = TLVM_GET_16BIT(TLVM_8080_REG_H, TLVM_8080_REG_L);
             src = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
         }
     break;
     case TLVM_CMP_A:
-        src = &context->m_Registers[TLVM_REG_A];
+        src = &context->m_Registers[TLVM_8080_REG_A];
     break;
     }
 
     TLVM_NULL_CHECK(src, INVALID_INPUT);
 
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)*src;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_8080_REG_A] - (tlvmShort)*src;
     TLVM_SET_FLAGS(res, 8080);
 
     // size of instruction    = 1
@@ -82,7 +82,7 @@ tlvmReturn tlvmCPI(tlvmContext* context, tlvmByte* cycles)
 
     TLVM_GET_OP(op1, 1);
 
-    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_REG_A] - (tlvmShort)op1;
+    tlvmShort res = (tlvmShort)context->m_Registers[TLVM_8080_REG_A] - (tlvmShort)op1;
     TLVM_SET_FLAGS(res, 8080);
 
     // size of instruction    = 1

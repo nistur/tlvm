@@ -27,6 +27,12 @@ nistur@gmail.com
 
 #ifdef  TLVM_HAS_6303
 
+#define TLVM_6303_REG_F    0x0
+#define TLVM_6303_REG_A    0x1
+#define TLVM_6303_REG_B    0x2
+#define TLVM_6303_REG_D    0x3
+#define TLVM_6303_REG_E    0x4
+
 /*********************************************
  * FLAGS
  *********************************************/
@@ -64,7 +70,7 @@ TLVM_INSTRUCTION_VARIATION(6303, LSRmm, 0x74);
  * initialise all the registers and I/O ports 
  * and then setup the instruction set
  * parameters:
- *     context - the CPU context to add 8080 
+ *     context - the CPU context to add 6303 
  * support to
  *********************************************/
 tlvmReturn  tlvm6303Init  (tlvmContext** context);

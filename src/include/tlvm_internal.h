@@ -36,19 +36,18 @@ typedef struct _tlvmProcessorData
 	tlvmByte m_ProcessorID;
 } tlvmProcessorData;
 
+#define TLVM_INSTRUCTION_BASE(cpu, mnem) \
+    tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
 
 #define TLVM_INSTRUCTION_DECLARE(cpu, mnem, hex) \
-extern const tlvmByte TLVM_##cpu##_##mnem; \
-tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
-
-#define TLVM_INSTRUCTION_BASE(cpu, mnem) \
-tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
+    TLVM_INSTRUCTION_VARIATION(cpu, mnem, hex); \
+    TLVM_INSTRUCTION_BASE(cpu, mnem);
 
 #define TLVM_INSTRUCTION_VARIATION(cpu, mnem, hex) \
-extern const tlvmByte TLVM_##cpu##_##mnem;
+    extern const tlvmByte TLVM_##cpu##_##mnem;
 
 #define TLVM_INSTRUCTION_DEFINE(cpu, mnem, hex) \
-const tlvmByte TLVM_##cpu##_##mnem = hex;
+    const tlvmByte TLVM_##cpu##_##mnem = hex;
 
 #define TLVM_INSTRUCTION_ADD(set, cpu, mnem) \
     set[TLVM_##cpu##_##mnem] = tlvm##cpu##mnem;
@@ -57,9 +56,9 @@ const tlvmByte TLVM_##cpu##_##mnem = hex;
     set[TLVM_##cpu##_##mnem] = tlvm##cpu##base;
 
 
-#define TLVM_FLAG_ISSET(x, cpu) (TLVM_REGISTER(TLVM_REG_F) & TLVM_##cpu##_FLAG_##x)
-#define TLVM_FLAG_SET(x, cpu) TLVM_REGISTER(TLVM_REG_F) |= TLVM_##cpu##_FLAG_##x
-#define TLVM_FLAG_UNSET(x, cpu) TLVM_REGISTER(TLVM_REG_F) &= (TLVM_##cpu##_FLAG_ALL ^ TLVM_##cpu##_FLAG_##x)
+#define TLVM_FLAG_ISSET(x, cpu) (TLVM_REGISTER(TLVM_##cpu##_REG_F) & TLVM_##cpu##_FLAG_##x)
+#define TLVM_FLAG_SET(x, cpu) TLVM_REGISTER(TLVM_##cpu##_REG_F) |= TLVM_##cpu##_FLAG_##x
+#define TLVM_FLAG_UNSET(x, cpu) TLVM_REGISTER(TLVM_##cpu##_REG_F) &= (TLVM_##cpu##_FLAG_ALL ^ TLVM_##cpu##_FLAG_##x)
 #define TLVM_FLAG_SET_IF(test, x, cpu) if(test){ TLVM_FLAG_SET(x, cpu); }else{ TLVM_FLAG_UNSET(x, cpu); }
 #define TLVM_SET_FLAGS(res, cpu) \
 	TLVM_FLAG_SET_IF((res & 0xFF) == 0, Z, cpu); \
@@ -75,7 +74,7 @@ const tlvmByte TLVM_##cpu##_##mnem = hex;
 #define TLVM_REGISTER_COMPLEMENT(x) \
     TLVM_REGISTER(x) = ~TLVM_REGISTER(x);
 
-#define TLVM_REGISTER(x) \
+#define TLVM_REGISTER(x)                       \
     (context->m_Registers[x])
 
 #define TLVM_GET_OP(v, n) \

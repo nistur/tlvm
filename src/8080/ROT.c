@@ -29,7 +29,7 @@ tlvmReturn tlvmROT(tlvmContext* context, tlvmByte* cycles)
     TLVM_NULL_CHECK(context, NO_CONTEXT);
     TLVM_GET_OP(operand,0);
     
-    tlvmShort acc = (tlvmShort)context->m_Registers[TLVM_REG_A];
+    tlvmShort acc = (tlvmShort)context->m_Registers[TLVM_8080_REG_A];
 
     if(operand == TLVM_RLC)
     {
@@ -72,7 +72,7 @@ tlvmReturn tlvmROT(tlvmContext* context, tlvmByte* cycles)
         acc >>= 1;
     }
 
-    context->m_Registers[TLVM_REG_A] = (tlvmByte)(acc & 0xFF);
+    context->m_Registers[TLVM_8080_REG_A] = (tlvmByte)(acc & 0xFF);
 
     // size of instruction = 1
     context->m_ProgramCounter += 1;
