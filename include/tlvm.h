@@ -140,7 +140,7 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  */
 #define TLVM_CPU_6303          2
 
-#include "tlvm_8080.h"
+typedef void(*tlvmIOCallback)(tlvmContext* context, tlvmByte port);
 
 /*********************************************
  * TLVM DEBUGGER SUPPORT
@@ -241,6 +241,18 @@ TLVM_EXPORT tlvmReturn   tlvmSetClock        (tlvmContext* context, tlvmClockFn 
 TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context, tlvmByte interrupt);
 
 TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
+
+/*********************************************
+ * tlvmSetIOCallback
+ *     Provides a callback for when any of the
+ *   CPU's ports have been written to.
+ * parameters:
+ *     context - the CPU context to add the
+ *   callback to
+ *     callback - the function pointer of the
+ *   callback
+ *********************************************/
+TLVM_EXPORT tlvmReturn  tlvmSetIOCallback(tlvmContext* context, tlvmIOCallback callback);
 
 TLVM_EXPORT const char*  tlvmError();
 

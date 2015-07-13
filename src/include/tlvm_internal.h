@@ -33,7 +33,8 @@ typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
 
 typedef struct _tlvmProcessorData
 {
-	tlvmByte m_ProcessorID;
+    tlvmByte m_ProcessorID;
+    tlvmIOCallback m_IOCallback;
 } tlvmProcessorData;
 
 #define TLVM_INSTRUCTION_BASE(cpu, mnem) \

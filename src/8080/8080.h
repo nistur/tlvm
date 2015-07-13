@@ -462,7 +462,6 @@ typedef struct _tlvmContext_8080
 typedef struct _tlvmProcessorData_8080
 {
 	tlvmProcessorData m_Header;
-	tlvm8080IOCallback m_IOCallback;
 
     // instrution set
     tlvmInstruction     m_InstructionSet[256];

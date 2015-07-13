@@ -288,6 +288,15 @@ tlvmReturn tlvmHalt(tlvmContext* context)
     TLVM_RETURN_CODE(SUCCESS);
 }
 
+tlvmReturn tlvmSetIOCallback(tlvmContext* context, tlvmIOCallback callback)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    context->m_ProcessorData->m_IOCallback = callback;
+
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
 // kinda hacked from http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/files/8080emu-first50.c
 tlvmBool tlvmParity(tlvmByte val)
 {

@@ -340,15 +340,6 @@ void tlvm8080SetupData()
     g_8080Data.m_InstructionSet[TLVM_DAA]      = tlvmDAA;
 }
 
-tlvmReturn tlvm8080SetIOCallback(tlvmContext* context, tlvm8080IOCallback callback)
-{
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    ((tlvmProcessorData_8080*)context->m_ProcessorData)->m_IOCallback = callback;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
-
 tlvmReturn tlvm8080GetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);

@@ -172,7 +172,7 @@ void startStdIO(tlvmContext* context, int outDataPort, int inDataPort, int statP
 	g_statPort = statPort;
 	tlvmSetPort(context, g_statPort, 0x01); // READY!
 	g_inputThreadState = Halt; // dont start running now, instead let resume take over
-	tlvm8080SetIOCallback(context, onIOWrite);
+	tlvmSetIOCallback(context, onIOWrite);
 }
 
 void pauseStdIO(tlvmContext* UNUSED(context))
@@ -198,7 +198,7 @@ void startIOPrint(tlvmContext* context, int dataPort, int statPort)
 	g_numDataPort = dataPort;
 	g_numStatPort = statPort;
 	tlvmSetPort(context, g_numStatPort, 0x01); // READY!
-	tlvm8080SetIOCallback(context, onIOWrite);
+	tlvmSetIOCallback(context, onIOWrite);
 }
 
 void setMemory(char* buffer, int address, int size)
