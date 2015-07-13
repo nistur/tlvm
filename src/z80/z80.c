@@ -1,37 +1,36 @@
 #ifdef  TLVM_HAS_Z80
 #include "tlvm_internal.h"
 
-tlvmReturn tlvmInitZ80(tlvmContext* context)
+tlvmProcessorData_Z80 g_Z80Data;
+
+tlvmReturn tlvmZ80Init(tlvmContext** context)
 {
-    if(context == NULL)
-        tlvmReturnCode(NO_CONTEXT);
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    
+    tlvmContext_Z80* cpu = tlvmMalloc(tlvmContext_Z80);
+    *context = &cpu->m_Header;
+    
+    if(g_Z80Data.m_Header.m_ProcessorID == 0)
+        tlvmZ80SetupData();
+ 
 
-    // make sure we have enough space for instructions
-    if(context->m_InstructionSet)
-        tlvmFree(context->m_InstructionSet);
-    context->m_InstructionSet = tlvmMallocArray(tlvmInstruction, 512);
-
-    // initialise all the 8080 registers
-    if(context->m_Registers)
-        tlvmFree(context->m_Registers);
-    context->m_Registers = tlvmMallocArray(tlvmByte, 8);
-
-    // create default I/O ports
-    if(context->m_Ports)
-        tlvmFree(context->m_Ports);
-    context->m_Ports = tlvmMallocArray(tlvmByte, 255);
-
-    if(tlvmAdd8080Instructions(context) != TLVM_SUCCESS)
-        tlvmReturn();
-
-    if(tlvmAddZ80Instructions(context) != TLVM_SUCCESS)
-        tlvmReturn();
-
-    tlvmReturnCode(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmAddZ80Instructions(tlvmContext* context)
+tlvmReturn tlvmAddZ80Instructions(tlvmInstruction* instructionSet)
 {
+    TLVM_RETURN_CODE(SUCCESS);
 }
+
+void tlvmZ80SetupData()
+{
+    g_Z80Data.m_Header.m_ProcessorID = TLVM_CPU_Z80;
+
+    tlvmAdd8080Instructions(g_Z80Data.m_InstructionSet);
+    tlvmAddZ80Instructions(g_Z80Data.m_InstructionSet);
+    
+    g_Z80Data.m_Header.m_InstructionSet = g_Z80Data.m_InstructionSet;
+}
+
 
 #endif/*TLVM_HAS_Z80*/

@@ -20,6 +20,9 @@ freely, subject to the following restrictions:
 Philipp Geyer
 nistur@gmail.com
 --]]
+if os.is("macosx") then
+    premake.tools.gcc.ldflags.flags = nil
+end
 
 solution "tlvm"
 configurations { "Debug", "Release" }
@@ -29,18 +32,19 @@ files { "include/**.h" }
 defines { "TLVM_BUILD" }
 
 -- Processor specific defines
-defines { "TLVM_HAS_8080", "TLVM_HAS_Z80" }
+defines { "TLVM_HAS_8080", "TLVM_HAS_Z80", "TLVM_HAS_6303" }
 
 configuration "Debug"
 defines { "DEBUG" }
+--optimize "Debug"
 flags { "Symbols" }
 targetdir "build/debug"
 
 configuration "Release"
 defines { "NDEBUG" }
-flags { "OptimizeSize",
-	"ExtraWarnings",
-	"FatalWarnings",
+optimize "Size"
+warnings "Extra"
+flags { "FatalWarnings",
 	"NoFramePointer" }
 targetdir "build/release"
 

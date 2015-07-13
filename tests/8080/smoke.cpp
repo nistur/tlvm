@@ -1,6 +1,27 @@
-#include "tlvm-tests.h"
-#include "tlvm.h"
-#include "tlvm_internal.h"
+/*
+Copyright (c) 2015 Philipp Geyer
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgement in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+Philipp Geyer
+nistur@gmail.com
+*/
+
+#include "../tlvm-tests.h"
 
 #include <string.h>
 
@@ -8,10 +29,10 @@
 TEST(HelloWorld, Smoke, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
+      tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
       m_data.bootloader[0x00] = TLVM_LXI_H;
       m_data.bootloader[0x01] = 0x0;
       m_data.bootloader[0x02] = 0x1;
@@ -80,13 +101,16 @@ TEST(HelloWorld, Smoke, 0.0f,
      }
     );
 
+// This Hello World program is expected to run significantly slower than the above one
+// as it uses a couple of "slow" JMPs however it demonstrates a more concise and sane
+// program where all the data is together
 TEST(HelloWorld2, Smoke, 0.0f,
      // initialisation
      {
-      tlvmInitContext(&m_data.context);
-      tlvmInit8080(m_data.context);
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
       tlvmSetMemory(m_data.context, m_data.bootloader, 0x000, 255, TLVM_FLAG_READ);
       tlvmSetMemory(m_data.context, m_data.memory, 0x100, 255, TLVM_FLAG_READ | TLVM_FLAG_WRITE);
+      tlvmSetClockspeed(m_data.context, TLVM_MHZ(2,0));
       m_data.bootloader[0x00] = TLVM_LXI_B; // set the position that we're
       m_data.bootloader[0x01] = 0x00;       // going to write to
       m_data.bootloader[0x02] = 0x01;

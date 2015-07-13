@@ -21,16 +21,25 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#include "tlvm.h"
+#include "../tlvm-tests.h"
 
-tlvmReturn g_tlvmStatus;
-const char* g_tlvmStatusMessages[] = 
-{
-    "Success",							//TLVM_SUCCESS
-    "Null context",						//TLVM_NO_CONTEXT
-    "Memory has not been set",			//TLVM_NO_MEMORY
-    "Undefined invalid input",			//TLVM_INVALID_INPUT
-    "Unrecognised instruction",			//TLVM_UNKNOWN_INSTRUCTION
-    "",									//TLVM_EXIT (internal only)
-    "Memory overlaps existing address",	//TLVM_MEMORY_OVERLAP
-};
+TEST(InitTerminate, CPU_6303, 0.0f,
+     // initialisation
+     {
+      m_data.context = 0;
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+      ASSERT(tlvmInitContext(&m_data.context, TLVM_CPU_6303) == TLVM_SUCCESS);
+      ASSERT(m_data.context != NULL);
+      ASSERT(tlvmTerminateContext(&m_data.context) == TLVM_SUCCESS);
+     },
+     // data
+     {
+      tlvmContext* context;
+     }
+    );

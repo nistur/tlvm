@@ -21,16 +21,17 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#include "tlvm.h"
+#ifndef __8080_DEBUG_H__
+#define __8080_DEBUG_H__
 
-tlvmReturn g_tlvmStatus;
-const char* g_tlvmStatusMessages[] = 
-{
-    "Success",							//TLVM_SUCCESS
-    "Null context",						//TLVM_NO_CONTEXT
-    "Memory has not been set",			//TLVM_NO_MEMORY
-    "Undefined invalid input",			//TLVM_INVALID_INPUT
-    "Unrecognised instruction",			//TLVM_UNKNOWN_INSTRUCTION
-    "",									//TLVM_EXIT (internal only)
-    "Memory overlaps existing address",	//TLVM_MEMORY_OVERLAP
-};
+#ifdef  TLVM_HAS_8080
+#ifdef  TLVM_DEBUG
+
+tlvmReturn tlvm8080DebugGetInstruction(tlvmContext* context, tlvmChar** instruction, tlvmByte* size);
+
+tlvmReturn tlvm8080DebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg);
+
+#endif/*TLVM_DEBUG*/
+#endif/*TLVM_HAS_8080*/
+
+#endif/*__8080_DEBUG_H__*/

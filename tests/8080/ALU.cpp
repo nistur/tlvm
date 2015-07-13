@@ -21,16 +21,31 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#include "tlvm.h"
+#include "../tlvm-tests.h"
 
-tlvmReturn g_tlvmStatus;
-const char* g_tlvmStatusMessages[] = 
-{
-    "Success",							//TLVM_SUCCESS
-    "Null context",						//TLVM_NO_CONTEXT
-    "Memory has not been set",			//TLVM_NO_MEMORY
-    "Undefined invalid input",			//TLVM_INVALID_INPUT
-    "Unrecognised instruction",			//TLVM_UNKNOWN_INSTRUCTION
-    "",									//TLVM_EXIT (internal only)
-    "Memory overlaps existing address",	//TLVM_MEMORY_OVERLAP
-};
+TEST(ADI, ALU, 0.0f,
+     // initialisation
+     {
+      tlvmInitContext(&m_data.context, TLVM_CPU_8080);
+      tlvmSetMemory(m_data.context, m_data.bootloader, 0, 255, TLVM_FLAG_READ);
+      m_data.bootloader[0] = TLVM_ADI;
+      m_data.bootloader[1] = 99;
+     },
+     // cleanup
+     {
+      tlvmTerminateContext(&m_data.context);
+     },
+     // test
+     {
+          // reload the program so each time we start from 0x0
+          tlvmReset(m_data.context);
+          tlvmByte cycle = 0;
+          ASSERT(tlvmStep(m_data.context, &cycle) == TLVM_SUCCESS); // run the first instruction
+          ASSERT(cycle == 7);
+     },
+     // data
+     {
+      tlvmContext* context;
+      tlvmByte     bootloader[255];
+     }
+    );

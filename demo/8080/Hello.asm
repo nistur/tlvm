@@ -1,0 +1,50 @@
+;; Hello World
+OUTDATA EQU 0x01
+OUTSTAT EQU 0x02
+
+READY   EQU 0x01
+
+NEWLINE EQU 0x0A
+ENDSTR  EQU 0x24
+
+JMP MAIN
+
+MESSAGE:					;; 0x0003
+.db "Hello world$"
+
+PRINTCH:					;; 0x000F
+	PUSH PSW				;; We want a character to be printed in C
+PRINTLOOP:					;; 0x0010
+	IN OUTSTAT
+	CPI READY
+	JNZ PRINTLOOP
+	MOV A,C
+	OUT OUTDATA
+	POP PSW
+	RET
+
+PRINT: 						;; 0x001C
+	PUSH D					;; We expect DE to point to the value to be printed
+	PUSH B
+	PUSH PSW
+PRINTCHECK: 				;; 0x001F
+	LDAX D
+	CPI ENDSTR
+	JZ PRINTEND
+	MOV C,A
+	CALL PRINTCH
+	INX D
+	JMP PRINTCHECK
+PRINTEND:					;; 0x002D
+	MVI C,NEWLINE
+	CALL PRINTCH
+	POP PSW
+	POP B
+	POP D
+	RET
+
+MAIN:						;; 0x0036
+	STA 0x01FF
+	LXI D,MESSAGE
+	CALL PRINT
+	HLT
