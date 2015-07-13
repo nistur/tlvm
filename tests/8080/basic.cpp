@@ -105,7 +105,7 @@ TEST(InstructionSet, Basic, 0.0f,
      {
         for(unsigned int i = 0; i < 256; ++i)
           if(m_data.nullInstructions[i] == 0)
-            ASSERT(((_tlvmContext*)m_data.context)->m_InstructionSet[i] != NULL);
+            ASSERT(((_tlvmContext*)m_data.context)->m_ProcessorData->m_InstructionSet[i] != NULL);
      },
      // data
      {

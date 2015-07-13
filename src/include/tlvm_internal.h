@@ -29,14 +29,74 @@ nistur@gmail.com
 #include "tlvm_time.h"
 #include "tlvm_debug_internal.h"
 
+/***************************************
+ * Callback functions
+ ***************************************/
 typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
 typedef tlvmReturn(*tlvmInterruptFn)(tlvmContext*, tlvmByte);
 
+
+/***************************************
+ * Forward declarations
+ ***************************************/
+typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
+
+/***************************************
+ * Processor information - Not necessarily
+ * per CPU instance.
+ ***************************************/
 typedef struct _tlvmProcessorData
 {
-    tlvmByte        m_ProcessorID;
-    tlvmInterruptFn m_Interrupt;
+    tlvmByte          m_ProcessorID;
+    tlvmInterruptFn   m_Interrupt;
+    tlvmInstruction*  m_InstructionSet;
 } tlvmProcessorData;
+
+/***************************************
+ * Library context
+ * - holds current state
+ ***************************************/
+struct _tlvmContext
+{
+    tlvmMemoryBuffer* m_Memory;
+    
+    tlvmShort         m_ProgramCounter;
+    
+    tlvmShort         m_StackPointer;
+    
+    // registers
+    tlvmByte*         m_Registers;
+    
+    tlvmByte*         m_Ports;
+    
+    tlvmShort         m_Clockspeed;
+    
+    tlvmLong          m_StartTime;
+    
+    tlvmLong          m_TimeOffset;
+    
+    tlvmClockFn        m_ClockFn;
+    tlvmIOCallback     m_IOCallback;
+    tlvmByte           m_Halt;
+
+    tlvmProcessorData* m_ProcessorData;
+
+    // functionality for hooking up a debugger
+#ifdef  TLVM_DEBUG
+    tlvmDebugBreakpoint*  m_Breakpoints;
+    tlvmByte		  m_DebugState;
+    tlvmDebugCallbackFn   m_StepCallback;
+#endif/*TLVM_DEBUG*/
+};
+
+struct _tlvmMemoryBuffer
+{
+    tlvmMemoryBuffer* m_Next;
+    tlvmShort         m_Start;
+    tlvmShort         m_End;
+    tlvmByte*         m_Buffer;
+    tlvmByte	      m_Flags;
+};
 
 #define TLVM_INSTRUCTION_BASE(cpu, mnem) \
     tlvmReturn tlvm##cpu##mnem(tlvmContext*, tlvmByte*);
@@ -121,56 +181,6 @@ typedef struct _tlvmProcessorData
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
 tlvmBool tlvmParity(tlvmByte val);
-
-/***************************************
- * Library context
- * - holds current state
- ***************************************/
-typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
-
-struct _tlvmContext
-{
-    tlvmInstruction*  m_InstructionSet;
-    
-    tlvmMemoryBuffer* m_Memory;
-    
-    tlvmShort         m_ProgramCounter;
-    
-    tlvmShort         m_StackPointer;
-    
-    // registers
-    tlvmByte*         m_Registers;
-    
-    tlvmByte*         m_Ports;
-    
-    tlvmShort         m_Clockspeed;
-    
-    tlvmLong          m_StartTime;
-    
-    tlvmLong          m_TimeOffset;
-    
-    tlvmClockFn        m_ClockFn;
-    tlvmIOCallback     m_IOCallback;
-    tlvmByte           m_Halt;
-
-    tlvmProcessorData* m_ProcessorData;
-
-    // functionality for hooking up a debugger
-#ifdef  TLVM_DEBUG
-    tlvmDebugBreakpoint*  m_Breakpoints;
-    tlvmByte		  m_DebugState;
-    tlvmDebugCallbackFn   m_StepCallback;
-#endif/*TLVM_DEBUG*/
-};
-
-struct _tlvmMemoryBuffer
-{
-    tlvmMemoryBuffer* m_Next;
-    tlvmShort         m_Start;
-    tlvmShort         m_End;
-    tlvmByte*         m_Buffer;
-    tlvmByte	      m_Flags;
-};
 
 /***************************************
  * CPU specific headers

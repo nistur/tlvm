@@ -37,14 +37,14 @@ TEST(Instructions, JMP, 0.0f,
           // reload the program so each time we start from 0x0
           tlvmReset(m_data.context);
 
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JMP] == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JNZ] == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JZ]  == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JNC] == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JPO] == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JPE] == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JP]  == tlvmJMP);
-          ASSERT(m_data.context->m_InstructionSet[TLVM_JM]  == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JMP] == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JNZ] == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JZ]  == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JNC] == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JPO] == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JPE] == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JP]  == tlvmJMP);
+          ASSERT(m_data.context->m_ProcessorData->m_InstructionSet[TLVM_JM]  == tlvmJMP);
      },
      // data
      {

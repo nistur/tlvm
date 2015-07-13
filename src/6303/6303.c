@@ -45,7 +45,6 @@ tlvmReturn tlvm6303Init(tlvmContext** context)
         tlvm6303SetupData();
 
     (*context)->m_ProcessorData = &g_6303Data.m_Header;
-    (*context)->m_InstructionSet = g_6303Data.m_InstructionSet;
 
     (*context)->m_Registers = cpu->m_Registers;
     (*context)->m_Ports = cpu->m_Ports;
@@ -56,6 +55,7 @@ tlvmReturn tlvm6303Init(tlvmContext** context)
 void tlvm6303SetupData()
 {
     g_6303Data.m_Header.m_ProcessorID = TLVM_CPU_6303;
+    g_6303Data.m_Header.m_InstructionSet = g_6303Data.m_InstructionSet;
 
     TLVM_INSTRUCTION_ADD          (g_6303Data.m_InstructionSet, 6303, TRAP);
     TLVM_INSTRUCTION_ADD          (g_6303Data.m_InstructionSet, 6303, NOP);

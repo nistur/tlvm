@@ -170,9 +170,9 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);
     TLVM_NULL_CHECK(opcode, INVALID_INPUT);
-    TLVM_NULL_CHECK(context->m_InstructionSet[*opcode], UNKNOWN_INSTRUCTION);
+    TLVM_NULL_CHECK(context->m_ProcessorData->m_InstructionSet[*opcode], UNKNOWN_INSTRUCTION);
     tlvmByte numCycles = 0;
-    context->m_InstructionSet[*opcode](context, &numCycles);
+    context->m_ProcessorData->m_InstructionSet[*opcode](context, &numCycles);
     if(context->m_ClockFn)
     {
         int i;

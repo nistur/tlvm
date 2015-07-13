@@ -37,7 +37,6 @@ tlvmReturn tlvm8080Init(tlvmContext** context)
         tlvm8080SetupData();
 
     (*context)->m_ProcessorData = &g_8080Data.m_Header;
-    (*context)->m_InstructionSet = g_8080Data.m_InstructionSet;
 
     (*context)->m_Registers = cpu->m_Registers;
     (*context)->m_Ports = cpu->m_Ports;
@@ -48,6 +47,7 @@ tlvmReturn tlvm8080Init(tlvmContext** context)
 void tlvm8080SetupData()
 {
     g_8080Data.m_Header.m_ProcessorID = TLVM_CPU_8080;
+    g_8080Data.m_Header.m_InstructionSet = g_8080Data.m_InstructionSet;
 
     g_8080Data.m_InstructionSet[TLVM_NOP]      = tlvmNOP;
     g_8080Data.m_InstructionSet[TLVM_HLT]      = tlvmHLT;
