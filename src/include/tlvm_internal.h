@@ -58,28 +58,31 @@ typedef struct _tlvmProcessorData
  ***************************************/
 struct _tlvmContext
 {
+    // global Processor definition
+    tlvmProcessorData* m_ProcessorData;
+
+    // Attached memory
     tlvmMemoryBuffer* m_Memory;
     
-    tlvmShort         m_ProgramCounter;
-    
+    // CPU state
+    tlvmShort         m_ProgramCounter;    
     tlvmShort         m_StackPointer;
     
     // registers
     tlvmByte*         m_Registers;
-    
     tlvmByte*         m_Ports;
     
+    // CPU timing
     tlvmShort         m_Clockspeed;
-    
     tlvmLong          m_StartTime;
-    
     tlvmLong          m_TimeOffset;
     
+    // Callback functions
     tlvmClockFn        m_ClockFn;
     tlvmIOCallback     m_IOCallback;
-    tlvmByte           m_Halt;
 
-    tlvmProcessorData* m_ProcessorData;
+    // Halt
+    tlvmByte           m_Halt;
 
     // functionality for hooking up a debugger
 #ifdef  TLVM_DEBUG
@@ -128,7 +131,7 @@ struct _tlvmMemoryBuffer
 	TLVM_FLAG_SET_IF(res > 0xFF, C, cpu); \
 	TLVM_FLAG_SET_IF(tlvmParity(res) == TLVM_TRUE, P, cpu);
 	
-#define TLVM_GET_16BIT(h, l) 	((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l)
+#define TLVM_GET_16BIT(h, l) 	(((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l))
 #define TLVM_SET_16BIT(h, l, v) \
 	context->m_Registers[h] = (tlvmByte)((v) >> 8); \
 	context->m_Registers[l] = (tlvmByte)((v) & 0xFF);
