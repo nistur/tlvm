@@ -38,9 +38,8 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
-	tlvmProcessorData* data = context->m_ProcessorData;
-	if(data != NULL && data->m_IOCallback != NULL)
-		data->m_IOCallback(context, dest);
+	if(context->m_IOCallback != NULL)
+		context->m_IOCallback(context, dest);
 
 	TLVM_RETURN_CODE(SUCCESS);
 }

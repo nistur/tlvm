@@ -34,7 +34,6 @@ typedef tlvmReturn(*tlvmInstruction)(tlvmContext*, tlvmByte*);
 typedef struct _tlvmProcessorData
 {
     tlvmByte m_ProcessorID;
-    tlvmIOCallback m_IOCallback;
 } tlvmProcessorData;
 
 #define TLVM_INSTRUCTION_BASE(cpu, mnem) \
@@ -129,48 +128,54 @@ typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
 
 struct _tlvmContext
 {
-    tlvmInstruction* m_InstructionSet;
-
-	tlvmMemoryBuffer* m_Memory;
-
-	tlvmShort  m_ProgramCounter;
-
-	tlvmShort  m_StackPointer;
-
-	// registers
-	tlvmByte*  m_Registers;
-
-	tlvmByte*  m_Ports;
-
-	tlvmShort  m_Clockspeed;
-
-	tlvmLong   m_StartTime;
-
-	tlvmLong   m_TimeOffset;
-
-#ifdef  TLVM_DEBUG
-	tlvmDebugBreakpoint* 	m_Breakpoints;
-	tlvmByte				m_DebugState;
-	tlvmDebugCallbackFn     m_StepCallback;
-#endif/*TLVM_DEBUG*/
-
-	tlvmProcessorData* m_ProcessorData;
-
+    tlvmInstruction*  m_InstructionSet;
+    
+    tlvmMemoryBuffer* m_Memory;
+    
+    tlvmShort         m_ProgramCounter;
+    
+    tlvmShort         m_StackPointer;
+    
+    // registers
+    tlvmByte*         m_Registers;
+    
+    tlvmByte*         m_Ports;
+    
+    tlvmShort         m_Clockspeed;
+    
+    tlvmLong          m_StartTime;
+    
+    tlvmLong          m_TimeOffset;
+    
     tlvmClockFn        m_ClockFn;
+    tlvmIOCallback     m_IOCallback;
     tlvmByte           m_Halt;
+
+    tlvmProcessorData* m_ProcessorData;
+
+    // functionality for hooking up a debugger
+#ifdef  TLVM_DEBUG
+    tlvmDebugBreakpoint*  m_Breakpoints;
+    tlvmByte		  m_DebugState;
+    tlvmDebugCallbackFn   m_StepCallback;
+#endif/*TLVM_DEBUG*/
 };
 
 struct _tlvmMemoryBuffer
 {
-	tlvmMemoryBuffer* m_Next;
-	tlvmShort         m_Start;
-	tlvmShort         m_End;
-	tlvmByte*         m_Buffer;
-	tlvmByte		  m_Flags;
+    tlvmMemoryBuffer* m_Next;
+    tlvmShort         m_Start;
+    tlvmShort         m_End;
+    tlvmByte*         m_Buffer;
+    tlvmByte	      m_Flags;
 };
 
+/***************************************
+ * CPU specific headers
+ ***************************************/
 #include "../8080/8080.h"
 #include "../6303/6303.h"
+
 /***************************************
  * Some basic memory management wrappers
  ***************************************/

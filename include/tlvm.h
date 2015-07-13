@@ -33,20 +33,16 @@ nistur@gmail.com
  * Example:
  *********************************************
  * tlvmContext* vm = NULL;
- * if(tlvmInitContext(&vm) != TLVM_SUCCESS)
+ * if(tlvmInitContext(&vm, TLVM_CPU_8080) != TLVM_SUCCESS)
  * {
  *    printf("TLVM Error: %s\n", tlvmError());
- *    return();	
- * }
- * if(tlvm8080Init(vm) != TLVM_SUCCESS)
- * {
- *    printf("TLVM Error: %s\n", tlvmError());
- *    return();	
+ *    return;	
  * }
  * if(tlvmSetClockspeed(vm, TLVM_MHZ(2,5)) != TLVM_SUCCESS)
  * {
  *    printf("TLVM Error: %s\n", tlvmError());
- *    return();	
+ *    tlvmTerminateContext(&vm);
+ *    return;	
  * }
  * tlvmByte mem[256];
  * // -- the processor will probably start
@@ -56,13 +52,16 @@ nistur@gmail.com
  * if(tlvmSetMemory(vm, mem, 0, 256, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
  * {
  *    printf("TLVM Error: %s\n", tlvmError());
- *    return();	
+ *    tlvmTerminateContext(&vm);
+ *    return;	
  * }
  * tlvmRun(vm);
+ * tlvmTerminateContext(&vm);
  *********************************************
  * Current supported processor instruction
  * sets:
- * Intel 8080 (95%)
+ * Intel 8080 (99%)
+ * Hitachi 6303 (10%)
  * 
  *********************************************/
 
@@ -140,14 +139,17 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  */
 #define TLVM_CPU_6303          2
 
+/*********************************************
+ * CALLBACK DEFINITIONS
+ *********************************************/
 typedef void(*tlvmIOCallback)(tlvmContext* context, tlvmByte port);
 
 /*********************************************
  * TLVM DEBUGGER SUPPORT
  *
  * Note:
- *   requires TLVM_DEBUG to build with debugger
- *  support
+ *    This requires the library to be build
+ *  with TLVM_DEBUG to compile in debug support
  *********************************************/
 #include "tlvm_debug.h"
 
@@ -158,7 +160,8 @@ typedef void(*tlvmIOCallback)(tlvmContext* context, tlvmByte port);
  *     context - the pointer to where the CPU
  *       context should be created
  *     cpuid - the type of CPU to create
- *             - TLVM_CPU_8080
+ *             - TLVM_CPU_8080 - Intel 8080
+ *             - TLVM_CPU_6303 - Hitachi 6303
  *   return:
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - context pointer is NULL
@@ -186,7 +189,7 @@ TLVM_EXPORT tlvmReturn   tlvmTerminateContext(tlvmContext** context);
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - NULL context passed
  *
- * Note: Currently not implemented.
+ * Note:
  *   Use TLVM_MHZ(x, y) to calculate speed
  *    eg: tlvmSetClockSpeed(context, TLVM_MHZ(2,500));
  *        // sets clockspeed to 2.5MHz
@@ -213,33 +216,166 @@ TLVM_EXPORT tlvmReturn   tlvmSetClockspeed   (tlvmContext* context,
  *   be handled manually
  *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmSetMemory       (tlvmContext* context, 
-									          tlvmByte* memory, 
-									          tlvmShort offset, 
-									          tlvmShort size,
-									          tlvmByte flags);
+                                              tlvmByte* memory, 
+                                              tlvmShort offset, 
+                                              tlvmShort size,
+                                              tlvmByte flags);
 
+/*********************************************
+ * tlvmUnsetMemory
+ *     Removes a memory region from the processor
+ *  parameters:
+ *     context - the CPU context
+ *     memory - the memory buffer that was set with tlvmSetMemory
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *     TLVM_NO_MEMORY - NULL memory buffer passed or
+ *                      no memory attached to CPU instance
+ *     TLVM_INVALID_INPUT - Memory buffer not attached to CPU
+ *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmUnsetMemory     (tlvmContext* context,
-										      tlvmByte* memory);
+                                              tlvmByte* memory);
 
-TLVM_EXPORT tlvmReturn   tlvmGetPort		 (tlvmContext* context,
-											  tlvmByte port,
-											  tlvmByte* outport);
+/*********************************************
+ * tlvmGetPort
+ *     Retrieves current value written to one of the CPU's ports
+ *  parameters:
+ *     context - the CPU context
+ *     port - the port ID to retrieve data from
+ *     outport - the value to popupate with the port data 
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *     TLVM_INVALID_INPUT - NULL outport parameter passed
+ *  note: 
+ *     This will not work for CPUs with memory mapped io 
+ *********************************************/    
+TLVM_EXPORT tlvmReturn   tlvmGetPort         (tlvmContext* context,
+                                              tlvmByte port,
+                                              tlvmByte* outport);
 
-TLVM_EXPORT tlvmReturn   tlvmSetPort		 (tlvmContext* context,
-											  tlvmByte port,
-											  tlvmByte portval);
+/*********************************************
+ * tlvmSetPort
+ *     Writes a byte to one of the CPU's I/O ports
+ *  parameters:
+ *     context - the CPU context
+ *     port - the port ID to retrieve data from
+ *     portval - the value to write to the port 
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *  note: 
+ *     This will not work for CPUs with memory mapped io 
+ *********************************************/    
+TLVM_EXPORT tlvmReturn   tlvmSetPort	     (tlvmContext* context,
+                                              tlvmByte port,
+                                              tlvmByte portval);
 
+/*********************************************
+ * tlvmStep
+ *     Steps the processor one instruction
+ *  parameters:
+ *     context - the CPU context
+ *     cycles - (output) number of cycles taken by the instruction
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *     TLVM_INVALID_INPUT - current executable memory address is invalid
+ *     TLVM_UNKNOWN_INSTRUCTION - memory address returned opcode not
+ *                                recognised by the CPU
+ *     TLVM_EXIT - Program called for the CPU to halt
+ *  note: 
+ *     This function can return other error codes, based on the outcome
+ *   of the CPU instruction 
+ *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmStep            (tlvmContext* context, 
-											  tlvmByte* cycles);
+                                              tlvmByte* cycles);
 
+/*********************************************
+ * tlvmRun
+ *     Starts the CPU running based on the clockspeed provided by
+ *   tlvmSetClockspeed, or as fast as possible if the clockspeed is
+ *   unset. Will not return until the CPU is forced to halt.
+ *  parameters:
+ *     context - the CPU context
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *     TLVM_INVALID_INPUT - current executable memory address is invalid
+ *     TLVM_UNKNOWN_INSTRUCTION - memory address returned opcode not
+ *                                recognised by the CPU
+ *     TLVM_EXIT - Program called for the CPU to halt
+ *  note: 
+ *     This function can return other error codes, based on the outcome
+ *   of the CPU instruction s
+ *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmRun             (tlvmContext* context);
+    
+/*********************************************
+ * tlvmReset
+ *     Resets the CPU to as close to a 'fresh boot' as possible.
+ *  parameters:
+ *     context - the CPU context to reset 
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *  note: 
+ *     This will not reset memory to the state before initial run
+ *********************************************/
+TLVM_EXPORT tlvmReturn   tlvmReset	     (tlvmContext* context);
 
-TLVM_EXPORT tlvmReturn   tlvmReset			 (tlvmContext* context);
+/*********************************************
+ * tlvmSetClock
+ *     Sets a clock callback function. This will call once per CPU cycle
+ *   on the provided CPU context and can be used to synchronise with a
+ *   coprocessor or similar
+ *  parameters:
+ *     context - the CPU context
+ *     clockFn - the clock callback function
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *  note: 
+ *     As tlvm executes each instruction instantaneously and then waits
+ *   for the relevant time, the callback funtion will be receieved after
+ *   the instruction has run. The callback will also be provided with a
+ *   pointer to the amount of cycles that the CPU is currently running for
+ *   so it would be possible to modify this value and either add artificial
+ *   delays to CPUs, or allow them to run quicker, by modifying this. This
+ *   may lead to unexpected effects occuring though.
+ *********************************************/
+TLVM_EXPORT tlvmReturn   tlvmSetClock        (tlvmContext* context, 
+                                              tlvmClockFn clockFn);
 
-TLVM_EXPORT tlvmReturn   tlvmSetClock        (tlvmContext* context, tlvmClockFn clockFn);
+/*********************************************
+ * tlvmInterrrupt
+ *     Performs a 'hardware' interrupt of the CPU
+ *  parameters:
+ *     context - the CPU context
+ *     interrupt - the CPU interrupt routine to call
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *  note: 
+ *     The effect of this will depend on the CPU implementation
+ *********************************************/
+TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context, 
+                                              tlvmByte interrupt);
 
-TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context, tlvmByte interrupt);
-
+/*********************************************
+ * tlvmHalt
+ *     Halts the CPU operation
+ *  parameters:
+ *     context - the CPU context
+ *  return:
+ *     TLVM_SUCCESS - no error
+ *     TLVM_NO_CONTEXT - NULL context passed
+ *  note: 
+ *     This will return immediately after flagging the CPU
+ *   to halt. The CPU may still be completing the instruction
+ *   that is was last on.
+ *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
 
 /*********************************************
@@ -248,11 +384,12 @@ TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
  *   CPU's ports have been written to.
  * parameters:
  *     context - the CPU context to add the
- *   callback to
+ *               callback to
  *     callback - the function pointer of the
- *   callback
+ *                callback
  *********************************************/
-TLVM_EXPORT tlvmReturn  tlvmSetIOCallback(tlvmContext* context, tlvmIOCallback callback);
+TLVM_EXPORT tlvmReturn  tlvmSetIOCallback    (tlvmContext* context, 
+                                              tlvmIOCallback callback);
 
 TLVM_EXPORT const char*  tlvmError();
 

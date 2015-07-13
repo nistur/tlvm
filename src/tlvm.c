@@ -292,7 +292,7 @@ tlvmReturn tlvmSetIOCallback(tlvmContext* context, tlvmIOCallback callback)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_ProcessorData->m_IOCallback = callback;
+    context->m_IOCallback = callback;
 
     TLVM_RETURN_CODE(SUCCESS);
 }
