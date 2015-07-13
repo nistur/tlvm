@@ -131,11 +131,16 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 /*********************************************
  * PROCESSOR INSTRUCTION SETS
  *********************************************/
+/* TLVM_CPU_8080
+ * Intel 8080 Processor
+ */
 #define TLVM_CPU_8080          1
+/* TLVM_CPU_6303
+ * Hitachi 6303 Processor
+ */
 #define TLVM_CPU_6303          2
 
 #include "tlvm_8080.h"
-#include "tlvm_6303.h"
 
 /*********************************************
  * TLVM DEBUGGER SUPPORT
