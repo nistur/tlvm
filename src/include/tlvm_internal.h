@@ -190,6 +190,7 @@ tlvmBool tlvmParity(tlvmByte val);
  ***************************************/
 #include "../8080/8080.h"
 #include "../6303/6303.h"
+#include "../6800/6800.h"
 
 /***************************************
  * Some basic memory management wrappers

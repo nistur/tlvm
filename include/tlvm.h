@@ -134,10 +134,15 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  * Intel 8080 Processor
  */
 #define TLVM_CPU_8080          1
+/* TLVM_CPU_6800
+ *Motorola 6800 Processor
+ */
+#define TLVM_CPU_6800          2
+
 /* TLVM_CPU_6303
  * Hitachi 6303 Processor
  */
-#define TLVM_CPU_6303          2
+#define TLVM_CPU_6303          3
 
 /*********************************************
  * CALLBACK DEFINITIONS

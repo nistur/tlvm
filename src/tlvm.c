@@ -46,6 +46,10 @@ tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
     if(cpuid == TLVM_CPU_8080)
         tlvm8080Init(context);
 #endif
+#if TLVM_HAS_6800
+    if(cpuid == TLVM_CPU_6800)
+        tlvm6800Init(context);
+#endif
 #if TLVM_HAS_6303
     if(cpuid == TLVM_CPU_6303)
         tlvm6303Init(context);
