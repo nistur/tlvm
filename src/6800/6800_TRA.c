@@ -32,8 +32,14 @@ tlvmReturn tlvm6800TRA(tlvmContext* context, tlvmByte* cycles)
 
     if(opcode == TLVM_6800_TAP)
         TLVM_REGISTER(TLVM_6800_REG_F) = TLVM_REGISTER(TLVM_6800_REG_A);
-    if(opcode == TLVM_6800_TPA)
+    else if(opcode == TLVM_6800_TPA)
         TLVM_REGISTER(TLVM_6800_REG_A) = TLVM_REGISTER(TLVM_6800_REG_F);
+    else if(opcode == TLVM_6800_TSX)
+    {
+        TLVM_SET_16BIT(TLVM_6800_REG_I, TLVM_6800_REG_X, context->m_StackPointer);
+    }
+    else if(opcode == TLVM_6800_TXS)
+        context->m_StackPointer = TLVM_GET_16BIT(TLVM_6800_REG_I, TLVM_6800_REG_X);
 
     context->m_ProgramCounter += 1;
 

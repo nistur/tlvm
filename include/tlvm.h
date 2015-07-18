@@ -93,6 +93,7 @@ typedef unsigned char  tlvmChar;
 typedef unsigned short tlvmShort;
 typedef unsigned long  tlvmLong;
 typedef unsigned char  tlvmBool;
+typedef signed   char  tlvmSByte;
 
 #define TLVM_FALSE 				 0
 #define TLVM_TRUE 				 1

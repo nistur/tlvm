@@ -133,8 +133,10 @@ struct _tlvmMemoryBuffer
 	
 #define TLVM_GET_16BIT(h, l) 	(((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l))
 #define TLVM_SET_16BIT(h, l, v) \
-	context->m_Registers[h] = (tlvmByte)((v) >> 8); \
-	context->m_Registers[l] = (tlvmByte)((v) & 0xFF);
+    { \
+    context->m_Registers[h] = (tlvmByte)((v) >> 8);             \
+    context->m_Registers[l] = (tlvmByte)((v) & 0xFF);           \
+    }
 
 #define TLVM_REGISTER_COMPLEMENT(x) \
     TLVM_REGISTER(x) = ~TLVM_REGISTER(x);
