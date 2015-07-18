@@ -36,6 +36,8 @@ tlvmReturn tlvm6800DEC(tlvmContext* context, tlvmByte* cycles)
         TLVM_SET_16BIT(TLVM_6800_REG_I, TLVM_6800_REG_X, val - 1);
         TLVM_FLAG_SET_IF(val, Z, 6800);
     }
+    else if(opcode == TLVM_6800_DES)
+        context->m_StackPointer -= 1;
 
     context->m_ProgramCounter += 1;
 
