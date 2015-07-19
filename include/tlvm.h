@@ -91,7 +91,7 @@ typedef int tlvmReturn;
 typedef unsigned char  tlvmByte;
 typedef unsigned char  tlvmChar;
 typedef unsigned short tlvmShort;
-typedef unsigned long  tlvmLong;
+typedef unsigned long long tlvmLong;
 typedef unsigned char  tlvmBool;
 typedef signed   char  tlvmSByte;
 

@@ -32,7 +32,7 @@ tlvmReturn tlvm6800CMP(tlvmContext* context, tlvmByte* cycles)
 
     TLVM_GET_OP(opcode, 0);
 
-    tlvmShort val;
+    tlvmShort val = 0;
     if(opcode == TLVM_6800_SBA)
     {
         val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A) - (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
