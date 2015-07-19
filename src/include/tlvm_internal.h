@@ -158,30 +158,40 @@ struct _tlvmMemoryBuffer
     context->m_StackPointer --; \
 }
 
-#define TLVM_STACK_POP(v) \
-{ \
-    tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
-    TLVM_NULL_CHECK(dst, INVALID_INPUT); \
-    v = *dst; \
-    context->m_StackPointer ++; \
-}
+#define TLVM_STACK_POP(v)                                               \
+    {                                                                   \
+        tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
+        TLVM_NULL_CHECK(dst, INVALID_INPUT);                            \
+        v = *dst;                                                       \
+        context->m_StackPointer ++;                                     \
+    }
 
-#define TLVM_PUSH_PC(val) \
-{ \
-	tlvmByte pcHi = (tlvmByte)(context->m_ProgramCounter >> 8); \
-	tlvmByte pcLo = (tlvmByte)(context->m_ProgramCounter & 0xFF); \
-	TLVM_STACK_PUSH(pcHi); \
-	TLVM_STACK_PUSH(pcLo); \
-	context->m_ProgramCounter = val; \
-}
+#define TLVM_PUSH_16(val)                                               \
+    {                                                                   \
+        tlvmByte valHi = (tlvmByte)(val >> 8);                          \
+        tlvmByte valLo = (tlvmByte)(val & 0xFF);                        \
+        TLVM_STACK_PUSH(valHi);                                         \
+        TLVM_STACK_PUSH(valLo);                                         \
+    }
 
-#define TLVM_POP_PC() \
-{ \
-	tlvmByte pcHi, pcLo; \
-	TLVM_STACK_POP(pcLo); \
-	TLVM_STACK_POP(pcHi); \
-	context->m_ProgramCounter = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo; \
-}
+#define TLVM_STACK_POP_16(dst)                              \
+    {                                                       \
+        tlvmByte pcHi, pcLo;                                \
+        TLVM_STACK_POP(pcLo);                               \
+        TLVM_STACK_POP(pcHi);                               \
+        dst = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo;   \
+    }
+
+#define TLVM_PUSH_PC(val)                               \
+    {                                                   \
+        TLVM_STACK_PUSH_16(context->m_ProgramCounter);  \
+        context->m_ProgramCounter = val;                \
+    }
+
+#define TLVM_POP_PC()                                   \
+    {                                                   \
+        TLVM_STACK_POP_16(context->m_ProgramCounter);   \
+    }
 
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
