@@ -69,6 +69,8 @@ TLVM_INSTRUCTION_DEFINE(6800, PSHA,  0x36);
 TLVM_INSTRUCTION_DEFINE(6800, PSHB,  0x37);
 TLVM_INSTRUCTION_DEFINE(6800, RTS,   0x39);
 TLVM_INSTRUCTION_DEFINE(6800, RTI,   0x3B);
+TLVM_INSTRUCTION_DEFINE(6800, WAI,   0x3E);
+TLVM_INSTRUCTION_DEFINE(6800, SWI,   0x3F);
 
 TLVM_INSTRUCTION_DEFINE(6800, LSRA,  0x44);
 TLVM_INSTRUCTION_DEFINE(6800, LSRB,  0x54);
@@ -90,6 +92,7 @@ tlvmReturn tlvm6800Init(tlvmContext** context)
     (*context)->m_ProcessorData = &g_6800Data.m_Header;
 
     (*context)->m_Registers = cpu->m_Registers;
+    (*context)->m_WideRegisters = cpu->m_WideRegisters;
     (*context)->m_Ports = cpu->m_Ports;
 
     TLVM_RETURN_CODE(SUCCESS);
@@ -145,6 +148,8 @@ void tlvm6800SetupData()
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, PSHB, PSH);
     TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, RTS);
     TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, RTI);
+    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, WAI);
+    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, SWI);
 
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRA,  LSR);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRB,  LSR);

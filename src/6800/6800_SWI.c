@@ -24,25 +24,25 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800TRA(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvm6800SWI(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    TLVM_GET_OP(opcode, 0);
-
-    if(opcode == TLVM_6800_TAP)
-        TLVM_REGISTER(TLVM_6800_REG_F) = TLVM_REGISTER(TLVM_6800_REG_A);
-    else if(opcode == TLVM_6800_TPA)
-        TLVM_REGISTER(TLVM_6800_REG_A) = TLVM_REGISTER(TLVM_6800_REG_F);
-    else if(opcode == TLVM_6800_TSX)
-        TLVM_REGISTER16(TLVM_6800_REG16_IX) = context->m_StackPointer;
-    else if(opcode == TLVM_6800_TXS)
-        context->m_StackPointer = TLVM_REGISTER16(TLVM_6800_REG16_IX);
-
     context->m_ProgramCounter += 1;
 
+    TLVM_STACK_PUSH16(context->m_ProgramCounter);
+    TLVM_STACK_PUSH16(TLVM_REGISTER16(TLVM_6800_REG16_IX));
+    TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_A));
+    TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_B));
+    TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_F));
+
+    TLVM_FLAG_SET(I, 6800);
+            
+    TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_IRQ);
+    context->m_ProgramCounter = interrupt;
+    
     if(cycles)
-        *cycles = 2;
+        *cycles = 9;
 
     TLVM_RETURN_CODE(SUCCESS);
 }

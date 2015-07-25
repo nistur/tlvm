@@ -32,8 +32,8 @@ tlvmReturn tlvm6800INC(tlvmContext* context, tlvmByte* cycles)
 
     if(opcode == TLVM_6800_INX)
     {
-        tlvmShort val = TLVM_GET_16BIT(TLVM_6800_REG_I, TLVM_6800_REG_X);
-        TLVM_SET_16BIT(TLVM_6800_REG_I, TLVM_6800_REG_X, val + 1);
+        tlvmShort val = TLVM_REGISTER16(TLVM_6800_REG16_IX) + 1;
+        TLVM_REGISTER16(TLVM_6800_REG16_IX) = val;
         TLVM_FLAG_SET_IF(val, Z, 6800);
     }
     else if(opcode == TLVM_6800_INS)

@@ -27,11 +27,14 @@ nistur@gmail.com
 
 #ifdef  TLVM_HAS_6800
 
+/*********************************************
+ * REGISTERS
+ *********************************************/
 #define TLVM_6800_REG_A    0x0
 #define TLVM_6800_REG_B    0x1
-#define TLVM_6800_REG_I    0x2
-#define TLVM_6800_REG_X    0x3 // I and X are a single 16 bit IX reg
-#define TLVM_6800_REG_F    0x4
+#define TLVM_6800_REG_F    0x2 // Condition Code Register
+
+#define TLVM_6800_REG16_IX 0x0
 
 /*********************************************
  * FLAGS
@@ -54,6 +57,17 @@ nistur@gmail.com
 // TLVM_FLAG_NONE is not just 0, as some of the bits are not used as flags
 #define TLVM_6800_FLAG_NONE   ~TLVM_6800_FLAG_ALL
 
+/*********************************************
+ * INTERRUPT VECTOR
+ *********************************************/
+#define TLVM_6800_INT_RESET 0xFFFE
+#define TLVM_6800_INT_NMI   0xFFFC
+#define TLVM_6800_INT_SWI   0xFFFA
+#define TLVM_6800_INT_IRQ   0xFFF8
+
+/*********************************************
+ * INSTRUCTIONS
+ *********************************************/
 TLVM_INSTRUCTION_BASE(6800, LSR);
 TLVM_INSTRUCTION_BASE(6800, TRA);
 TLVM_INSTRUCTION_BASE(6800, INC);
@@ -113,6 +127,8 @@ TLVM_INSTRUCTION_VARIATION(6800, PSHA,  0x36);
 TLVM_INSTRUCTION_VARIATION(6800, PSHB,  0x37);
 TLVM_INSTRUCTION_DECLARE  (6800, RTS,   0x39);
 TLVM_INSTRUCTION_DECLARE  (6800, RTI,   0x3B);
+TLVM_INSTRUCTION_DECLARE  (6800, WAI,   0x3E);
+TLVM_INSTRUCTION_DECLARE  (6800, SWI,   0x3E);
 
 TLVM_INSTRUCTION_VARIATION(6800, LSRA,  0x44);
 TLVM_INSTRUCTION_VARIATION(6800, LSRB,  0x54);
@@ -142,6 +158,7 @@ typedef struct _tlvmContext_6800
     tlvmContext m_Header;
 
     tlvmByte    m_Registers[9];
+    tlvmShort   m_WideRegisters[1];
     tlvmByte    m_Ports[256];
 } tlvmContext_6800;
 
