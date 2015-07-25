@@ -32,8 +32,9 @@ solution "tlvm"
     defines { "TLVM_BUILD" }
     
     tlvmcpus = {
-       cpu_8080 = false,
-       cpu_6800 = true,
+       cpu_8080 = true,
+       cpu_6800 = false,
+       cpu_6303 = false,
     }
     
     for cpu,x in pairs(tlvmcpus) do 
