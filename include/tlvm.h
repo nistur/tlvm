@@ -112,6 +112,7 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 #define TLVM_UNKNOWN_INSTRUCTION 4
 #define TLVM_EXIT                5
 #define TLVM_MEMORY_OVERLAP      6
+#define TLVM_STALL               7
 #define TLVM_UNIMPLEMENTED      -1
 
 /*********************************************
@@ -120,6 +121,13 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 #define TLVM_FLAG_READ			(1<<0)
 #define TLVM_FLAG_WRITE			(1<<1)
 
+/*********************************************
+ * EMULATION FLAGS
+ *********************************************/
+#define TLVM_FLAG_HALT          (1<<2)
+#define TLVM_FLAG_STALL         (1<<3)
+#define TLVM_FLAG_HALT_ON_STALL (1<<4)
+    
 /*********************************************
  * CLOCKSPEED
  *********************************************/
@@ -384,6 +392,11 @@ TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context,
  *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
 
+
+TLVM_EXPORT tlvmReturn   tlvmSetFlags        (tlvmContext* context, tlvmByte flags);
+TLVM_EXPORT tlvmReturn   tlvmUnsetFlags      (tlvmContext* context, tlvmByte flags);
+TLVM_EXPORT tlvmReturn   tlvmGetFlags        (tlvmContext* context, tlvmByte* flags);
+    
 /*********************************************
  * tlvmSetIOCallback
  *     Provides a callback for when any of the
