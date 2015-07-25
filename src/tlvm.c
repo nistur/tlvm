@@ -207,7 +207,7 @@ tlvmReturn tlvmRun(tlvmContext* context)
 
         // if we're stalled, still tick over the CPU emulation, just
         // don't step forward - This should get the correct behaviour
-        if(context->m_Flags & TLVM_FLAG_STALL == TLVM_FALSE)
+        if((context->m_Flags & TLVM_FLAG_STALL) == TLVM_FALSE)
             status = tlvmStep(context, &cycles);
         
         if(status == TLVM_STALL)
@@ -220,8 +220,8 @@ tlvmReturn tlvmRun(tlvmContext* context)
             // To continue execution after a stall, either the halt on stall
             // flag should NOT be set, or tlvmRun should be called at the
             // correct time to continue execution.
-            if(context->m_Flags & TLVM_FLAG_HALT_ON_STALL &&
-               context->m_Flags & TLVM_FLAG_HALT == TLVM_FALSE)
+            if((context->m_Flags & TLVM_FLAG_HALT_ON_STALL) &&
+               (context->m_Flags & TLVM_FLAG_HALT) == TLVM_FALSE)
                 tlvmSetFlags(context, TLVM_FLAG_HALT);
         }
         else if(status != TLVM_SUCCESS)
