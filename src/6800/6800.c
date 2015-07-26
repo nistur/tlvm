@@ -103,6 +103,8 @@ void tlvm6800SetupData()
     g_6800Data.m_Header.m_ProcessorID = TLVM_CPU_6800;
     g_6800Data.m_Header.m_InstructionSet = g_6800Data.m_InstructionSet;
 
+    g_6800Data.m_Header.m_Interrupt = tlvm6800Interrupt;
+    
     TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, NOP);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TAP, TRA);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TPA, TRA);
@@ -155,6 +157,59 @@ void tlvm6800SetupData()
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRB,  LSR);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRdX, LSR);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRmm, LSR);
+}
+
+tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    // interrupts will un-stall a stallec CPU
+    context->m_Flags &= ~TLVM_FLAG_STALL;
+
+    tlvmBool  willInterrupt = TLVM_FALSE;
+    tlvmShort addr = 0;
+
+    if(interrupt == TLVM_INTERRUPT_RESET)
+    {
+        TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_RESET);
+        addr = interrupt;
+        willInterrupt = TLVM_TRUE;
+    }
+    else if(interrupt == TLVM_INTERRUPT_NMI)
+    {
+        TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_NMI);
+        addr = interrupt;
+        willInterrupt = TLVM_TRUE;
+    }
+    else if(interrupt == TLVM_INTERRUPT_IRQ)
+    {
+        if(context->m_Interrupts != TLVM_INTERRUPT_NMI &&
+           TLVM_FLAG_ISSET(I, 6800))
+        {
+            TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_IRQ);
+            addr = interrupt;
+            willInterrupt = TLVM_TRUE;
+        }
+    }
+
+    
+    if(willInterrupt)
+    {
+        if(context->m_Interrupts == TLVM_INTERRUPT_NONE)
+        {
+            TLVM_STACK_PUSH16(context->m_ProgramCounter);
+            TLVM_STACK_PUSH16(TLVM_REGISTER16(TLVM_6800_REG16_IX));
+            TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_A));
+            TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_B));
+            TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_F));
+        }
+
+        context->m_Interrupts = interrupt;
+
+        context->m_ProgramCounter = addr;
+    }
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvm6800NOP(tlvmContext* context, tlvmByte* cycles)

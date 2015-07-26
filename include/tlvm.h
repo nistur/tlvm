@@ -127,7 +127,16 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 #define TLVM_FLAG_HALT          (1<<2)
 #define TLVM_FLAG_STALL         (1<<3)
 #define TLVM_FLAG_HALT_ON_STALL (1<<4)
-    
+
+/*********************************************
+ * INTERRUPTS
+ *********************************************/
+#define TLVM_INTERRUPT_NONE   0
+#define TLVM_INTERRUPT_IRQ    1
+#define TLVM_INTERRUPT_NMI    2
+#define TLVM_INTERRUPT_RESET  3
+#define TLVM_INTERRUPT_SWI    4
+
 /*********************************************
  * CLOCKSPEED
  *********************************************/

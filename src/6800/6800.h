@@ -153,6 +153,20 @@ tlvmReturn  tlvm6800Init  (tlvmContext** context);
  *********************************************/
 void       tlvm6800SetupData();
 
+/*********************************************
+ * tlvm6800Interrupt
+ *     Perform a hardware interrupt on the 6800 CPU
+ * parameters:
+ *     context - the CPU context to perform the
+ * interrupt on
+ *     interrupt - the kind of hardware interrupt
+ * to trigger
+ *         - TLVM_INTERRUPT_IRQ - Maskable interrupt
+ *         - TLVM_INTERRUPT_NMI - Non-Maskable interrupt
+ *         - TLVM_INTERRUPT_RESET - Reset interrupt
+ *********************************************/
+tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt);
+
 typedef struct _tlvmContext_6800
 {
     tlvmContext m_Header;

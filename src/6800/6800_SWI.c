@@ -38,8 +38,10 @@ tlvmReturn tlvm6800SWI(tlvmContext* context, tlvmByte* cycles)
 
     TLVM_FLAG_SET(I, 6800);
             
-    TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_IRQ);
+    TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_SWI);
     context->m_ProgramCounter = interrupt;
+
+    context->m_Interrupts = TLVM_INTERRUPT_SWI;
     
     if(cycles)
         *cycles = 9;

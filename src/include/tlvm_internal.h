@@ -84,11 +84,12 @@ struct _tlvmContext
 
     // Halt
     tlvmByte           m_Flags;
+    tlvmByte           m_Interrupts;
     
     // functionality for hooking up a debugger
 #ifdef  TLVM_DEBUG
     tlvmDebugBreakpoint*  m_Breakpoints;
-    tlvmByte		  m_DebugState;
+    tlvmByte		      m_DebugState;
     tlvmDebugCallbackFn   m_StepCallback;
 #endif/*TLVM_DEBUG*/
 };
