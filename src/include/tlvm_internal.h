@@ -70,6 +70,7 @@ struct _tlvmContext
     
     // registers
     tlvmByte*         m_Registers;
+    tlvmShort*        m_WideRegisters;
     tlvmByte*         m_Ports;
     
     // CPU timing
@@ -82,8 +83,8 @@ struct _tlvmContext
     tlvmIOCallback     m_IOCallback;
 
     // Halt
-    tlvmByte           m_Halt;
-
+    tlvmByte           m_Flags;
+    
     // functionality for hooking up a debugger
 #ifdef  TLVM_DEBUG
     tlvmDebugBreakpoint*  m_Breakpoints;
@@ -133,8 +134,10 @@ struct _tlvmMemoryBuffer
 	
 #define TLVM_GET_16BIT(h, l) 	(((tlvmShort)TLVM_REGISTER(h)) << 8 | (tlvmShort)TLVM_REGISTER(l))
 #define TLVM_SET_16BIT(h, l, v) \
-	context->m_Registers[h] = (tlvmByte)((v) >> 8); \
-	context->m_Registers[l] = (tlvmByte)((v) & 0xFF);
+    { \
+    context->m_Registers[h] = (tlvmByte)((v) >> 8);             \
+    context->m_Registers[l] = (tlvmByte)((v) & 0xFF);           \
+    }
 
 #define TLVM_REGISTER_COMPLEMENT(x) \
     TLVM_REGISTER(x) = ~TLVM_REGISTER(x);
@@ -142,7 +145,10 @@ struct _tlvmMemoryBuffer
 #define TLVM_REGISTER(x)                       \
     (context->m_Registers[x])
 
-#define TLVM_GET_OP(v, n) \
+#define TLVM_REGISTER16(x)                      \
+    (context->m_WideRegisters[x])
+
+#define TLVM_GET_OP(v, n)                       \
 	tlvmByte v = 0;\
 	tlvmByte* v##addr = tlvmGetMemory(context, context->m_ProgramCounter+n, TLVM_FLAG_READ); \
     TLVM_NULL_CHECK(v##addr, NO_MEMORY); \
@@ -156,30 +162,56 @@ struct _tlvmMemoryBuffer
     context->m_StackPointer --; \
 }
 
-#define TLVM_STACK_POP(v) \
-{ \
-    tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
-    TLVM_NULL_CHECK(dst, INVALID_INPUT); \
-    v = *dst; \
-    context->m_StackPointer ++; \
-}
+#define TLVM_STACK_POP(v)                                               \
+    {                                                                   \
+        tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 0, TLVM_FLAG_READ); \
+        TLVM_NULL_CHECK(dst, INVALID_INPUT);                            \
+        v = *dst;                                                       \
+        context->m_StackPointer ++;                                     \
+    }
 
-#define TLVM_PUSH_PC(val) \
-{ \
-	tlvmByte pcHi = (tlvmByte)(context->m_ProgramCounter >> 8); \
-	tlvmByte pcLo = (tlvmByte)(context->m_ProgramCounter & 0xFF); \
-	TLVM_STACK_PUSH(pcHi); \
-	TLVM_STACK_PUSH(pcLo); \
-	context->m_ProgramCounter = val; \
-}
+#define TLVM_STACK_PUSH16(val)                                          \
+    {                                                                   \
+        tlvmByte valHi = (tlvmByte)(val >> 8);                          \
+        tlvmByte valLo = (tlvmByte)(val & 0xFF);                        \
+        TLVM_STACK_PUSH(valHi);                                         \
+        TLVM_STACK_PUSH(valLo);                                         \
+    }
 
-#define TLVM_POP_PC() \
-{ \
-	tlvmByte pcHi, pcLo; \
-	TLVM_STACK_POP(pcLo); \
-	TLVM_STACK_POP(pcHi); \
-	context->m_ProgramCounter = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo; \
-}
+#define TLVM_STACK_POP16(dst)                               \
+    {                                                       \
+        tlvmByte pcHi, pcLo;                                \
+        TLVM_STACK_POP(pcLo);                               \
+        TLVM_STACK_POP(pcHi);                               \
+        dst = ((tlvmShort)(pcHi) << 8) | (tlvmShort)pcLo;   \
+    }
+
+#define TLVM_PUSH_PC(val)                               \
+    {                                                   \
+        TLVM_STACK_PUSH16(context->m_ProgramCounter);   \
+        context->m_ProgramCounter = val;                \
+    }
+
+#define TLVM_POP_PC()                                   \
+    {                                                   \
+        TLVM_STACK_POP16(context->m_ProgramCounter);    \
+    }
+
+#define TLVM_GET_MEMORY(val, addr)                                      \
+    tlvmByte val = 0;                                                   \
+    {                                                                   \
+        tlvmByte* mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);   \
+        if(mem != 0)                                                    \
+            val = *mem;                                                 \
+    }
+// TODO: This doesn't take processor endianness into account
+#define TLVM_GET_MEMORY16(val, addr)            \
+    tlvmShort val;                              \
+    {                                           \
+        TLVM_GET_MEMORY(hi, addr);              \
+        TLVM_GET_MEMORY(lo, addr+1);            \
+        val = (((tlvmShort)hi)<<8) | lo;        \
+    }
 
 tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags);
 
@@ -190,6 +222,7 @@ tlvmBool tlvmParity(tlvmByte val);
  ***************************************/
 #include "../8080/8080.h"
 #include "../6303/6303.h"
+#include "../6800/6800.h"
 
 /***************************************
  * Some basic memory management wrappers
