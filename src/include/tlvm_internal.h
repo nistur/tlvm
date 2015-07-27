@@ -70,7 +70,8 @@ struct _tlvmContext
     
     // registers
     tlvmByte*         m_Registers;
-    tlvmByte*         m_Ports;
+    tlvmByte*         m_InputPorts;
+    tlvmByte*         m_OutputPorts;
     
     // CPU timing
     tlvmShort         m_Clockspeed;

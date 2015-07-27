@@ -259,14 +259,14 @@ tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
     TLVM_NULL_CHECK(outPort, INVALID_INPUT);
-    *outPort = context->m_Ports[port];
+    *outPort = context->m_OutputPorts[port];
     TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
-    context->m_Ports[port] = portval;
+    context->m_InputPorts[port] = portval;
     TLVM_RETURN_CODE(SUCCESS);
 }
 

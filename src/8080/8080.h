@@ -454,7 +454,8 @@ typedef struct _tlvmContext_8080
     tlvmContext m_Header;
 
     tlvmByte    m_Registers[9];
-    tlvmByte    m_Ports[256];
+    tlvmByte    m_InputPorts[256];
+    tlvmByte    m_OutputPorts[256];
 } tlvmContext_8080;
 
 typedef struct _tlvmProcessorData_8080

@@ -39,7 +39,8 @@ tlvmReturn tlvm8080Init(tlvmContext** context)
     (*context)->m_ProcessorData = &g_8080Data.m_Header;
 
     (*context)->m_Registers = cpu->m_Registers;
-    (*context)->m_Ports = cpu->m_Ports;
+    (*context)->m_InputPorts = cpu->m_InputPorts;
+    (*context)->m_OutputPorts = cpu->m_OutputPorts;
 
     TLVM_RETURN_CODE(SUCCESS);
 }
