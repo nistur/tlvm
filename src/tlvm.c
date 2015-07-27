@@ -42,9 +42,14 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
 tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(cpuid, INVALID_INPUT);
 #if TLVM_HAS_8080
     if(cpuid == TLVM_CPU_8080)
         tlvm8080Init(context);
+#endif
+#if TLVM_HAS_6800
+    if(cpuid == TLVM_CPU_6800)
+        tlvm6800Init(context);
 #endif
 #if TLVM_HAS_6303
     if(cpuid == TLVM_CPU_6303)
@@ -187,37 +192,55 @@ tlvmReturn tlvmRun(tlvmContext* context)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_Halt = TLVM_FALSE;
+    tlvmUnsetFlags(context, TLVM_FLAG_HALT | TLVM_FLAG_STALL);
 
-    if(context->m_Clockspeed == 0)
+    tlvmLong cycleCount = 0;
+    tlvmByte cycles = 0;
+    tlvmReturn status = TLVM_SUCCESS;
+    
+    tlvmResetClock(context);
+    
+    while(TLVM_TRUE)
     {
-        tlvmByte empty;
-        while(tlvmStep(context, &empty) == TLVM_SUCCESS){}
-        if(g_tlvmStatus != TLVM_EXIT)
-            TLVM_RETURN();
-        TLVM_RETURN_CODE(SUCCESS);
-    }
-    else
-    {
-        tlvmLong cycleCount = 0;
-        tlvmByte cycles = 0;
-        tlvmReturn status = TLVM_SUCCESS;
+        if(context->m_Flags & TLVM_FLAG_HALT)
+            break;
 
-        tlvmResetClock(context);
-
-        while(status == TLVM_SUCCESS && context->m_Halt == TLVM_FALSE)
-        {
+        // if we're stalled, still tick over the CPU emulation, just
+        // don't step forward - This should get the correct behaviour
+        if((context->m_Flags & TLVM_FLAG_STALL) == TLVM_FALSE)
             status = tlvmStep(context, &cycles);
-
-            cycleCount += (tlvmLong)cycles;
-
-            tlvmSleepUntil(context, cycleCount); // sleep until we've taken long enough for 
+        
+        if(status == TLVM_STALL)
+        {
+            // If the CPU's stalled and we've been told to halt on stalls
+            // then flag that the CPU's halted, which will break out of
+            // the run loop the next time around, after we've called sleep
+            // which would match behaviour of instructions which stall the
+            // CPU, as they finish execution before stalling (eg 6800 WAI)
+            // To continue execution after a stall, either the halt on stall
+            // flag should NOT be set, or tlvmRun should be called at the
+            // correct time to continue execution.
+            if((context->m_Flags & TLVM_FLAG_HALT_ON_STALL) &&
+               (context->m_Flags & TLVM_FLAG_HALT) == TLVM_FALSE)
+                tlvmSetFlags(context, TLVM_FLAG_HALT);
         }
-
-        if(status != TLVM_EXIT)
-            TLVM_RETURN();
-        TLVM_RETURN_CODE(SUCCESS);
+        else if(status != TLVM_SUCCESS)
+        {
+            // anything else other than stall and success, we definitely
+            // want to break out
+            break;
+        }
+        
+        cycleCount += (tlvmLong)cycles;
+        
+        if(context->m_Clockspeed != 0)
+            tlvmSleepUntil(context, cycleCount); // sleep until we've taken long enough for 
+        
     }
+    tlvmSetFlags(context, TLVM_FLAG_HALT);
+    if(status != TLVM_EXIT)
+        TLVM_RETURN();
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmReset(tlvmContext* context)
@@ -288,10 +311,34 @@ tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
 
 tlvmReturn tlvmHalt(tlvmContext* context)
 {
+    return tlvmSetFlags(context, TLVM_FLAG_HALT);
+}
+
+tlvmReturn tlvmGetFlags(tlvmContext* context, tlvmByte* flags)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(flags, INVALID_INPUT);
+
+    *flags = context->m_Flags;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmUnsetFlags(tlvmContext* context, tlvmByte flags)
+{
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_Halt = TLVM_TRUE;
+    context->m_Flags &= ~flags;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
 
+tlvmReturn tlvmSetFlags(tlvmContext* context, tlvmByte flags)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    context->m_Flags |= flags;
+    
     TLVM_RETURN_CODE(SUCCESS);
 }
 

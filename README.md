@@ -45,6 +45,10 @@ Sample tlvm-dbg commands:
    - Research what these are first!
 - Add 6303 instructions
    - Try and find documentation for this
+   - Turns out that it's an extended Motorola 6801, so I'm implementing 6800, then adding 6801
+- Add 6800 instructions
+  - Extend to 6801
+  - Need to split instructions into separate functions. It's currently doing the instruction lookup, followed by a set of if tests for almost every single instruction, even if the instructions don't share any common code at all
 - Make tlvm threadsafe.
    - This should be safe enough to do by putting a byte in the context and checking it when something changes the state (interrupt, reset, step)
 
