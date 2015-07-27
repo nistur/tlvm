@@ -272,7 +272,7 @@ void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::o
 
     tlvmDebugGetMemory(context, address, size, &dat);
     char line[255];
-    sprintf(line, "0x%.04X", address);
+    sprintf(line, "$%.04Xh", address);
     for(int i = 0; i < size; ++i)
     {
         if(i && i%8 == 0)
@@ -288,7 +288,7 @@ void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::o
             sprintf(line, "");
         }
         PAD(line, 8+((i%8)*8));
-        sprintf(line, "%s0x%.02X", line, dat[i]);
+        sprintf(line, "%s$%.02Xh", line, dat[i]);
         if(i == size - 1)
         {
             tlvmShort num = 8-i%8;
@@ -329,7 +329,7 @@ void printDisassembly(tlvmContext* context, std::ostream& stream)
         PAD(line, 16);
         sprintf(line, "%s%s", line, inst->dest ? (char*)inst->dest->label : "");
         PAD(line, 64);
-        sprintf(line, "%s;0x%.04X\n", line, inst->address);
+        sprintf(line, "%s;$%.04Xh\n", line, inst->address);
 
         prev = inst;
         inst = inst->next;
@@ -419,7 +419,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
             {
                 setMemory(file, address, size);
 
-                printf("Loaded file %s into memory at 0x%04X - 0x%04X\n", filename.c_str(), address, address + size - 1);
+                printf("Loaded file %s into memory at $%04X - $%04X\n", filename.c_str(), address, address + size - 1);
             }
         }
         HANDLE_INPUT_OPTION(memory, m)
@@ -442,7 +442,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
             else
             {
                 setMemory(buffer, address, size);
-                printf("Created %dB RAM at 0x%04X - 0x%04X\n", size, address, address + size - 1);
+                printf("Created %dB RAM at $%04X - $%04X\n", size, address, address + size - 1);
             }
         }
         HANDLE_INPUT_OPTION(run, r)
