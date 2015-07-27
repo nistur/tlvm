@@ -81,6 +81,7 @@ TLVM_INSTRUCTION_BASE(6800, ADD);
 TLVM_INSTRUCTION_BASE(6800, BRA);
 TLVM_INSTRUCTION_BASE(6800, PUL);
 TLVM_INSTRUCTION_BASE(6800, PSH);
+TLVM_INSTRUCTION_BASE(6800, NEG);
 
 TLVM_INSTRUCTION_DECLARE  (6800, NOP,   0x01);
 TLVM_INSTRUCTION_VARIATION(6800, TAP,   0x06);
@@ -130,10 +131,33 @@ TLVM_INSTRUCTION_DECLARE  (6800, RTI,   0x3B);
 TLVM_INSTRUCTION_DECLARE  (6800, WAI,   0x3E);
 TLVM_INSTRUCTION_DECLARE  (6800, SWI,   0x3E);
 
+TLVM_INSTRUCTION_VARIATION(6800, NEGA,  0x40);
+
+TLVM_INSTRUCTION_VARIATION(6800, NEGB,  0x50);
+
+TLVM_INSTRUCTION_VARIATION(6800, NEGX,  0x60);
+
+TLVM_INSTRUCTION_VARIATION(6800, NEGE,  0x70);
+
 TLVM_INSTRUCTION_VARIATION(6800, LSRA,  0x44);
 TLVM_INSTRUCTION_VARIATION(6800, LSRB,  0x54);
 TLVM_INSTRUCTION_VARIATION(6800, LSRdX, 0x64);
 TLVM_INSTRUCTION_VARIATION(6800, LSRmm, 0x74);
+
+#define TLVM_6800_GET_ADDR_EXTENDED(val)                \
+tlvmShort val;                                          \
+{                                                       \
+    TLVM_GET_OP(hi, 1);                                 \
+    TLVM_GET_OP(lo, 2);                                 \
+    val = ((((tlvmShort)hi) << 8) | ((tlvmShort)lo));   \
+}
+
+#define TLVM_6800_GET_ADDR_INDEXED(val)                 \
+tlvmShort val = TLVM_REGISTER16(TLVM_6800_REG16_IX);    \
+{                                                       \
+    TLVM_GET_OP(addr, 1);                               \
+    val += (tlvmShort)addr;                             \
+}
 
 /*********************************************
  * tlvm6800Init
