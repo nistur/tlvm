@@ -9,8 +9,8 @@
 #define TLVM_6502_REG_A    0x0 // Accumulator
 #define TLVM_6502_REG_X    0x1
 #define TLVM_6502_REG_Y    0x2
-#define TLVM_6502_REG_SP_H 0x3 // Stack Pointer High byte
-#define TLVM_6502_REG_SP_L 0x4 // Stack Pointer Low byte
+//#define TLVM_6502_REG_SP_H 0x3 // Stack Pointer High byte
+//#define TLVM_6502_REG_SP_L 0x4 // Stack Pointer Low byte
 #define TLVM_6502_REG_P    0x5 // Processor flags
 #define TLVM_6502_REG_F    0x6 // Flags
 
@@ -28,19 +28,29 @@
 /*********************************************
  * INSTRUCTIONS
  *********************************************/
+#define TLVM_6502_BRK 0x00
+#define TLVM_6502_RTI 0x40
 #define TLVM_6502_NOP 0xEA
 
-
+tlvmReturn tlvm6502BRK(tlvmContext* context, tlvmByte* cycles);
+tlvmReturn tlvm6502RTI(tlvmContext* context, tlvmByte* cycles);
 tlvmReturn tlvm6502NOP(tlvmContext* context, tlvmByte* cycles);
 
 tlvmReturn tlvm6502Init(tlvmContext** context);
+tlvmReturn tlvm6502Reset(tlvmContext* context);
 void tlvm6502SetupData();
 
 typedef struct _tlvmProcessorData_6502
 {
     tlvmProcessorData m_Header;
-    tlvmInstruction m_InstructionSet[256];
+    tlvmInstruction   m_InstructionSet[256];
 } tlvmProcessorData_6502;
+
+typedef struct _tlvmContext_6502
+{
+    tlvmContext m_Header;
+    tlvmByte    m_Stack[0x10];
+} tlvmContext_6502;
 
 #endif/*TLVM_HAS_6502*/
 #endif/*__6502_H__*/

@@ -52,8 +52,11 @@ tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, 
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
+#ifdef TLVM_HAS_8080
 	// for now, we only have the 8080
 	return tlvm8080DebugGetInstruction(context, instuction, size);
+#endif/*TLVM_HAS_8080*/
+    TLVM_RETURN_CODE(UNIMPLEMENTED);
 }
 
 tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback)
@@ -114,7 +117,10 @@ tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmBy
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
+#ifdef TLVM_HAS_8080
 	return tlvm8080DebugParseRegister(context, regstr, outreg);
+#endif/*TLVM_HAS_8080*/
+    TLVM_RETURN_CODE(UNIMPLEMENTED);
 }
 
 tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* outval)

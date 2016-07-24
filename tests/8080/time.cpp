@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_8080
 
 TEST(SetClockspeed, Time, 0.0f,
      // initialisation
@@ -68,3 +69,5 @@ TEST(Time, Time, 0.0f,
       tlvmByte     memory[256];
      }
     );
+
+#endif/*TLVM_HAS_8080*/

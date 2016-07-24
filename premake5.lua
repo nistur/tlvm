@@ -33,8 +33,8 @@ defines { "TLVM_BUILD" }
 
 -- Processor specific defines
 defines { 
-   "TLVM_HAS_8080", 
-   "TLVM_HAS_6303",
+--   "TLVM_HAS_8080", 
+--   "TLVM_HAS_6303",
    "TLVM_HAS_6502"
 }
 
@@ -71,10 +71,11 @@ kind "ConsoleApp"
 files { "dbg/**.cpp" }
 links { "tlvm", "pthread", "stdc++" }
 defines { "TLVM_DEBUG" }
-
+--[[
 project "tlvm-dasm"
 language "C++"
 kind "ConsoleApp"
 files { "dasm/**.cpp" }
 links { "tlvm", "pthread" }
 defines { "TLVM_DEBUG" }
+   --]]

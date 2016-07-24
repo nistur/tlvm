@@ -24,6 +24,7 @@ nistur@gmail.com
 #include "../tlvm-tests.h"
 
 #include <string.h>
+#ifdef TLVM_HAS_8080
 
 // TODO: replace Hello world with more condense version
 TEST(HelloWorld, Smoke, 0.0f,
@@ -166,3 +167,5 @@ TEST(HelloWorld2, Smoke, 0.0f,
       tlvmByte     memory[255];
      }
     );
+
+#endif/*TLVM_HAS_8080*/

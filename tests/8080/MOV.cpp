@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_8080
 
 TEST(Instructions, MOV, 0.0f,
      // initialisation
@@ -188,3 +189,5 @@ TEST(ML, MOV, 0.0f,
      }
     );
 TEST_MOV_MEM_REG(A,8080);
+
+#endif/*TLVM_HAS_8080*/

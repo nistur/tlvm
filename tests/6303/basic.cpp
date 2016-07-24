@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_6303
 
 TEST(InitTerminate, CPU_6303, 0.0f,
      // initialisation
@@ -43,3 +44,4 @@ TEST(InitTerminate, CPU_6303, 0.0f,
       tlvmContext* context;
      }
     );
+#endif/*TLVM_HAS_6303*/

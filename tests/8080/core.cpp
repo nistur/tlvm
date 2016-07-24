@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_8080
 
 TEST(NOP, Core, 0.0f,
      // initialisation
@@ -93,3 +94,5 @@ TEST(LXI, Core, 0.0f,
       tlvmByte     memory[255];
      }
     );
+
+#endif/*TLVM_HAS_8080*/

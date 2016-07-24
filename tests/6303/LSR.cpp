@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_6303
 
 TEST(InstLSRD, CPU_6303, 0.0f,
      // initialisation
@@ -48,3 +49,4 @@ TEST(InstLSRD, CPU_6303, 0.0f,
       tlvmByte     bootloader[1];
      }
     );
+#endif/*TLVM_HAS_6303*/

@@ -148,6 +148,27 @@ struct _tlvmMemoryBuffer
     TLVM_NULL_CHECK(v##addr, NO_MEMORY); \
 	v = *v##addr;
 
+#define TLVM_GET_MEMORY(v, x)                                           \
+    tlvmByte v = 0;                                                     \
+    {                                                                   \
+        tlvmByte* v##addr = tlvmGetMemory(context, x, TLVM_FLAG_READ);  \
+        TLVM_NULL_CHECK(v##addr, NO_MEMORY);                            \
+        v = *v##addr;                                                   \
+    }
+
+#define TLVM_GET_MEMORY_16(v, x)                \
+    tlvmShort v = 0;                            \
+    TLVM_GET_MEMORY(lsb, x);                    \
+    TLVM_GET_MEMORY(msb, x+1);                  \
+    v = (msb << 8) | lsb;
+
+#define TLVM_STACK_PUSH_16(v)                   \
+    {                                           \
+    TLVM_STACK_PUSH((v && 0xFF00) >> 8);        \
+    TLVM_STACK_PUSH((v && 0x00FF));             \
+    }
+
+
 #define TLVM_STACK_PUSH(v) \
 { \
     tlvmByte* dst = tlvmGetMemory(context, context->m_StackPointer - 1, TLVM_FLAG_WRITE); \

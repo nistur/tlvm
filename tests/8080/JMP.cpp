@@ -22,6 +22,7 @@ nistur@gmail.com
 */
 
 #include "../tlvm-tests.h"
+#ifdef TLVM_HAS_8080
 
 TEST(Instructions, JMP, 0.0f,
      // initialisation
@@ -410,3 +411,5 @@ TEST(JM, JMP, 0.0f,
       tlvmByte     bootloader[255];
      }
     );
+
+#endif/*TLVM_HAS_8080*/

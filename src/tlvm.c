@@ -234,6 +234,16 @@ tlvmReturn tlvmReset(tlvmContext* context)
     tlvmDebugReset(context);
 #endif/*TLVM_DEBUG*/
 
+#ifdef TLVM_HAS_6502
+    if(context->m_ProcessorData->m_ProcessorID == TLVM_CPU_6502)
+    {
+        if(tlvm6502Reset(context) != TLVM_SUCCESS)
+        {
+            TLVM_RETURN();
+        }
+    }
+#endif/*TLVM_HAS_6502*/
+
     TLVM_RETURN_CODE(SUCCESS);
 }
 
