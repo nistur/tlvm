@@ -20,6 +20,11 @@ freely, subject to the following restrictions:
 Philipp Geyer
 nistur@gmail.com
 --]]
+function file_exists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
 if os.is("macosx") then
     premake.tools.gcc.ldflags.flags = nil
 end
@@ -59,6 +64,15 @@ language "C++"
 kind "ConsoleApp"
 files { "tests/**.cpp" }
 links { "tlvm" }
+
+if file_exists("tests/bin/6502/nestest.nes") then
+   defines { "TEST_HAS_NESTEST" }
+   postbuildcommands 
+   {
+      "{MKDIR} %{cfg.targetdir}/bin/6502",
+      "{COPY} tests/bin/6502/nestest.nes %{cfg.targetdir}/bin/6502" 
+   }
+end
 defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
 configuration "Debug"
 postbuildcommands("build/debug/tests")

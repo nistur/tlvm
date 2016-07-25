@@ -1,0 +1,9 @@
+build/
+obj/
+Makefile
+*.make
+
+# binary files of unknown license aren't added to this repository
+# but they can be dropped in and should automagically be picked
+# up by the testsuite
+tests/bin/**/
