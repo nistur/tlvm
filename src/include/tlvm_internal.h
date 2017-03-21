@@ -89,6 +89,7 @@ struct _tlvmContext
     // functionality for hooking up a debugger
 #ifdef  TLVM_DEBUG
     tlvmDebugBreakpoint*  m_Breakpoints;
+    tlvmDebugWatch*       m_MemoryWatches;
     tlvmByte		  m_DebugState;
     tlvmDebugCallbackFn   m_StepCallback;
 #endif/*TLVM_DEBUG*/

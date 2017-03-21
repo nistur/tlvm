@@ -48,6 +48,29 @@ tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebu
 	TLVM_RETURN_CODE(SUCCESS);
 }
 
+tlvmReturn tlvmDebugAddWatch(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+	tlvmDebugWatch* watch = tlvmMalloc(tlvmDebugWatch);
+	watch->m_Address = addr;
+	watch->m_Callback = callback;
+
+	if(context->m_MemoryWatches == NULL)
+	{
+		context->m_MemoryWatches = watch;
+	}
+	else
+	{
+		tlvmDebugWatch* prev = context->m_MemoryWatches;
+		while(prev->m_Next != NULL)
+			prev = prev->m_Next;
+		prev->m_Next = watch;
+	}
+
+	TLVM_RETURN_CODE(SUCCESS);
+}
+
 tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, tlvmByte* size)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
@@ -96,6 +119,15 @@ tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort addr)
 	TLVM_RETURN_CODE(SUCCESS);
 }
 
+tlvmReturn tlvmGetProgramCounter(tlvmContext* context, tlvmShort* addr)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(addr,NO_MEMORY);
+    *addr = context->m_ProgramCounter;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
 tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst)
 {
 	tlvmByte* target = *dst;
@@ -134,6 +166,24 @@ tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* 
 	*outval = context->m_Registers[regid];
 
 	TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmDebugCheckMemory(tlvmContext* context, tlvmShort address)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    tlvmPauseClock(context);
+    tlvmDebugWatch* watch = context->m_MemoryWatches;
+    while(watch)
+    {
+	if(watch->m_Address == address)
+	{
+	    context->m_DebugState = TLVM_DEBUG_STATE_BREAK;
+	    watch->m_Callback(context, TLVM_DEBUG_WATCH, address);
+	}
+	watch = watch->m_Next;
+    }
+    tlvmResumeClock(context);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context)

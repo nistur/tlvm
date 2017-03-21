@@ -274,6 +274,13 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
     if(flags & TLVM_FLAG_WRITE && !(pMem->m_Flags & TLVM_FLAG_WRITE))
         return NULL;
 
+#ifdef TLVM_DEBUG
+    if(flags  & TLVM_FLAG_WRITE)
+    {
+	tlvmDebugCheckMemory(context, address);
+    }
+#endif/*TLVM_DEBUG*/
+
     tlvmShort addr = address - pMem->m_Start;
     return &pMem->m_Buffer[addr];
 }

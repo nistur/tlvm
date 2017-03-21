@@ -37,8 +37,11 @@ typedef struct _tlvmDebugBreakpoint
 	tlvmShort 						m_Address;
 	tlvmDebugCallbackFn 			m_Callback;
 } tlvmDebugBreakpoint;
+typedef tlvmDebugBreakpoint tlvmDebugWatch;
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context);
+
+tlvmReturn tlvmDebugCheckMemory(tlvmContext* context, tlvmShort address);
 
 tlvmReturn tlvmDebugReset(tlvmContext* context);
 
