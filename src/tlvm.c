@@ -56,6 +56,19 @@ tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
         tlvm6303Init(context);
 #endif
 
+#ifdef TLVM_DEBUG
+    (*context)->m_Backtrace = (*context)->m_BacktracePool;
+    int bt = 0;
+    (*context)->m_BacktracePool[bt].m_Trace[0] = 0;
+    for(bt = 0; bt < TLVM_DEBUG_BACKTRACE_SIZE - 1; ++bt)
+    {
+	(*context)->m_BacktracePool[bt].m_Next = &(*context)->m_BacktracePool[bt+1];
+	(*context)->m_BacktracePool[bt+1].m_Prev = &(*context)->m_BacktracePool[bt];
+	(*context)->m_BacktracePool[bt+1].m_Trace[0] = 0;
+	(*context)->m_BacktraceEnd = &(*context)->m_BacktracePool[bt+1];
+    }
+#endif
+
     TLVM_RETURN_CODE(SUCCESS);
 }
 
@@ -171,6 +184,22 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 #ifdef  TLVM_DEBUG
     if(tlvmDebugCheck(context) != TLVM_SUCCESS)
         TLVM_RETURN();
+
+    tlvmDebugBacktrace* trace = context->m_BacktraceEnd;
+    // mark previous one as new end
+    context->m_BacktraceEnd = trace->m_Prev;
+    trace->m_Prev->m_Next = 0;
+    trace->m_Prev = 0;
+    // put this one at the start
+    context->m_Backtrace->m_Prev = trace;
+    trace->m_Next = context->m_Backtrace;
+    context->m_Backtrace = trace;
+    // populate this trace
+    tlvmChar*  instruction = tlvmMallocArray(tlvmChar, TLVM_DEBUG_BACKTRACE_STRSIZE);
+    tlvmByte size = TLVM_DEBUG_BACKTRACE_STRSIZE;
+    tlvmDebugGetInstruction(context, &instruction, &size);
+    sprintf(trace->m_Trace, "0x%X\t%s", context->m_ProgramCounter, instruction);
+    tlvmFree(instruction);
 #endif/*TLVM_DEBUG*/
 
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);

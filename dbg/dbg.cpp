@@ -301,6 +301,15 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 			cin >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
 		}
+		HANDLE_INPUT_OPTION(backtrace, bt)
+		{
+		    tlvmShort size = 2048;
+		    tlvmChar* backtrace = new tlvmChar[size];
+		    tlvmGetBacktrace(context, &backtrace, &size);
+		    cout << "Backtrace:" << endl;
+		    cout << backtrace;
+		    delete [] backtrace;
+		}
 		HANDLE_INPUT_OPTION(watch, w)
 		{
 			string address;

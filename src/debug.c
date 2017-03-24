@@ -128,6 +128,40 @@ tlvmReturn tlvmGetProgramCounter(tlvmContext* context, tlvmShort* addr)
     TLVM_RETURN_CODE(SUCCESS);
 }
 
+tlvmReturn tlvmGetBacktrace(tlvmContext* context, tlvmChar** backtrace, tlvmShort* size)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(backtrace && size && (*backtrace || *size), INVALID_INPUT);
+
+    if(*backtrace == 0)
+    {
+	*backtrace = tlvmMallocArray(tlvmChar, *size);
+    }
+
+    tlvmChar* c = *backtrace;
+    tlvmShort s = 0;
+    tlvmDebugBacktrace* trace = context->m_Backtrace;
+    while(trace)
+    {
+	tlvmShort len = strlen(trace->m_Trace);
+	if(len > 0)
+	{
+	    if(s + len + 2 >= *size)
+	    {
+		break;
+	    }
+
+	    sprintf((char*)c, "%s\n", trace->m_Trace);
+	    s += len + 1;
+	    c += len + 1;
+	}
+	trace = trace->m_Next;
+    }
+    *size = s;
+
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
 tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst)
 {
 	tlvmByte* target = *dst;

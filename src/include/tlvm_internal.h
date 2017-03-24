@@ -92,6 +92,10 @@ struct _tlvmContext
     tlvmDebugWatch*       m_MemoryWatches;
     tlvmByte		  m_DebugState;
     tlvmDebugCallbackFn   m_StepCallback;
+    tlvmDebugBacktrace*   m_Backtrace;
+    tlvmDebugBacktrace*   m_BacktraceEnd;
+
+    tlvmDebugBacktrace    m_BacktracePool[TLVM_DEBUG_BACKTRACE_SIZE];
 #endif/*TLVM_DEBUG*/
 };
 

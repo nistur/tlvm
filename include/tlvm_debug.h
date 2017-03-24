@@ -93,6 +93,8 @@ TLVM_EXPORT tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort add
 
 TLVM_EXPORT tlvmReturn tlvmGetProgramCounter(tlvmContext* context, tlvmShort* addr);
 
+TLVM_EXPORT tlvmReturn tlvmGetBacktrace(tlvmContext* context, tlvmChar** backtrace, tlvmShort* size);
+
 #endif/*TLVM_DEBUG*/
 
 #endif/*__TLVM_DEBUG_H__*/
