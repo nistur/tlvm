@@ -242,6 +242,29 @@ void setMemory(char* buffer, int address, int size)
 #define HANDLE_INPUT_OPTION(opt, shortopt)	\
     if(val == #opt || val == #shortopt)
 
+void PrintMemory(tlvmContext* context)
+{
+    string addressStr;
+    string sizeStr;
+    tlvmShort address, size;
+    tlvmByte* mem;
+    int iMem;
+    
+    cin >> addressStr;
+    cin >> sizeStr;
+    
+    address = parseAddress(addressStr);
+    size = parseAddress(sizeStr);
+    mem = new tlvmByte[size];
+    tlvmDebugGetMemory(context, address, size, &mem);
+    for(iMem = 0; iMem < size; ++iMem)
+    {
+	printf("0x%02X%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
+    }
+    cout << endl;
+    delete [] mem;
+}
+
 void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 {
     pauseStdIO(context);
@@ -318,25 +341,7 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 		}
 		HANDLE_INPUT_OPTION(print, p)
 		{
-			string addressStr;
-			string sizeStr;
-			tlvmShort address, size;
-			tlvmByte* mem;
-			int iMem;
-
-			cin >> addressStr;
-			cin >> sizeStr;
-
-			address = parseAddress(addressStr);
-			size = parseAddress(sizeStr);
-			mem = new tlvmByte[size];
-			tlvmDebugGetMemory(context, address, size, &mem);
-			for(iMem = 0; iMem < size; ++iMem)
-			{
-				printf("0x%02X%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
-			}
-			cout << endl;
-			delete [] mem;
+		    PrintMemory(context);
 		}
 		HANDLE_INPUT_OPTION(register, x)
 		{
@@ -439,9 +444,7 @@ int main(int argc, char** argv)
 		}
 		HANDLE_INPUT_OPTION(print, p)
 		{
-			string dummy;
-			*in >> dummy;
-			cout << "Program not running" << endl;
+		    PrintMemory(context);
 		}
 		HANDLE_INPUT_OPTION(register, x)
 		{
