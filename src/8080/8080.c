@@ -730,6 +730,7 @@ tlvmReturn tlvmORA(tlvmContext* context, tlvmByte* cycles)
     TLVM_NULL_CHECK(src, INVALID_INPUT);
 
 	context->m_Registers[TLVM_8080_REG_A] |= *src;
+	TLVM_SET_FLAGS(TLVM_REGISTER(TLVM_8080_REG_A), 8080);
 
 	// size of instruction    = 1
 	context->m_ProgramCounter += 1;

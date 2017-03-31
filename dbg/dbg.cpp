@@ -164,6 +164,7 @@ void onIOWrite(tlvmContext* context, tlvmByte port)
 	{
 		printf("%d\n", val);
 	}
+	fflush(stdout);
 }
 
 void startStdIO(tlvmContext* context, int outDataPort, int inDataPort, int statPort)
