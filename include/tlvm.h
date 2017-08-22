@@ -139,22 +139,34 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 /*********************************************
  * PROCESSOR INSTRUCTION SETS
  *********************************************/
-/* TLVM_CPU_8080
- * Intel 8080 Processor
- */
-#define TLVM_CPU_8080          1
-/* TLVM_CPU_6800
- *Motorola 6800 Processor
- */
-#define TLVM_CPU_6800          2
+typedef enum _tlvmCpuId
+{
+    /* TLVM_CPU_NONE
+     * No CPU instruction set
+     */
+    TLVM_CPU_NONE,
 
-/* TLVM_CPU_6303
- * Hitachi 6303 Processor
- */
-#define TLVM_CPU_6303          3
+    /* TLVM_CPU_8080
+     * Intel 8080 Processor
+     */
+    TLVM_CPU_8080,
 
-#define TLVM_CPU_Z80           3
+    /* TLVM_CPU_6800
+     *Motorola 6800 Processor
+     */
+    TLVM_CPU_6800,
 
+    /* TLVM_CPU_6303
+     * Hitachi 6303 Processor
+     */
+    TLVM_CPU_6303,
+    
+    /* TLVM_CPU_Z80
+     * Zilog Z80 Processor
+     */
+    TLVM_CPU_Z80,
+} tlvmCpuId;
+    
 /*********************************************
  * CALLBACK DEFINITIONS
  *********************************************/
@@ -182,7 +194,7 @@ typedef void(*tlvmIOCallback)(tlvmContext* context, tlvmByte port);
  *     TLVM_SUCCESS - no error
  *     TLVM_NO_CONTEXT - context pointer is NULL
  *********************************************/
-TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context, tlvmByte cpuid);
+TLVM_EXPORT tlvmReturn   tlvmInitContext     (tlvmContext** context, tlvmCpuId cpuid);
 
 /*********************************************
  * tlvmTerminateContext

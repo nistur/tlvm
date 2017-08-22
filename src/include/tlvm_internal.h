@@ -47,7 +47,7 @@ typedef struct _tlvmMemoryBuffer tlvmMemoryBuffer;
  ***************************************/
 typedef struct _tlvmProcessorData
 {
-    tlvmByte          m_ProcessorID;
+    tlvmCpuId         m_ProcessorID;
     tlvmInterruptFn   m_Interrupt;
     tlvmInstruction*  m_InstructionSet;
 } tlvmProcessorData;
