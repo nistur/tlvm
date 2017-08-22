@@ -26,9 +26,15 @@ nistur@gmail.com
 
 #ifdef  TLVM_DEBUG
 
+#include "tlvm_debug.h"
+#include <stdio.h>
+
 #define TLVM_DEBUG_STATE_RUN 	0x00
 #define TLVM_DEBUG_STATE_BREAK	0x01
 #define TLVM_DEBUG_STATE_HALT   0xFF
+
+#define TLVM_DEBUG_BACKTRACE_SIZE    0x0F
+#define TLVM_DEBUG_BACKTRACE_STRSIZE 0x1F
 
 typedef struct _tlvmDebugBreakpoint
 {
@@ -37,8 +43,20 @@ typedef struct _tlvmDebugBreakpoint
 	tlvmShort 						m_Address;
 	tlvmDebugCallbackFn 			m_Callback;
 } tlvmDebugBreakpoint;
+typedef tlvmDebugBreakpoint tlvmDebugWatch;
+
+
+typedef struct _tlvmDebugBacktrace
+{
+    struct _tlvmDebugBacktrace* m_Prev;
+    struct _tlvmDebugBacktrace* m_Next;
+    
+    char                        m_Trace[TLVM_DEBUG_BACKTRACE_STRSIZE];
+} tlvmDebugBacktrace;
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context);
+
+tlvmReturn tlvmDebugCheckMemory(tlvmContext* context, tlvmShort address);
 
 tlvmReturn tlvmDebugReset(tlvmContext* context);
 

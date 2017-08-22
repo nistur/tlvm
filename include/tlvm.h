@@ -91,8 +91,9 @@ typedef int tlvmReturn;
 typedef unsigned char  tlvmByte;
 typedef unsigned char  tlvmChar;
 typedef unsigned short tlvmShort;
-typedef unsigned long  tlvmLong;
+typedef unsigned long long tlvmLong;
 typedef unsigned char  tlvmBool;
+typedef signed   char  tlvmSByte;
 
 #define TLVM_FALSE 				 0
 #define TLVM_TRUE 				 1
@@ -111,6 +112,7 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 #define TLVM_UNKNOWN_INSTRUCTION 4
 #define TLVM_EXIT                5
 #define TLVM_MEMORY_OVERLAP      6
+#define TLVM_STALL               7
 #define TLVM_UNIMPLEMENTED      -1
 
 /*********************************************
@@ -119,6 +121,13 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
 #define TLVM_FLAG_READ			(1<<0)
 #define TLVM_FLAG_WRITE			(1<<1)
 
+/*********************************************
+ * EMULATION FLAGS
+ *********************************************/
+#define TLVM_FLAG_HALT          (1<<2)
+#define TLVM_FLAG_STALL         (1<<3)
+#define TLVM_FLAG_HALT_ON_STALL (1<<4)
+    
 /*********************************************
  * CLOCKSPEED
  *********************************************/
@@ -134,10 +143,15 @@ typedef void(*tlvmClockFn)(tlvmContext*, tlvmByte*);
  * Intel 8080 Processor
  */
 #define TLVM_CPU_8080          1
+/* TLVM_CPU_6800
+ *Motorola 6800 Processor
+ */
+#define TLVM_CPU_6800          2
+
 /* TLVM_CPU_6303
  * Hitachi 6303 Processor
  */
-#define TLVM_CPU_6303          2
+#define TLVM_CPU_6303          3
 
 #define TLVM_CPU_Z80           3
 
@@ -380,6 +394,11 @@ TLVM_EXPORT tlvmReturn   tlvmInterrupt       (tlvmContext* context,
  *********************************************/
 TLVM_EXPORT tlvmReturn   tlvmHalt            (tlvmContext* context);
 
+
+TLVM_EXPORT tlvmReturn   tlvmSetFlags        (tlvmContext* context, tlvmByte flags);
+TLVM_EXPORT tlvmReturn   tlvmUnsetFlags      (tlvmContext* context, tlvmByte flags);
+TLVM_EXPORT tlvmReturn   tlvmGetFlags        (tlvmContext* context, tlvmByte* flags);
+    
 /*********************************************
  * tlvmSetIOCallback
  *     Provides a callback for when any of the

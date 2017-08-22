@@ -48,12 +48,39 @@ tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebu
 	TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, tlvmByte* size)
+tlvmReturn tlvmDebugAddWatch(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
+	tlvmDebugWatch* watch = tlvmMalloc(tlvmDebugWatch);
+	watch->m_Address = addr;
+	watch->m_Callback = callback;
+
+	if(context->m_MemoryWatches == NULL)
+	{
+		context->m_MemoryWatches = watch;
+	}
+	else
+	{
+		tlvmDebugWatch* prev = context->m_MemoryWatches;
+		while(prev->m_Next != NULL)
+			prev = prev->m_Next;
+		prev->m_Next = watch;
+	}
+
+	TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmDebugGetInstruction(tlvmContext* context, tlvmChar** instuction, tlvmByte* size)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(instuction, INVALID_INPUT);
+    TLVM_NULL_CHECK(size, INVALID_INPUT);
+#ifdef TLVM_HAS_8080
 	// for now, we only have the 8080
 	return tlvm8080DebugGetInstruction(context, instuction, size);
+#endif
+        TLVM_RETURN_CODE(INVALID_INPUT);
 }
 
 tlvmReturn tlvmDebugStep(tlvmContext* context, tlvmDebugCallbackFn callback)
@@ -92,6 +119,49 @@ tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort addr)
 	TLVM_RETURN_CODE(SUCCESS);
 }
 
+tlvmReturn tlvmGetProgramCounter(tlvmContext* context, tlvmShort* addr)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(addr,NO_MEMORY);
+    *addr = context->m_ProgramCounter;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmGetBacktrace(tlvmContext* context, tlvmChar** backtrace, tlvmShort* size)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(backtrace && size && (*backtrace || *size), INVALID_INPUT);
+
+    if(*backtrace == 0)
+    {
+	*backtrace = tlvmMallocArray(tlvmChar, *size);
+    }
+
+    tlvmChar* c = *backtrace;
+    tlvmShort s = 0;
+    tlvmDebugBacktrace* trace = context->m_Backtrace;
+    while(trace)
+    {
+	tlvmShort len = strlen(trace->m_Trace);
+	if(len > 0)
+	{
+	    if(s + len + 2 >= *size)
+	    {
+		break;
+	    }
+
+	    sprintf((char*)c, "%s\n", trace->m_Trace);
+	    s += len + 1;
+	    c += len + 1;
+	}
+	trace = trace->m_Next;
+    }
+    *size = s;
+
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
 tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort size, tlvmByte** dst)
 {
 	tlvmByte* target = *dst;
@@ -113,8 +183,12 @@ tlvmReturn tlvmDebugGetMemory(tlvmContext* context, tlvmShort addr, tlvmShort si
 tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* regstr, tlvmByte* outreg)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
-
+    TLVM_NULL_CHECK(regstr, INVALID_INPUT);
+    TLVM_NULL_CHECK(outreg, INVALID_INPUT);
+#ifdef TLVM_HAS_8080
 	return tlvm8080DebugParseRegister(context, regstr, outreg);
+#endif
+        TLVM_RETURN_CODE(INVALID_INPUT);
 }
 
 tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* outval)
@@ -126,6 +200,24 @@ tlvmReturn tlvmDebugGetRegister(tlvmContext* context, tlvmByte regid, tlvmByte* 
 	*outval = context->m_Registers[regid];
 
 	TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmDebugCheckMemory(tlvmContext* context, tlvmShort address)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    tlvmPauseClock(context);
+    tlvmDebugWatch* watch = context->m_MemoryWatches;
+    while(watch)
+    {
+	if(watch->m_Address == address)
+	{
+	    context->m_DebugState = TLVM_DEBUG_STATE_BREAK;
+	    watch->m_Callback(context, TLVM_DEBUG_WATCH, address);
+	}
+	watch = watch->m_Next;
+    }
+    tlvmResumeClock(context);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmDebugCheck(tlvmContext* context)

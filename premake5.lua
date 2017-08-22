@@ -25,52 +25,73 @@ if os.is("macosx") then
 end
 
 solution "tlvm"
-configurations { "Debug", "Release" }
-includedirs { "include", "src/include" }
-files { "include/**.h" }
+    configurations { "Debug", "Release" }
+    includedirs { "include", "src/include" }
+    files { "include/**.h" }
+    
+    defines { "TLVM_BUILD" }
+    
+    tlvmcpus = {
+       cpu_8080 = true,
+       cpu_6800 = false,
+       cpu_6303 = false,
+    }
+    
+    for cpu,x in pairs(tlvmcpus) do 
+       if x then
+          defines {  "TLVM_HAS_" .. cpu:gsub("cpu_", "") }
+       end
+    end
+    
+    configuration "Debug"
+        defines { "DEBUG" }
+        --optimize "Debug"
+        flags { "Symbols" }
+        targetdir "build/debug"
 
-defines { "TLVM_BUILD" }
+    configuration "Release"
+        defines { "NDEBUG" }
+        optimize "Size"
+        warnings "Extra"
+        flags { "FatalWarnings",
+                "NoFramePointer" }
+        targetdir "build/release"
 
--- Processor specific defines
-defines { "TLVM_HAS_8080", "TLVM_HAS_Z80", "TLVM_HAS_6303" }
 
-configuration "Debug"
-defines { "DEBUG" }
---optimize "Debug"
-flags { "Symbols" }
-targetdir "build/debug"
+	
+    dofile("buildlib.lua")
 
-configuration "Release"
-defines { "NDEBUG" }
-optimize "Size"
-warnings "Extra"
-flags { "FatalWarnings",
-	"NoFramePointer" }
-targetdir "build/release"
+    project "tests"
+        language "C++"
+        kind "ConsoleApp"
+        files { "tests/testsuite/**.cpp" }
 
-dofile("buildlib.lua")
+        for cpu,x in pairs(tlvmcpus) do 
+           if x then
+              files{ "tests/" .. cpu:gsub("cpu_", "") .. "/*.cpp" }
+           end
+        end
 
-project "tests"
-language "C++"
-kind "ConsoleApp"
-files { "tests/**.cpp" }
-links { "tlvm" }
-defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
-configuration "Debug"
-postbuildcommands("build/debug/tests")
-configuration "Release"
-postbuildcommands("build/release/tests")
+        links { "tlvm" }
+        defines { "TEST_MAX_TEST=128", "TEST_MAX_GROUP=32" }
+        configuration "Debug"
+            postbuildcommands("build/debug/tests")
+        configuration "Release"
+            postbuildcommands("build/release/tests")
 
-project "tlvm-dbg"
-language "C++"
-kind "ConsoleApp"
-files { "dbg/**.cpp" }
-links { "tlvm", "pthread", "stdc++" }
-defines { "TLVM_DEBUG" }
-
-project "tlvm-dasm"
-language "C++"
-kind "ConsoleApp"
-files { "dasm/**.cpp" }
-links { "tlvm", "pthread" }
-defines { "TLVM_DEBUG" }
+    project "tlvm-dbg"
+        language "C++"
+        kind "ConsoleApp"
+        files { "dbg/**.cpp" }
+        links { "tlvm", "pthread", "stdc++" }
+        defines { "TLVM_DEBUG" }
+        
+    -- this is 8080 only
+    if tlvmcpus.cpu_8080 then
+       project "tlvm-dasm"
+           language "C++"
+           kind "ConsoleApp"
+           files { "dasm/**.cpp" }
+           links { "tlvm", "pthread" }
+           defines { "TLVM_DEBUG" }
+    end

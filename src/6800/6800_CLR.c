@@ -21,43 +21,27 @@ Philipp Geyer
 nistur@gmail.com
 */
 
-#ifdef  TLVM_HAS_8080
+#ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
+tlvmReturn tlvm6800CLR(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-	TLVM_GET_OP(dest, 1);
-
-	context->m_Ports[dest] = context->m_Registers[TLVM_8080_REG_A];
-
-    // size of instruction    = 1
-    // size of operand        = 1
-    context->m_ProgramCounter += 2;
+    TLVM_GET_OP(opcode, 0);
+    
+    if(opcode == TLVM_6800_CLC)
+        TLVM_FLAG_UNSET(C, 6800);
+    if(opcode == TLVM_6800_CLI)
+        TLVM_FLAG_UNSET(I, 6800);
+    if(opcode == TLVM_6800_CLV)
+        TLVM_FLAG_UNSET(V, 6800);
+    
+    context->m_ProgramCounter += 1;
     if(cycles)
-    	*cycles =10;
+        *cycles = 2;
 
-	if(context->m_IOCallback != NULL)
-		context->m_IOCallback(context, dest);
-
-	TLVM_RETURN_CODE(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
-tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
-{
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-	TLVM_GET_OP(dest, 1);
-
-	context->m_Registers[TLVM_8080_REG_A] = context->m_Ports[dest];
-
-    // size of instruction    = 1
-    // size of operand        = 1
-    context->m_ProgramCounter += 2;
-    if(cycles)
-    	*cycles =10;
-
-	TLVM_RETURN_CODE(SUCCESS);
-}
-#endif/*TLVM_HAS_8080*/
+#endif/*TLVM_HAS_6800*/

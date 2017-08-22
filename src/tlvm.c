@@ -42,9 +42,14 @@ tlvmReturn tlvmClearContext(tlvmContext* context)
 tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(cpuid, INVALID_INPUT);
 #if TLVM_HAS_8080
     if(cpuid == TLVM_CPU_8080)
         tlvm8080Init(context);
+#endif
+#if TLVM_HAS_6800
+    if(cpuid == TLVM_CPU_6800)
+        tlvm6800Init(context);
 #endif
 #if TLVM_HAS_6303
     if(cpuid == TLVM_CPU_6303)
@@ -53,6 +58,19 @@ tlvmReturn tlvmInitContext(tlvmContext** context, tlvmByte cpuid)
 #if TLVM_HAS_Z80
     if(cpuid == TLVM_CPU_Z80)
         tlvmZ80Init(context);
+#endif
+
+#ifdef TLVM_DEBUG
+    (*context)->m_Backtrace = (*context)->m_BacktracePool;
+    int bt = 0;
+    (*context)->m_BacktracePool[bt].m_Trace[0] = 0;
+    for(bt = 0; bt < TLVM_DEBUG_BACKTRACE_SIZE - 1; ++bt)
+    {
+	(*context)->m_BacktracePool[bt].m_Next = &(*context)->m_BacktracePool[bt+1];
+	(*context)->m_BacktracePool[bt+1].m_Prev = &(*context)->m_BacktracePool[bt];
+	(*context)->m_BacktracePool[bt+1].m_Trace[0] = 0;
+	(*context)->m_BacktraceEnd = &(*context)->m_BacktracePool[bt+1];
+    }
 #endif
 
     TLVM_RETURN_CODE(SUCCESS);
@@ -170,6 +188,22 @@ tlvmReturn tlvmStep(tlvmContext* context, tlvmByte* cycles)
 #ifdef  TLVM_DEBUG
     if(tlvmDebugCheck(context) != TLVM_SUCCESS)
         TLVM_RETURN();
+
+    tlvmDebugBacktrace* trace = context->m_BacktraceEnd;
+    // mark previous one as new end
+    context->m_BacktraceEnd = trace->m_Prev;
+    trace->m_Prev->m_Next = 0;
+    trace->m_Prev = 0;
+    // put this one at the start
+    context->m_Backtrace->m_Prev = trace;
+    trace->m_Next = context->m_Backtrace;
+    context->m_Backtrace = trace;
+    // populate this trace
+    tlvmChar*  instruction = tlvmMallocArray(tlvmChar, TLVM_DEBUG_BACKTRACE_STRSIZE);
+    tlvmByte size = TLVM_DEBUG_BACKTRACE_STRSIZE;
+    tlvmDebugGetInstruction(context, &instruction, &size);
+    sprintf(trace->m_Trace, "0x%X\t%s", context->m_ProgramCounter, instruction);
+    tlvmFree(instruction);
 #endif/*TLVM_DEBUG*/
 
     tlvmByte* opcode = tlvmGetMemory(context, context->m_ProgramCounter, TLVM_FLAG_READ);
@@ -191,37 +225,55 @@ tlvmReturn tlvmRun(tlvmContext* context)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_Halt = TLVM_FALSE;
+    tlvmUnsetFlags(context, TLVM_FLAG_HALT | TLVM_FLAG_STALL);
 
-    if(context->m_Clockspeed == 0)
+    tlvmLong cycleCount = 0;
+    tlvmByte cycles = 0;
+    tlvmReturn status = TLVM_SUCCESS;
+    
+    tlvmResetClock(context);
+    
+    while(TLVM_TRUE)
     {
-        tlvmByte empty;
-        while(tlvmStep(context, &empty) == TLVM_SUCCESS){}
-        if(g_tlvmStatus != TLVM_EXIT)
-            TLVM_RETURN();
-        TLVM_RETURN_CODE(SUCCESS);
-    }
-    else
-    {
-        tlvmLong cycleCount = 0;
-        tlvmByte cycles = 0;
-        tlvmReturn status = TLVM_SUCCESS;
+        if(context->m_Flags & TLVM_FLAG_HALT)
+            break;
 
-        tlvmResetClock(context);
-
-        while(status == TLVM_SUCCESS && context->m_Halt == TLVM_FALSE)
-        {
+        // if we're stalled, still tick over the CPU emulation, just
+        // don't step forward - This should get the correct behaviour
+        if((context->m_Flags & TLVM_FLAG_STALL) == TLVM_FALSE)
             status = tlvmStep(context, &cycles);
-
-            cycleCount += (tlvmLong)cycles;
-
-            tlvmSleepUntil(context, cycleCount); // sleep until we've taken long enough for 
+        
+        if(status == TLVM_STALL)
+        {
+            // If the CPU's stalled and we've been told to halt on stalls
+            // then flag that the CPU's halted, which will break out of
+            // the run loop the next time around, after we've called sleep
+            // which would match behaviour of instructions which stall the
+            // CPU, as they finish execution before stalling (eg 6800 WAI)
+            // To continue execution after a stall, either the halt on stall
+            // flag should NOT be set, or tlvmRun should be called at the
+            // correct time to continue execution.
+            if((context->m_Flags & TLVM_FLAG_HALT_ON_STALL) &&
+               (context->m_Flags & TLVM_FLAG_HALT) == TLVM_FALSE)
+                tlvmSetFlags(context, TLVM_FLAG_HALT);
         }
-
-        if(status != TLVM_EXIT)
-            TLVM_RETURN();
-        TLVM_RETURN_CODE(SUCCESS);
+        else if(status != TLVM_SUCCESS)
+        {
+            // anything else other than stall and success, we definitely
+            // want to break out
+            break;
+        }
+        
+        cycleCount += (tlvmLong)cycles;
+        
+        if(context->m_Clockspeed != 0)
+            tlvmSleepUntil(context, cycleCount); // sleep until we've taken long enough for 
+        
     }
+    tlvmSetFlags(context, TLVM_FLAG_HALT);
+    if(status != TLVM_EXIT)
+        TLVM_RETURN();
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmReset(tlvmContext* context)
@@ -255,6 +307,13 @@ tlvmByte* tlvmGetMemory(tlvmContext* context, tlvmShort address, tlvmByte flags)
     if(flags & TLVM_FLAG_WRITE && !(pMem->m_Flags & TLVM_FLAG_WRITE))
         return NULL;
 
+#ifdef TLVM_DEBUG
+    if(flags  & TLVM_FLAG_WRITE)
+    {
+	tlvmDebugCheckMemory(context, address);
+    }
+#endif/*TLVM_DEBUG*/
+
     tlvmShort addr = address - pMem->m_Start;
     return &pMem->m_Buffer[addr];
 }
@@ -263,14 +322,14 @@ tlvmReturn tlvmGetPort(tlvmContext* context, tlvmByte port, tlvmByte* outPort)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
     TLVM_NULL_CHECK(outPort, INVALID_INPUT);
-    *outPort = context->m_Ports[port];
+    *outPort = context->m_OutputPorts[port];
     TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmSetPort(tlvmContext* context, tlvmByte port, tlvmByte portval)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
-    context->m_Ports[port] = portval;
+    context->m_InputPorts[port] = portval;
     TLVM_RETURN_CODE(SUCCESS);
 }
 
@@ -292,10 +351,34 @@ tlvmReturn tlvmInterrupt(tlvmContext* context, tlvmByte interrupt)
 
 tlvmReturn tlvmHalt(tlvmContext* context)
 {
+    return tlvmSetFlags(context, TLVM_FLAG_HALT);
+}
+
+tlvmReturn tlvmGetFlags(tlvmContext* context, tlvmByte* flags)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_NULL_CHECK(flags, INVALID_INPUT);
+
+    *flags = context->m_Flags;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
+
+tlvmReturn tlvmUnsetFlags(tlvmContext* context, tlvmByte flags)
+{
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-    context->m_Halt = TLVM_TRUE;
+    context->m_Flags &= ~flags;
+    
+    TLVM_RETURN_CODE(SUCCESS);
+}
 
+tlvmReturn tlvmSetFlags(tlvmContext* context, tlvmByte flags)
+{
+    TLVM_NULL_CHECK(context, NO_CONTEXT);
+
+    context->m_Flags |= flags;
+    
     TLVM_RETURN_CODE(SUCCESS);
 }
 

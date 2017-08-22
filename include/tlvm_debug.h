@@ -31,7 +31,8 @@ nistur@gmail.com
 #endif
 
 #define TLVM_DEBUG_BREAKPOINT 0x00
-#define TLVM_DEBUG_STEP       0x01
+#define TLVM_DEBUG_WATCH      0x01
+#define TLVM_DEBUG_STEP       0x02
 
 typedef void(*tlvmDebugCallbackFn)(tlvmContext* context, tlvmByte message, tlvmShort addr);
 
@@ -51,6 +52,8 @@ typedef void(*tlvmDebugCallbackFn)(tlvmContext* context, tlvmByte message, tlvmS
  *  the breakpoint is hit
  *********************************************/
 TLVM_EXPORT tlvmReturn tlvmDebugAddBreakpoint(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback);
+
+TLVM_EXPORT tlvmReturn tlvmDebugAddWatch(tlvmContext* context, tlvmShort addr, tlvmDebugCallbackFn callback);
 
 /*********************************************
  * tlvmDebugStep
@@ -87,6 +90,10 @@ TLVM_EXPORT tlvmReturn tlvmDebugParseRegister(tlvmContext* context, tlvmChar* re
 TLVM_EXPORT tlvmReturn tlvmDebugHalt(tlvmContext* context);
 
 TLVM_EXPORT tlvmReturn tlvmSetProgramCounter(tlvmContext* context, tlvmShort addr);
+
+TLVM_EXPORT tlvmReturn tlvmGetProgramCounter(tlvmContext* context, tlvmShort* addr);
+
+TLVM_EXPORT tlvmReturn tlvmGetBacktrace(tlvmContext* context, tlvmChar** backtrace, tlvmShort* size);
 
 #endif/*TLVM_DEBUG*/
 

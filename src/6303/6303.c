@@ -47,7 +47,7 @@ tlvmReturn tlvm6303Init(tlvmContext** context)
     (*context)->m_ProcessorData = &g_6303Data.m_Header;
 
     (*context)->m_Registers = cpu->m_Registers;
-    (*context)->m_Ports = cpu->m_Ports;
+//    (*context)->m_Ports = cpu->m_Ports;
 
     TLVM_RETURN_CODE(SUCCESS);
 }

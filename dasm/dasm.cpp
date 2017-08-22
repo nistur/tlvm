@@ -368,12 +368,22 @@ void cleanUpInstructions()
     g_state.instructions = NULL;
 }
 
-#define HANDLE_INPUT_START() \
-while(true) \
-{ \
-    string val; \
-    cout << "> "; \
-    cin >> val;
+#define HANDLE_INPUT_START(x)			\
+    std::ifstream file(x);			\
+    while(true)					\
+    {						\
+	string val;				\
+	std::istream* in = &cin;		\
+	if(file.is_open() && !file.eof())	\
+	{					\
+	    in = &file;				\
+	    *in >> val;				\
+	}					\
+	else					\
+	{					\
+	    cout << ">";			\
+	    cin >> val;				\
+	}
 
 #define HANDLE_INPUT_END() \
 }
@@ -388,7 +398,7 @@ if(val == #opt || val == #shortopt)
  * but for now, I'm just making sure
  * it works
  */
-int main(int UNUSED(argc), char** UNUSED(argv))
+int main(int argc, char** argv)
 {
     g_state.memory = NULL;
     g_state.quit = false;
@@ -396,8 +406,19 @@ int main(int UNUSED(argc), char** UNUSED(argv))
     tlvmContext* context;
     tlvmInitContext(&context, TLVM_CPU_8080);
     tlvmSetClockspeed(context, TLVM_MHZ(2,0));
+    string initFile = "tlvminit";
+    for(int i = 1; i < argc; ++i)
+    {
+	if(strcmp(argv[i], "-f") == 0)
+	{
+	    initFile = argv[i+1];
+	    ++i;
+	} 
+    }
 
-    HANDLE_INPUT_START();
+
+
+    HANDLE_INPUT_START(initFile.c_str());
         HANDLE_INPUT_OPTION(quit, q)
             break;
         HANDLE_INPUT_OPTION(file, f)
@@ -405,10 +426,10 @@ int main(int UNUSED(argc), char** UNUSED(argv))
             string filename;
             string addressStr;
             int address = 0;
-            cin >> filename;
+            *in >> filename;
             int size;
             char* file = loadFile(filename, size);
-            cin >> addressStr;
+            *in >> addressStr;
             address = parseAddress(addressStr);
 
             if(tlvmSetMemory(context, (tlvmByte*)file, address, size, TLVM_FLAG_READ) != TLVM_SUCCESS)
@@ -426,8 +447,8 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         {
             string addressStr;
             string sizeStr;
-            cin >> addressStr;
-            cin >> sizeStr;
+            *in >> addressStr;
+            *in >> sizeStr;
 
             int address = parseAddress(addressStr);
             int size = parseAddress(sizeStr);
@@ -448,7 +469,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         HANDLE_INPUT_OPTION(run, r)
         {
             string addressStr;
-            cin >> addressStr;
+            *in >> addressStr;
             int address = parseAddress(addressStr);
 
             tlvmReset(context);
@@ -472,8 +493,8 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         {
             string addressStr;
             string label;
-            cin >> addressStr;
-            cin >> label;
+            *in >> addressStr;
+            *in >> label;
 
             int address = parseAddress(addressStr);
             Instruction* inst = GetInstruction(address);
@@ -486,7 +507,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         HANDLE_INPUT_OPTION(write, w)
         {
             string filename;
-            cin >> filename;
+            *in >> filename;
             std::ofstream file(filename.c_str());
             printDisassembly(context, file);
             file.close();
@@ -495,8 +516,8 @@ int main(int UNUSED(argc), char** UNUSED(argv))
         {
             string addressStr;
             string sizeStr;
-            cin >> addressStr;
-            cin >> sizeStr;
+            *in >> addressStr;
+            *in >> sizeStr;
 
             int address = parseAddress(addressStr);
             int size = parseAddress(sizeStr);

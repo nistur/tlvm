@@ -24,6 +24,7 @@ nistur@gmail.com
 #include <tlvm.h>
 
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,6 +164,7 @@ void onIOWrite(tlvmContext* context, tlvmByte port)
 	{
 		printf("%d\n", val);
 	}
+	fflush(stdout);
 }
 
 void startStdIO(tlvmContext* context, int outDataPort, int inDataPort, int statPort)
@@ -218,30 +220,69 @@ void setMemory(char* buffer, int address, int size)
 	}
 }
 
-#define HANDLE_INPUT_START() \
-while(true) \
-{ \
-	string val; \
-	cout << "> "; \
-	cin >> val;
+#define HANDLE_INPUT_START(x)			\
+    std::ifstream file(x);			\
+    while(true)					\
+    {						\
+	string val;				\
+	std::istream* in = &cin;		\
+	if(file.is_open() && !file.eof())	\
+	{					\
+	    in = &file;				\
+	    *in >> val;				\
+	}					\
+	else					\
+	{					\
+	    cout << ">";			\
+	    cin >> val;				\
+	}
 
-#define HANDLE_INPUT_END() \
+#define HANDLE_INPUT_END()			\
+    }
+
+#define HANDLE_INPUT_OPTION(opt, shortopt)	\
+    if(val == #opt || val == #shortopt)
+
+void PrintMemory(tlvmContext* context)
+{
+    string addressStr;
+    string sizeStr;
+    tlvmShort address, size;
+    tlvmByte* mem;
+    int iMem;
+    
+    cin >> addressStr;
+    cin >> sizeStr;
+    
+    address = parseAddress(addressStr);
+    size = parseAddress(sizeStr);
+    mem = new tlvmByte[size];
+    tlvmDebugGetMemory(context, address, size, &mem);
+    for(iMem = 0; iMem < size; ++iMem)
+    {
+	printf("0x%02X%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
+    }
+    cout << endl;
+    delete [] mem;
 }
 
-#define HANDLE_INPUT_OPTION(opt, shortopt) \
-if(val == #opt || val == #shortopt)
-
-void breakpoint(tlvmContext* context, tlvmByte UNUSED(message), tlvmShort addr)
+void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 {
-	pauseStdIO(context);
-	tlvmChar* instruction = new tlvmChar[256];
-	instruction[0] = 0;
-	tlvmByte size;
-	tlvmDebugGetInstruction(context, &instruction, &size);
-	printf("0x%X\t%s\n", addr, instruction);
-	delete[] instruction;
+    pauseStdIO(context);
+    if(message == TLVM_DEBUG_WATCH)
+    {
+	printf("Memory 0x%X\n", addr);
+    }	
 
-	HANDLE_INPUT_START();
+    tlvmChar* instruction = new tlvmChar[256];
+    instruction[0] = 0;
+    tlvmByte size;
+    tlvmDebugGetInstruction(context, &instruction, &size);
+    tlvmGetProgramCounter(context, &addr);
+    printf("0x%X\t%s\n", addr, instruction);
+    delete[] instruction;
+	
+	HANDLE_INPUT_START("")
 		HANDLE_INPUT_OPTION(step, s)
 		{
 			tlvmDebugStep(context, breakpoint);
@@ -284,27 +325,24 @@ void breakpoint(tlvmContext* context, tlvmByte UNUSED(message), tlvmShort addr)
 			cin >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
 		}
+		HANDLE_INPUT_OPTION(backtrace, bt)
+		{
+		    tlvmShort size = 2048;
+		    tlvmChar* backtrace = new tlvmChar[size];
+		    tlvmGetBacktrace(context, &backtrace, &size);
+		    cout << "Backtrace:" << endl;
+		    cout << backtrace;
+		    delete [] backtrace;
+		}
+		HANDLE_INPUT_OPTION(watch, w)
+		{
+			string address;
+			cin >> address;
+			tlvmDebugAddWatch(context, parseAddress(address), breakpoint);
+		}
 		HANDLE_INPUT_OPTION(print, p)
 		{
-			string addressStr;
-			string sizeStr;
-			tlvmShort address, size;
-			tlvmByte* mem;
-			int iMem;
-
-			cin >> addressStr;
-			cin >> sizeStr;
-
-			address = parseAddress(addressStr);
-			size = parseAddress(sizeStr);
-			mem = new tlvmByte[size];
-			tlvmDebugGetMemory(context, address, size, &mem);
-			for(iMem = 0; iMem < size; ++iMem)
-			{
-				printf("0x%02X%s", mem[iMem], (iMem + 1) % 8 ? "\t" : "\n");
-			}
-			cout << endl;
-			delete [] mem;
+		    PrintMemory(context);
 		}
 		HANDLE_INPUT_OPTION(register, x)
 		{
@@ -329,7 +367,7 @@ void breakpoint(tlvmContext* context, tlvmByte UNUSED(message), tlvmShort addr)
  * but for now, I'm just making sure
  * it works
  */
-int main(int UNUSED(argc), char** UNUSED(argv))
+int main(int argc, char** argv)
 {
 	g_state.memory = NULL;
 	g_state.quit = false;
@@ -337,8 +375,17 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 	tlvmContext* context;
 	tlvmInitContext(&context, TLVM_CPU_8080);
 	tlvmSetClockspeed(context, TLVM_MHZ(2,0));
+	string initFile = "tlvminit";
+	for(int i = 1; i < argc; ++i)
+	{
+	    if(strcmp(argv[i], "-f") == 0)
+	    {
+		initFile = argv[i+1];
+		++i;
+	    } 
+	}
 
-	HANDLE_INPUT_START();
+	HANDLE_INPUT_START(initFile.c_str())	
 		HANDLE_INPUT_OPTION(quit, q)
 			break;
 		HANDLE_INPUT_OPTION(file, f)
@@ -346,10 +393,10 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 			string filename;
 			string addressStr;
 			int address = 0;
-			cin >> filename;
+			*in >> filename;
 			int size;
 			char* file = loadFile(filename, size);
-			cin >> addressStr;
+			*in >> addressStr;
 			address = parseAddress(addressStr);
 
 			if(tlvmSetMemory(context, (tlvmByte*)file, address, size, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
@@ -379,8 +426,14 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 		HANDLE_INPUT_OPTION(breakpoint, b)
 		{
 			string address;
-			cin >> address;
+			*in >> address;
 			tlvmDebugAddBreakpoint(context, parseAddress(address), breakpoint);
+		}
+		HANDLE_INPUT_OPTION(watch, w)
+		{
+			string address;
+			*in >> address;
+			tlvmDebugAddWatch(context, parseAddress(address), breakpoint);
 		}
 		HANDLE_INPUT_OPTION(step, s)
 		{
@@ -392,15 +445,13 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 		}
 		HANDLE_INPUT_OPTION(print, p)
 		{
-			string dummy;
-			cin >> dummy;
-			cout << "Program not running" << endl;
+		    PrintMemory(context);
 		}
 		HANDLE_INPUT_OPTION(register, x)
 		{
 			string dummy;
-			cin >> dummy; 
-			cin >> dummy;
+			*in >> dummy; 
+			*in >> dummy;
 			cout << "Program not running" << endl;
 		}
 		HANDLE_INPUT_OPTION(stdio, i)
@@ -409,26 +460,26 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 			string inDataPortStr;
 			string statPortStr;
 
-			cin >> outDataPortStr;
-			cin >> inDataPortStr;
-			cin >> statPortStr;
+			*in >> outDataPortStr;
+			*in >> inDataPortStr;
+			*in >> statPortStr;
 			startStdIO(context, parseAddress(outDataPortStr), parseAddress(inDataPortStr), parseAddress(statPortStr));
 		}
-		HANDLE_INPUT_OPTION(watch, w)
+/*		HANDLE_INPUT_OPTION(watch, w)
 		{
 			string dataPortStr;
 			string statPortStr;
 
-			cin >> dataPortStr;
-			cin >> statPortStr;
+			*in >> dataPortStr;
+			*in >> statPortStr;
 			startIOPrint(context, parseAddress(dataPortStr), parseAddress(statPortStr));
-		}
+			}*/
 		HANDLE_INPUT_OPTION(memory, m)
 		{
 			string addressStr;
 			string sizeStr;
-			cin >> addressStr;
-			cin >> sizeStr;
+			*in >> addressStr;
+			*in >> sizeStr;
 
 			int address = parseAddress(addressStr);
 			int size = parseAddress(sizeStr);
@@ -447,6 +498,10 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 			}
 		}
 	HANDLE_INPUT_END();
+	if(file.is_open())
+	{
+	    file.close();
+	}
 
 	// Remove all the memory allocated
 	Memory* mem = g_state.memory;
