@@ -49,7 +49,6 @@ typedef struct _tlvmProcessorData
 {
     tlvmCpuId         m_ProcessorID;
     tlvmInterruptFn   m_Interrupt;
-    tlvmInstruction*  m_InstructionSet;
 } tlvmProcessorData;
 
 /***************************************
@@ -60,6 +59,9 @@ struct _tlvmContext
 {
     // global Processor definition
     tlvmProcessorData* m_ProcessorData;
+
+    // current instruction set for this CPU
+    tlvmInstruction*  m_InstructionSet;
 
     // Attached memory
     tlvmMemoryBuffer* m_Memory;

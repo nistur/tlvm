@@ -94,6 +94,7 @@ tlvmReturn tlvm6800Init(tlvmContext** context)
     (*context)->m_Registers = cpu->m_Registers;
     (*context)->m_WideRegisters = cpu->m_WideRegisters;
     (*context)->m_Ports = cpu->m_Ports;
+    (*context)->m_InstructionSet = g_6800Data.m_InstructionSet;
 
     TLVM_RETURN_CODE(SUCCESS);
 }
@@ -101,7 +102,6 @@ tlvmReturn tlvm6800Init(tlvmContext** context)
 void tlvm6800SetupData()
 {
     g_6800Data.m_Header.m_ProcessorID = TLVM_CPU_6800;
-    g_6800Data.m_Header.m_InstructionSet = g_6800Data.m_InstructionSet;
 
     TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, NOP);
     TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TAP, TRA);

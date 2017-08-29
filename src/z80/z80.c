@@ -13,6 +13,7 @@ tlvmReturn tlvmZ80Init(tlvmContext** context)
     if(g_Z80Data.m_Header.m_ProcessorID == 0)
         tlvmZ80SetupData();
  
+    (*context)->m_InstructionSet = g_Z80Data.m_InstructionSet;
 
     TLVM_RETURN_CODE(SUCCESS);
 }
@@ -29,7 +30,6 @@ void tlvmZ80SetupData()
     tlvmAdd8080Instructions(g_Z80Data.m_InstructionSet);
     tlvmAddZ80Instructions(g_Z80Data.m_InstructionSet);
     
-    g_Z80Data.m_Header.m_InstructionSet = g_Z80Data.m_InstructionSet;
 }
 
 
