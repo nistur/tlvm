@@ -267,5 +267,7 @@ extern const char* g_tlvmStatusMessages[];
     if(x == 0) TLVM_RETURN_CODE(ret);
 #endif/*TLVM_UNSAFE*/
 
+// todo: make sure this define works for all comilers
+#define FALLTHROUGH __attribute__ ((fallthrough))
 
 #endif/*__TLVM_INTERNAL_H__*/

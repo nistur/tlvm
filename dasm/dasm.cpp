@@ -66,7 +66,7 @@ struct Instruction
     tlvmShort    size;
     tlvmChar     output[256];
     int          flags;
-    tlvmChar     label[8];
+    tlvmChar     label[16];
     Instruction* dest;
 };
 
@@ -264,7 +264,7 @@ tlvmReturn step(tlvmContext* context, tlvmShort address)
 }
 
 #define PAD(l, w) \
-    while(strlen(l) < w) sprintf(l,"%s ", l);
+    while(strlen(l) < (unsigned int)w) sprintf(l,"%s ", l);
 
 void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::ostream& stream)
 {
@@ -285,7 +285,7 @@ void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::o
                 sprintf(line, "%s%c", line, c >= 0x20 ? c : '.');
             }
             stream << line << std::endl;
-            sprintf(line, "");
+            line[0] = 0;//sprintf(line, "");
         }
         PAD(line, 8+((i%8)*8));
         sprintf(line, "%s0x%.02X", line, dat[i]);
@@ -300,7 +300,7 @@ void printMemory(tlvmContext* context, tlvmShort address, tlvmShort size, std::o
                 sprintf(line, "%s%c", line, c >= 0x20 ? c : '.');
             }
             stream << line << std::endl;
-            sprintf(line, "");
+            line[0] = 0;//sprintf(line, "");
         }
     }
 

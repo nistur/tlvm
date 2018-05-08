@@ -37,36 +37,43 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     {
     case TLVM_ADC_B:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_B:
         src = &context->m_Registers[TLVM_8080_REG_B];
     break;
     case TLVM_ADC_C:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_C:
         src = &context->m_Registers[TLVM_8080_REG_C];
     break;
     case TLVM_ADC_D:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_D:
         src = &context->m_Registers[TLVM_8080_REG_D];
     break;
     case TLVM_ADC_E:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_E:
         src = &context->m_Registers[TLVM_8080_REG_E];
     break;
     case TLVM_ADC_H:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_H:
         src = &context->m_Registers[TLVM_8080_REG_H];
     break;
     case TLVM_ADC_L:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_L:
         src = &context->m_Registers[TLVM_8080_REG_L];
     break;
     case TLVM_ADC_M:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_M:
         {
             tlvmShort addr = TLVM_GET_16BIT(TLVM_8080_REG_H, TLVM_8080_REG_L);
@@ -75,6 +82,7 @@ tlvmReturn tlvmADD(tlvmContext* context, tlvmByte* cycles)
     break;
     case TLVM_ADC_A:
         carry = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	FALLTHROUGH;
     case TLVM_ADD_A:
         src = &context->m_Registers[TLVM_8080_REG_A];
     break;

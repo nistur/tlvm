@@ -38,26 +38,26 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
-	if(context->m_IOCallback != NULL)
-		context->m_IOCallback(context, dest);
-
-	TLVM_RETURN_CODE(SUCCESS);
+    if(context->m_IOCallback != NULL)
+	context->m_IOCallback(context, dest);
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
-	TLVM_GET_OP(dest, 1);
-
-	context->m_Registers[TLVM_8080_REG_A] = context->m_InputPorts[dest];
-
+    TLVM_GET_OP(dest, 1);
+    
+    context->m_Registers[TLVM_8080_REG_A] = context->m_InputPorts[dest];
+    
     // size of instruction    = 1
     // size of operand        = 1
     context->m_ProgramCounter += 2;
     if(cycles)
     	*cycles =10;
-
-	TLVM_RETURN_CODE(SUCCESS);
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/
