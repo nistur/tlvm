@@ -93,7 +93,7 @@ tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)
 
     tlvmBool  willInterrupt = TLVM_FALSE;
     tlvmShort addr = 0;
-
+    
     if(interrupt == TLVM_INTERRUPT_RESET)
     {
         TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_RESET);

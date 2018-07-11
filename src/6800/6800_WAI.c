@@ -33,18 +33,8 @@ TLVM_6800_INSTRUCTION(WAI, 9, 0,
     TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_B));
     TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_F));
     
-    if(TLVM_FLAG_ISSET(I, 6800))
-    {
-        // stall the CPU
-        TLVM_RETURN_CODE(STALL);
-    }
-    else
-    {
-        TLVM_FLAG_SET(I, 6800);
-        
-        TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_RESET);
-        context->m_ProgramCounter = interrupt;
-    }
+    // stall the CPU
+    TLVM_RETURN_CODE(STALL);
 })
 
 #endif/*TLVM_HAS_6800*/
