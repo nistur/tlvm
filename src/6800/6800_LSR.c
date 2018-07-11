@@ -24,38 +24,33 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800LSR(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(LSR_A,
+		       2, /* Cycles */
+		       1, /* Instruction length */
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_REGISTER(TLVM_6800_REG_A) <<= 1;
+})
 
-    TLVM_GET_OP(opcode, 0);
+TLVM_6800_INSTRUCTION(LSR_B,
+		       2, /* Cycles */
+		       1, /* Instruction length */
+{
+    TLVM_REGISTER(TLVM_6800_REG_B) <<= 1;
+})
 
-    tlvmByte cycleCount = 1;
-    tlvmByte length = 1;
-    if(opcode == TLVM_6800_LSRA)
-    {
-        TLVM_REGISTER(TLVM_6800_REG_A) <<= 1;
-    }
-    else if(opcode == TLVM_6800_LSRB)
-    {
-        TLVM_REGISTER(TLVM_6800_REG_B) <<= 1;
-    }
-    else if(opcode == TLVM_6800_LSRdX)
-    {
-        length = 2;
-        cycleCount = 6;
-    }
-    else if(opcode == TLVM_6800_LSRmm)
-    {
-        length = 3;
-        cycleCount = 6;
-    }
+TLVM_6800_INSTRUCTION(LSR_I, 
+		       2, /* Cycles */
+		       2, /* Instruction length */
+{
+    TLVM_6800_GET_MEM_INDEXED(mem);
+    *mem <<= 1;
+})
 
-    context->m_ProgramCounter += length;
-    if(cycles)
-        *cycles = cycleCount;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
-
+TLVM_6800_INSTRUCTION(LSR_E,
+		       2, /* Cycles */
+		       3, /* Instruction length */
+{
+    TLVM_6800_GET_MEM_EXTENDED(mem);
+    *mem <<= 1;
+})
 #endif/*TLVM_HAS_6800*/

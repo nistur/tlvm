@@ -24,30 +24,16 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800ADD(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(ABA, 2, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    context->m_ProgramCounter += 1;
-
-    TLVM_GET_OP(opcode, 0);
-
     tlvmShort val = 0;
-    if(opcode == TLVM_6800_ABA)
-    {
-        val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A) + (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
-        TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmByte)val;
-    }
+    val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A) + (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmByte)val;
 
     TLVM_FLAG_SET_IF(val&0x00FF, Z, 6800);
     TLVM_FLAG_SET_IF(val&0xFF00, C, 6800);
     TLVM_FLAG_SET_IF(val&0xFF00, V, 6800);
     TLVM_FLAG_SET_IF(val&0x0080, N, 6800);
-    
-    if(cycles)
-        *cycles = 2;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+})
 
 #endif/*TLVM_HAS_6800*/

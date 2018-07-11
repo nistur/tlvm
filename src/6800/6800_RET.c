@@ -24,32 +24,18 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800RTS(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(RTS, 5, 0,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
     TLVM_POP_PC();
-    
-    if(cycles)
-        *cycles = 5;
+})
 
-    TLVM_RETURN_CODE(SUCCESS);
-}
-
-tlvmReturn tlvm6800RTI(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(RTI, 5, 0,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
     TLVM_STACK_POP(TLVM_REGISTER(TLVM_6800_REG_F));
     TLVM_STACK_POP(TLVM_REGISTER(TLVM_6800_REG_B));
     TLVM_STACK_POP(TLVM_REGISTER(TLVM_6800_REG_A));
     TLVM_STACK_POP16(TLVM_REGISTER16(TLVM_6800_REG16_IX));
     TLVM_POP_PC();
-    
-    if(cycles)
-        *cycles = 5;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+})
 
 #endif/*TLVM_HAS_6800*/

@@ -24,29 +24,14 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800PSH(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(PSH_A, 4, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-    
-    TLVM_GET_OP(opcode, 0);
-    
-    context->m_ProgramCounter += 1;
-    
-    tlvmByte val = 0;
-    if(opcode == TLVM_6800_PSHA)
-    {
-        val = TLVM_REGISTER(TLVM_6800_REG_A);
-    }
-    else if(opcode == TLVM_6800_PSHB)
-    {
-        val = TLVM_REGISTER(TLVM_6800_REG_B);
-    }
-    TLVM_STACK_PUSH(val);
+    TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_A));
+})
 
-    if(cycles)
-        *cycles = 4;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(PSH_B, 4, 1,
+{
+    TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_B));
+})
 
 #endif/*TLVM_HAS_6800*/

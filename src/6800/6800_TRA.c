@@ -24,27 +24,34 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800TRA(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(TAP, 2, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_REGISTER(TLVM_6800_REG_F) = TLVM_REGISTER(TLVM_6800_REG_A);
+})
 
-    TLVM_GET_OP(opcode, 0);
+TLVM_6800_INSTRUCTION(TPA, 2, 1,
+{
+     TLVM_REGISTER(TLVM_6800_REG_A) = TLVM_REGISTER(TLVM_6800_REG_F);
+})
 
-    if(opcode == TLVM_6800_TAP)
-        TLVM_REGISTER(TLVM_6800_REG_F) = TLVM_REGISTER(TLVM_6800_REG_A);
-    else if(opcode == TLVM_6800_TPA)
-        TLVM_REGISTER(TLVM_6800_REG_A) = TLVM_REGISTER(TLVM_6800_REG_F);
-    else if(opcode == TLVM_6800_TSX)
-        TLVM_REGISTER16(TLVM_6800_REG16_IX) = context->m_StackPointer;
-    else if(opcode == TLVM_6800_TXS)
-        context->m_StackPointer = TLVM_REGISTER16(TLVM_6800_REG16_IX);
+TLVM_6800_INSTRUCTION(TAB, 2, 1,
+{
+    TLVM_REGISTER(TLVM_6800_REG_B) = TLVM_REGISTER(TLVM_6800_REG_A);
+})
 
-    context->m_ProgramCounter += 1;
+TLVM_6800_INSTRUCTION(TBA, 2, 1,
+{
+    TLVM_REGISTER(TLVM_6800_REG_A) = TLVM_REGISTER(TLVM_6800_REG_B);
+})
 
-    if(cycles)
-        *cycles = 2;
+TLVM_6800_INSTRUCTION(TSX, 4, 1,
+{
+    TLVM_REGISTER16(TLVM_6800_REG16_IX) = context->m_StackPointer;
+})
 
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(TXS, 4, 1,
+{
+    context->m_StackPointer = TLVM_REGISTER16(TLVM_6800_REG16_IX);
+})
 
 #endif/*TLVM_HAS_6800*/

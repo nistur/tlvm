@@ -24,24 +24,19 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800SET(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(SEC, 4, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_FLAG_SET(C, 6800);
+})
 
-    TLVM_GET_OP(opcode, 0);
+TLVM_6800_INSTRUCTION(SEI, 4, 1,
+{
+    TLVM_FLAG_SET(I, 6800);
+})
 
-    if(opcode == TLVM_6800_SEC)
-        TLVM_FLAG_SET(C, 6800);
-    if(opcode == TLVM_6800_SEI)
-        TLVM_FLAG_SET(I, 6800);
-    if(opcode == TLVM_6800_SEV)
-        TLVM_FLAG_SET(V, 6800);
-
-    context->m_ProgramCounter += 1;
-    if(cycles)
-        *cycles = 2;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(SEV, 4, 1,
+{
+    TLVM_FLAG_SET(V, 6800);
+})
 
 #endif/*TLVM_HAS_6800*/

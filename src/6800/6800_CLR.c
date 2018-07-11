@@ -24,24 +24,19 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800CLR(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(CLC, 2, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    TLVM_FLAG_UNSET(C, 6800);
+})
 
-    TLVM_GET_OP(opcode, 0);
-    
-    if(opcode == TLVM_6800_CLC)
-        TLVM_FLAG_UNSET(C, 6800);
-    if(opcode == TLVM_6800_CLI)
-        TLVM_FLAG_UNSET(I, 6800);
-    if(opcode == TLVM_6800_CLV)
-        TLVM_FLAG_UNSET(V, 6800);
-    
-    context->m_ProgramCounter += 1;
-    if(cycles)
-        *cycles = 2;
+TLVM_6800_INSTRUCTION(CLI, 2, 1,
+{
+    TLVM_FLAG_UNSET(I, 6800);
+})
 
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(CLV, 2, 1,
+{
+    TLVM_FLAG_UNSET(V, 6800);
+})
 
 #endif/*TLVM_HAS_6800*/

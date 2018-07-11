@@ -24,13 +24,9 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800DAA(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(DAA, 2, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    context->m_ProgramCounter += 1;
-
-    tlvmShort val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A);;
+    tlvmShort val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A);
 
     tlvmByte nibbleLo = val & 0x0F;
     tlvmByte nibbleHi = (val & 0xF0)>>4;
@@ -55,11 +51,6 @@ tlvmReturn tlvm6800DAA(tlvmContext* context, tlvmByte* cycles)
 
     
     TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmByte)(val & 0xFF);
-    
-    if(cycles)
-        *cycles = 2;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+})
 
 #endif/*TLVM_HAS_6800*/

@@ -201,9 +201,9 @@ struct _tlvmMemoryBuffer
 #define TLVM_GET_MEMORY(val, addr)                                      \
     tlvmByte val = 0;                                                   \
     {                                                                   \
-        tlvmByte* mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);   \
-        if(mem != 0)                                                    \
-            val = *mem;                                                 \
+        tlvmByte* _mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);	\
+        if(_mem != 0)							\
+            val = *_mem;						\
     }
 // TODO: This doesn't take processor endianness into account
 #define TLVM_GET_MEMORY16(val, addr)            \
@@ -259,5 +259,10 @@ extern const char* g_tlvmStatusMessages[];
     if(x == 0) TLVM_RETURN_CODE(ret);
 #endif/*TLVM_UNSAFE*/
 
+#ifdef TLVM_CYCLE_ACCURATE
+# define TLVM_TICK(ticks) if(cycles) { *cycles += ticks; }
+#else/*!TLVM_CYCLE_ACCURATE*/
+# define TLVM_TICK(ticks)
+#endif
 
 #endif/*__TLVM_INTERNAL_H__*/

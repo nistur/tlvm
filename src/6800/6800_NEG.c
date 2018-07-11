@@ -24,61 +24,46 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800NEG(tlvmContext* context, tlvmByte* cycles)
+#define SET_FLAGS(_val)				\
+TLVM_FLAG_SET_IF(_val &  0x0080, N, 6800);	\
+TLVM_FLAG_SET_IF(_val == 0x0000, Z, 6800);	\
+TLVM_FLAG_SET_IF(_val &  0xFF00, C, 6800);	\
+TLVM_FLAG_SET(V, 6800); 
+
+TLVM_6800_INSTRUCTION(NEG_A, 2, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    tlvmShort val = -(tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A);
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmByte)val & 0xFF;
 
-    TLVM_GET_OP(opcode, 0);
+    SET_FLAGS(val);
+})
 
+TLVM_6800_INSTRUCTION(NEG_B, 2, 1,
+{
+    tlvmShort val = -(tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
+    TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmByte)val & 0xFF;
+
+    SET_FLAGS(val);
+})
+
+TLVM_6800_INSTRUCTION(NEG_I, 2, 2,
+{
     tlvmShort val = 0;
-    tlvmByte length = 1;
-    tlvmByte count = 2;
-    if(opcode == TLVM_6800_NEGA)
-    {
-        val = -(tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A);
-        TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmByte)val & 0xFF;
-    }
-    else if(opcode == TLVM_6800_NEGB)
-    {
-        val = -(tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
-        TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmByte)val & 0xFF;
-    }
-    else if(opcode == TLVM_6800_NEGX)
-    {
-        TLVM_6800_GET_ADDR_EXTENDED(addr);
-        tlvmByte* mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
-        if(mem != 0)
-        {
-            val = -(tlvmShort)*mem;
-            *mem = (tlvmByte)val & 0xFF;
-        }
-        length = 3;
-        count = 6;
-    }
-    else if(opcode == TLVM_6800_NEGE)
-    {
-        TLVM_6800_GET_ADDR_INDEXED(addr);
-        tlvmByte* mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
-        if(mem != 0)
-        {
-            val = -(tlvmShort)*mem;
-            *mem = (tlvmByte)val & 0xFF;
-        }
-        length = 1;
-        count = 7;
-    }
+    TLVM_6800_GET_MEM_EXTENDED(mem);
+    val = -(tlvmShort)*mem;
+    *mem = (tlvmByte)val & 0xFF;
+    
+    SET_FLAGS(val);
+})
 
-    TLVM_FLAG_SET_IF(val &  0x0080, N, 6800);
-    TLVM_FLAG_SET_IF(val == 0x0000, Z, 6800);
-    TLVM_FLAG_SET_IF(val &  0xFF00, C, 6800);
-    TLVM_FLAG_SET(V, 6800); // I'm not sure about this... but I think this should always be true here?
-
-    context->m_ProgramCounter += length;
-
-    if(cycles)
-        *cycles = count;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(NEG_E, 2, 3,
+{
+    tlvmShort val = 0;
+    TLVM_6800_GET_MEM_EXTENDED(mem);
+    val = -(tlvmShort)*mem;
+    *mem = (tlvmByte)val & 0xFF;
+    
+    SET_FLAGS(val);
+})
 
 #endif/*TLVM_HAS_6800*/

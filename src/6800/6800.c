@@ -24,70 +24,34 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-TLVM_INSTRUCTION_DEFINE(6800, NOP,   0x01);
-TLVM_INSTRUCTION_DEFINE(6800, TAP,   0x06);
-TLVM_INSTRUCTION_DEFINE(6800, TPA,   0x07);
-TLVM_INSTRUCTION_DEFINE(6800, INX,   0x08);
-TLVM_INSTRUCTION_DEFINE(6800, DEX,   0x09);
-TLVM_INSTRUCTION_DEFINE(6800, CLV,   0x0A);
-TLVM_INSTRUCTION_DEFINE(6800, SEV,   0x0B);
-TLVM_INSTRUCTION_DEFINE(6800, CLC,   0x0C);
-TLVM_INSTRUCTION_DEFINE(6800, SEC,   0x0D);
-TLVM_INSTRUCTION_DEFINE(6800, CLI,   0x0E);
-TLVM_INSTRUCTION_DEFINE(6800, SEI,   0x0F);
+tlvmReturn tlvm6800NOP(tlvmContext* ctx, tlvmByte* cycles);
 
-TLVM_INSTRUCTION_DEFINE(6800, SBA,   0x10);
-TLVM_INSTRUCTION_DEFINE(6800, CBA,   0x11);
-TLVM_INSTRUCTION_DEFINE(6800, TAB,   0x16);
-TLVM_INSTRUCTION_DEFINE(6800, TBA,   0x17);
-TLVM_INSTRUCTION_DEFINE(6800, DAA,   0x19);
-TLVM_INSTRUCTION_DEFINE(6800, ABA,   0x1B);
+#define ______ NULL
+#define _(_X) tlvm6800##_X /* Standard instruction */
+#define A(_X) _(_X##_A)    /* Instruction on A accumulator */
+#define B(_X) _(_X##_B)    /* Instruction on B accumulator */
+#define I(_X) _(_X##_I)    /* Indexed address */
+#define E(_X) _(_X##_E)    /* Extended address */
 
-TLVM_INSTRUCTION_DEFINE(6800, BRA,   0x20);
-TLVM_INSTRUCTION_DEFINE(6800, BHI,   0x22);
-TLVM_INSTRUCTION_DEFINE(6800, BLS,   0x23);
-TLVM_INSTRUCTION_DEFINE(6800, BCC,   0x24);
-TLVM_INSTRUCTION_DEFINE(6800, BCS,   0x25);
-TLVM_INSTRUCTION_DEFINE(6800, BNE,   0x26);
-TLVM_INSTRUCTION_DEFINE(6800, BEQ,   0x27);
-TLVM_INSTRUCTION_DEFINE(6800, BVC,   0x28);
-TLVM_INSTRUCTION_DEFINE(6800, BVS,   0x29);
-TLVM_INSTRUCTION_DEFINE(6800, BPL,   0x2A);
-TLVM_INSTRUCTION_DEFINE(6800, BMI,   0x2B);
-TLVM_INSTRUCTION_DEFINE(6800, BGE,   0x2C);
-TLVM_INSTRUCTION_DEFINE(6800, BLT,   0x2D);
-TLVM_INSTRUCTION_DEFINE(6800, BGT,   0x2E);
-TLVM_INSTRUCTION_DEFINE(6800, BLE,   0x2F);
-
-TLVM_INSTRUCTION_DEFINE(6800, TSX,   0x30);
-TLVM_INSTRUCTION_DEFINE(6800, PULA,  0x32);
-TLVM_INSTRUCTION_DEFINE(6800, PULB,  0x33);
-TLVM_INSTRUCTION_DEFINE(6800, INS,   0x31);
-TLVM_INSTRUCTION_DEFINE(6800, DES,   0x34);
-TLVM_INSTRUCTION_DEFINE(6800, TXS,   0x35);
-TLVM_INSTRUCTION_DEFINE(6800, PSHA,  0x36);
-TLVM_INSTRUCTION_DEFINE(6800, PSHB,  0x37);
-TLVM_INSTRUCTION_DEFINE(6800, RTS,   0x39);
-TLVM_INSTRUCTION_DEFINE(6800, RTI,   0x3B);
-TLVM_INSTRUCTION_DEFINE(6800, WAI,   0x3E);
-TLVM_INSTRUCTION_DEFINE(6800, SWI,   0x3F);
-
-TLVM_INSTRUCTION_DEFINE(6800, NEGA,  0x40);
-TLVM_INSTRUCTION_DEFINE(6800, COMA,  0x41);
-
-TLVM_INSTRUCTION_DEFINE(6800, NEGB,  0x50);
-TLVM_INSTRUCTION_DEFINE(6800, COMB,  0x51);
-
-TLVM_INSTRUCTION_DEFINE(6800, NEGX,  0x60);
-TLVM_INSTRUCTION_DEFINE(6800, COMX,  0x61);
-
-TLVM_INSTRUCTION_DEFINE(6800, NEGE,  0x70);
-TLVM_INSTRUCTION_DEFINE(6800, COME,  0x71);
-
-TLVM_INSTRUCTION_DEFINE(6800, LSRA,  0x44);
-TLVM_INSTRUCTION_DEFINE(6800, LSRB,  0x54);
-TLVM_INSTRUCTION_DEFINE(6800, LSRdX, 0x64);
-TLVM_INSTRUCTION_DEFINE(6800, LSRmm, 0x74);
+tlvmInstruction g_6800InstructionSet[] =  {
+/*             0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F */
+    /* 0 */ ______,_(NOP),______,______,______,______,_(TAP),_(TPA),_(INX),_(DEX),_(CLV),_(SEV),_(CLC),_(SEC),_(CLI),_(SEI),
+    /* 1 */ _(SBA),______,______,______,______,______,_(TAB),_(TBA),______,_(DAA),______,_(ABA),______,______,______,______,
+    /* 2 */ _(BRA),______,_(BHI),_(BLS),_(BCC),_(BCS),_(BNE),_(BEQ),_(BVC),_(BVS),_(BPL),_(BMI),_(BGE),_(BLT),_(BGT),_(BLE),
+    /* 3 */ _(TSX),_(INS),A(PUL),B(PUL),_(DES),_(TXS),A(PSH),B(PSH),______,_(RTS),______,_(RTI),______,______,_(WAI),_(SWI),
+    /* 4 */ A(NEG),______,______,A(COM),A(LSR),______,______,______,______,______,A(DEC),______,A(INC),______,______,______,
+    /* 5 */ B(NEG),______,______,B(COM),B(LSR),______,______,______,______,______,B(DEC),______,B(INC),______,______,______,
+    /* 6 */ I(NEG),______,______,I(COM),I(LSR),______,______,______,______,______,I(DEC),______,I(INC),______,______,______,
+    /* 7 */ E(NEG),______,______,E(COM),E(LSR),______,______,______,______,______,E(DEC),______,E(INC),______,______,______,
+    /* 8 */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* 9 */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* A */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* B */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* C */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* D */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* E */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
+    /* F */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______
+};
 
 tlvmProcessorData_6800 g_6800Data;
 
@@ -113,74 +77,11 @@ tlvmReturn tlvm6800Init(tlvmContext** context)
 void tlvm6800SetupData()
 {
     g_6800Data.m_Header.m_ProcessorID = TLVM_CPU_6800;
+    g_6800Data.m_InstructionSet = g_6800InstructionSet;
     g_6800Data.m_Header.m_InstructionSet = g_6800Data.m_InstructionSet;
 
     g_6800Data.m_Header.m_Interrupt = tlvm6800Interrupt;
-    
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, NOP);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TAP, TRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TPA, TRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, INX, INC);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, DEX, DEC);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, CLV, CLR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, SEV, SET);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, CLC, CLR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, SEC, SET);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, CLI, CLR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, SEI, SET);
 
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, SBA, SUB);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, CBA, CMP);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TAB, TRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TBA, TRA);
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, DAA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, ABA, ADD);
-    
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BRA, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BHI, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BLS, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BCC, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BCS, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BNE, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BEQ, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BVC, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BVS, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BPL, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BMI, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BGE, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BLT, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BGT, BRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, BLE, BRA);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TSX, TRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, PULA, PUL);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, PULB, PUL);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, INS, INC);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, DES, DEC);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, TXS, TRA);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, PSHA, PSH);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, PSHB, PSH);
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, RTS);
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, RTI);
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, WAI);
-    TLVM_INSTRUCTION_ADD          (g_6800Data.m_InstructionSet, 6800, SWI);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, NEGA, NEG);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, COMA, COM);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, NEGB, NEG);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, COMB, COM);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, NEGX, NEG);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, COMX, COM);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, NEGE, NEG);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, COME, COM);
-
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRA,  LSR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRB,  LSR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRdX, LSR);
-    TLVM_INSTRUCTION_ADD_VARIATION(g_6800Data.m_InstructionSet, 6800, LSRmm, LSR);
 }
 
 tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)

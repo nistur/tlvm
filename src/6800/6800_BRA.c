@@ -28,95 +28,159 @@ nistur@gmail.com
 #define OR(a,b)  (a || b)
 #define AND(a,b) (a && b)
 
-tlvmReturn tlvm6800BRA(tlvmContext* context, tlvmByte* cycles)
-{
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+#define FLAG(x) ( TLVM_FLAG_ISSET(x, 6800) ? TLVM_TRUE : TLVM_FALSE )
 
-    TLVM_GET_OP(opcode, 0);
-    TLVM_GET_OP(address, 1);
-    
+#define BRANCH_BASE()			\
+    TLVM_GET_OP(opcode, 0);		\
+    TLVM_GET_OP(address, 1);		\
     context->m_ProgramCounter += 2;
 
-    tlvmBool z = TLVM_FLAG_ISSET(Z, 6800) ? TLVM_TRUE : TLVM_FALSE;
-    tlvmBool n = TLVM_FLAG_ISSET(N, 6800) ? TLVM_TRUE : TLVM_FALSE;
-    tlvmBool v = TLVM_FLAG_ISSET(V, 6800) ? TLVM_TRUE : TLVM_FALSE;
-    tlvmBool c = TLVM_FLAG_ISSET(C, 6800) ? TLVM_TRUE : TLVM_FALSE;
 
-    if(opcode == TLVM_6800_BRA)
-    {
-        context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BHI)
-    {
-        if(OR(c, !v))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BLS)
-    {
-        if(OR(c,v))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BCC)
-    {
-        if(!c)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BNE)
-    {
-        if(!z)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BEQ)
-    {
-        if(z)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BVC)
-    {
-        if(!v)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BVS)
-    {
-        if(v)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BPL)
-    {
-        if(!n)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BMI)
-    {
-        if(n)
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BGE)
-    {
-        if(!XOR(n,v))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BLT)
-    {
-        if(XOR(n,v))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BGT)
-    {
-        if(OR(z, XOR(n,v)))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
-    else if(opcode == TLVM_6800_BLE)
-    {
-        if(!OR(z, XOR(n,v)))
-            context->m_ProgramCounter += (tlvmSByte)address;
-    }
+TLVM_6800_INSTRUCTION(BRA, 4, 0,
+{
+    BRANCH_BASE();
+    
+    context->m_ProgramCounter += (tlvmSByte)address;
+})
 
+TLVM_6800_INSTRUCTION(BHI, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( OR( FLAG(C), !FLAG(V) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
 
-    if(cycles)
-        *cycles = 4;
+TLVM_6800_INSTRUCTION(BLS, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( OR( FLAG(C), FLAG(V) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
 
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(BCS, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( FLAG(C) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BCC, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !FLAG(C) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BNE, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !FLAG(Z) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BEQ, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( FLAG(Z) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BVC, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !FLAG(V) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BVS, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( FLAG(Z) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BPL, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !FLAG(N) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BMI, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( FLAG(N) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BGE,4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !XOR( FLAG(N), FLAG(V) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BLT, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( XOR( FLAG(N), FLAG(V) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BGT, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( OR(FLAG(Z), XOR( FLAG(N), FLAG(V) ) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
+
+TLVM_6800_INSTRUCTION(BLE, 4, 0,
+{
+    BRANCH_BASE();
+    
+    if( !OR( FLAG(Z), XOR( FLAG(N), FLAG(V) ) ) )
+    {
+	context->m_ProgramCounter += (tlvmSByte)address;
+    }
+})
 
 #endif/*TLVM_HAS_6800*/

@@ -335,8 +335,8 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 	g_state.quit = false;
 
 	tlvmContext* context;
-	tlvmInitContext(&context, TLVM_CPU_8080);
-	tlvmSetClockspeed(context, TLVM_MHZ(2,0));
+	tlvmInitContext(&context, TLVM_CPU_6800);
+	tlvmSetClockspeed(context, TLVM_MHZ(1,0));
 
 	HANDLE_INPUT_START();
 		HANDLE_INPUT_OPTION(quit, q)
@@ -352,7 +352,7 @@ int main(int UNUSED(argc), char** UNUSED(argv))
 			cin >> addressStr;
 			address = parseAddress(addressStr);
 
-			if(tlvmSetMemory(context, (tlvmByte*)file, address, size, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
+			if(tlvmSetMemory(context, (tlvmByte*)file, address, size - 1, TLVM_FLAG_READ | TLVM_FLAG_WRITE) != TLVM_SUCCESS)
 			{
 				delete[] file;
 			}

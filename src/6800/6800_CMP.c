@@ -24,29 +24,50 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800CMP(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(CMP, 2, 2,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    context->m_ProgramCounter += 1;
-
     TLVM_GET_OP(opcode, 0);
+    TLVM_GET_OP(op1, 1);
+    
+    tlvmShort val = (tlvmShort)TLVM_REGISTER( (opcode & 0x40) == 0x00 ? TLVM_6800_REG_A : TLVM_6800_REG_B );
+    tlvmByte imm = (opcode & 0x30) == 0x00;
+    tlvmByte dir = (opcode & 0x30) == 0x10;
+    tlvmByte idx = (opcode & 0x30) == 0x20;
+    tlvmByte ext = (opcode & 0x30) == 0x30;
 
-    tlvmShort val = 0;
-    if(opcode == TLVM_6800_SBA)
+    if( !imm )
     {
-        val = (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_A) - (tlvmShort)TLVM_REGISTER(TLVM_6800_REG_B);
+	tlvmShort addr = 0;
+
+	if(idx)
+	{
+	    TLVM_6800_GET_ADDR_INDEXED(val);
+	    addr = val;
+	}
+	else if(dir)
+	{
+	    addr = op1;
+	}
+	else if(ext)
+	{
+	    context->m_ProgramCounter += 1;
+	    
+	    TLVM_GET_OP(msb, 2);
+	    addr = (tlvmShort)(op1) | (tlvmShort)(msb << 8);
+	}
+	
+	TLVM_GET_MEMORY(mem, addr);
+	op1 = mem;
+
+	
     }
+    
+    val = val - op1;
 
     TLVM_FLAG_SET_IF(val&0x00FF, Z, 6800);
     TLVM_FLAG_SET_IF(val&0xFF00, C, 6800);
     TLVM_FLAG_SET_IF(val&0xFF00, V, 6800);
     TLVM_FLAG_SET_IF(val&0x0080, N, 6800);
-    
-    if(cycles)
-        *cycles = 2;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+})
 
 #endif/*TLVM_HAS_6800*/

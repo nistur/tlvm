@@ -24,12 +24,8 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800SWI(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(SWI, 9, 0,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
-
-    context->m_ProgramCounter += 1;
-
     TLVM_STACK_PUSH16(context->m_ProgramCounter);
     TLVM_STACK_PUSH16(TLVM_REGISTER16(TLVM_6800_REG16_IX));
     TLVM_STACK_PUSH(TLVM_REGISTER(TLVM_6800_REG_A));
@@ -42,11 +38,6 @@ tlvmReturn tlvm6800SWI(tlvmContext* context, tlvmByte* cycles)
     context->m_ProgramCounter = interrupt;
 
     context->m_Interrupts = TLVM_INTERRUPT_SWI;
-    
-    if(cycles)
-        *cycles = 9;
-
-    TLVM_RETURN_CODE(SUCCESS);
-}
+})
 
 #endif/*TLVM_HAS_6800*/

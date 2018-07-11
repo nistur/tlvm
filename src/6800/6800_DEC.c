@@ -24,27 +24,38 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-tlvmReturn tlvm6800DEC(tlvmContext* context, tlvmByte* cycles)
+TLVM_6800_INSTRUCTION(DEX, 4, 1,
 {
-    TLVM_NULL_CHECK(context, NO_CONTEXT);
+    tlvmShort val = TLVM_REGISTER16(TLVM_6800_REG16_IX) - 1;
+    TLVM_REGISTER16(TLVM_6800_REG16_IX) = val;
+    TLVM_FLAG_SET_IF(val, Z, 6800);
+})
 
-    TLVM_GET_OP(opcode, 0);
+TLVM_6800_INSTRUCTION(DES, 4, 1,
+{
+    context->m_StackPointer -= 1;
+})
 
-    if(opcode == TLVM_6800_DEX)
-    {
-        tlvmShort val = TLVM_REGISTER16(TLVM_6800_REG16_IX) - 1;
-        TLVM_REGISTER16(TLVM_6800_REG16_IX) = val;
-        TLVM_FLAG_SET_IF(val, Z, 6800);
-    }
-    else if(opcode == TLVM_6800_DES)
-        context->m_StackPointer -= 1;
+TLVM_6800_INSTRUCTION(DEC_A, 4, 1,
+{
+    TLVM_REGISTER(TLVM_6800_REG_A) -= 1;
+})
 
-    context->m_ProgramCounter += 1;
+TLVM_6800_INSTRUCTION(DEC_B, 4, 1,
+{
+    TLVM_REGISTER(TLVM_6800_REG_B) -= 1;
+})
 
-    if(cycles)
-        *cycles = 4; 
+TLVM_6800_INSTRUCTION(DEC_I, 4, 2,
+{
+    TLVM_6800_GET_MEM_INDEXED(mem);
+    *mem -= 1;
+})
 
-    TLVM_RETURN_CODE(SUCCESS);
-}
+TLVM_6800_INSTRUCTION(DEC_E, 4, 3,
+{
+    TLVM_6800_GET_MEM_EXTENDED(mem);
+    *mem -= 1;
+})
 
 #endif/*TLVM_HAS_6800*/
