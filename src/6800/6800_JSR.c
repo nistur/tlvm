@@ -34,7 +34,7 @@ TLVM_6800_INSTRUCTION(JSR_I, 8, 0,
 
 TLVM_6800_INSTRUCTION(JSR_E, 8, 0,
 {
-    context->m_ProgramCounter += 2;
+    context->m_ProgramCounter += 3;
 
     TLVM_6800_GET_ADDR_EXTENDED(addr);    
     TLVM_PUSH_PC(addr);
