@@ -38,7 +38,7 @@ TLVM_6800_INSTRUCTION(LSR_B,
     TLVM_REGISTER(TLVM_6800_REG_B) <<= 1;
 })
 
-TLVM_6800_INSTRUCTION(LSR_I, 
+TLVM_6800_INSTRUCTION(LSR_X, 
 		       2, /* Cycles */
 		       2, /* Instruction length */
 {

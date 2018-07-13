@@ -24,19 +24,17 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-TLVM_6800_INSTRUCTION(JSR_I, 8, 0,
+TLVM_6800_INSTRUCTION(JSR_X, 8, 0,
 {
-    context->m_ProgramCounter += 2;
-
     TLVM_6800_GET_ADDR_INDEXED(addr);
+    context->m_ProgramCounter += 2;
     TLVM_PUSH_PC(addr);
 })
 
 TLVM_6800_INSTRUCTION(JSR_E, 8, 0,
 {
-    context->m_ProgramCounter += 3;
-
     TLVM_6800_GET_ADDR_EXTENDED(addr);    
+    context->m_ProgramCounter += 3;
     TLVM_PUSH_PC(addr);
 })
 

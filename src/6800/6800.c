@@ -26,31 +26,39 @@ nistur@gmail.com
 
 tlvmReturn tlvm6800NOP(tlvmContext* ctx, tlvmByte* cycles);
 
-#define ______ NULL
-#define _(_X) tlvm6800##_X /* Standard instruction */
-#define A(_X) _(_X##_A)    /* Instruction on A accumulator */
-#define B(_X) _(_X##_B)    /* Instruction on B accumulator */
-#define I(_X) _(_X##_I)    /* Indexed address */
-#define E(_X) _(_X##_E)    /* Extended address */
+#define _______ NULL
+#define __(_m) tlvm6800##_m /* Standard instruction */
+#define _A(_m) __(_m##_A)    /* Instruction on A accumulator */
+#define _B(_m) __(_m##_B)    /* Instruction on B accumulator */
+#define X_(_m) __(_m##_X)    /* Indexed address */
+#define E_(_m) __(_m##_E)    /* Extended address */
+#define IA(_m) _A(_m##_I)    /* Immediate address -> A */
+#define DA(_m) _A(_m##_D)    /* Direct address -> A */
+#define XA(_m) _A(_m##_X)    /* Indexed address -> A */
+#define EA(_m) _A(_m##_E)    /* Extended address -> A */
+#define IB(_m) _A(_m##_I)    /* Immediate address -> B */
+#define DB(_m) _A(_m##_D)    /* Direct address -> B */
+#define XB(_m) _A(_m##_X)    /* Indexed address -> B */
+#define EB(_m) _A(_m##_E)    /* Extended address -> B */
 
 tlvmInstruction g_6800InstructionSet[] =  {
-/*             0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F */
-    /* 0 */ ______,_(NOP),______,______,______,______,_(TAP),_(TPA),_(INX),_(DEX),_(CLV),_(SEV),_(CLC),_(SEC),_(CLI),_(SEI),
-    /* 1 */ _(SBA),______,______,______,______,______,_(TAB),_(TBA),______,_(DAA),______,_(ABA),______,______,______,______,
-    /* 2 */ _(BRA),______,_(BHI),_(BLS),_(BCC),_(BCS),_(BNE),_(BEQ),_(BVC),_(BVS),_(BPL),_(BMI),_(BGE),_(BLT),_(BGT),_(BLE),
-    /* 3 */ _(TSX),_(INS),A(PUL),B(PUL),_(DES),_(TXS),A(PSH),B(PSH),______,_(RTS),______,_(RTI),______,______,_(WAI),_(SWI),
-    /* 4 */ A(NEG),______,______,A(COM),A(LSR),______,______,______,______,______,A(DEC),______,A(INC),______,______,______,
-    /* 5 */ B(NEG),______,______,B(COM),B(LSR),______,______,______,______,______,B(DEC),______,B(INC),______,______,______,
-    /* 6 */ I(NEG),______,______,I(COM),I(LSR),______,______,______,______,______,I(DEC),______,I(INC),______,______,______,
-    /* 7 */ E(NEG),______,______,E(COM),E(LSR),______,______,______,______,______,E(DEC),______,E(INC),______,______,______,
-    /* 8 */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
-    /* 9 */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
-    /* A */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,I(JSR),______,______,
-    /* B */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,E(JSR),______,______,
-    /* C */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
-    /* D */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
-    /* E */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______,
-    /* F */ ______,_(CMP),______,______,______,______,______,______,______,______,______,______,______,______,______,______
+/*          0       1       2       3       4       5       6       7       8       9       A       B       C       D       E       F */
+/* 0 */ _______,__(NOP),_______,_______,_______,_______,__(TAP),__(TPA),__(INX),__(DEX),__(CLV),__(SEV),__(CLC),__(SEC),__(CLI),__(SEI),
+/* 1 */ __(SBA),_______,_______,_______,_______,_______,__(TAB),__(TBA),_______,__(DAA),_______,__(ABA),_______,_______,_______,_______,
+/* 2 */ __(BRA),_______,__(BHI),__(BLS),__(BCC),__(BCS),__(BNE),__(BEQ),__(BVC),__(BVS),__(BPL),__(BMI),__(BGE),__(BLT),__(BGT),__(BLE),
+/* 3 */ __(TSX),__(INS),_A(PUL),_B(PUL),__(DES),__(TXS),_A(PSH),_B(PSH),_______,__(RTS),_______,__(RTI),_______,_______,__(WAI),__(SWI),
+/* 4 */ _A(NEG),_______,_______,_A(COM),_A(LSR),_______,_______,_______,_______,_______,_A(DEC),_______,_A(INC),_______,_______,_______,
+/* 5 */ _B(NEG),_______,_______,_B(COM),_B(LSR),_______,_______,_______,_______,_______,_B(DEC),_______,_B(INC),_______,_______,_______,
+/* 6 */ X_(NEG),_______,_______,X_(COM),X_(LSR),_______,_______,_______,_______,_______,X_(DEC),_______,X_(INC),_______,_______,_______,
+/* 7 */ E_(NEG),_______,_______,E_(COM),E_(LSR),_______,_______,_______,_______,_______,E_(DEC),_______,E_(INC),_______,_______,_______,
+/* 8 */ _______,IA(CMP),_______,_______,_______,_______,IA(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______,
+/* 9 */ _______,DA(CMP),_______,_______,_______,_______,DA(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______,
+/* A */ _______,XA(CMP),_______,_______,_______,_______,XA(LDA),_______,_______,_______,_______,_______,_______,X_(JSR),_______,_______,
+/* B */ _______,EA(CMP),_______,_______,_______,_______,EA(LDA),_______,_______,_______,_______,_______,_______,E_(JSR),_______,_______,
+/* C */ _______,IB(CMP),_______,_______,_______,_______,IB(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______,
+/* D */ _______,DB(CMP),_______,_______,_______,_______,DB(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______,
+/* E */ _______,XB(CMP),_______,_______,_______,_______,XB(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______,
+/* F */ _______,EB(CMP),_______,_______,_______,_______,EB(LDA),_______,_______,_______,_______,_______,_______,_______,_______,_______
 };
 
 
@@ -97,14 +105,14 @@ tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)
     
     if(interrupt == TLVM_INTERRUPT_RESET)
     {
-        TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_RESET);
-        addr = interrupt;
+        TLVM_GET_MEMORY16(vec, TLVM_6800_INT_RESET);
+        addr = vec;
         willInterrupt = TLVM_TRUE;
     }
     else if(interrupt == TLVM_INTERRUPT_NMI)
     {
-        TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_NMI);
-        addr = interrupt;
+        TLVM_GET_MEMORY16(vec, TLVM_6800_INT_NMI);
+        addr = vec;
         willInterrupt = TLVM_TRUE;
     }
     else if(interrupt == TLVM_INTERRUPT_IRQ)
@@ -112,8 +120,8 @@ tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)
         if(context->m_Interrupts != TLVM_INTERRUPT_NMI &&
            TLVM_FLAG_ISSET(I, 6800))
         {
-            TLVM_GET_MEMORY16(interrupt, TLVM_6800_INT_IRQ);
-            addr = interrupt;
+            TLVM_GET_MEMORY16(vec, TLVM_6800_INT_IRQ);
+            addr = vec;
             willInterrupt = TLVM_TRUE;
         }
     }
@@ -121,7 +129,7 @@ tlvmReturn tlvm6800Interrupt(tlvmContext* context, tlvmByte interrupt)
     
     if(willInterrupt)
     {
-        if(context->m_Interrupts == TLVM_INTERRUPT_NONE)
+        if(context->m_Interrupts == TLVM_INTERRUPT_NONE && interrupt != TLVM_INTERRUPT_RESET)
         {
             TLVM_STACK_PUSH16(context->m_ProgramCounter);
             TLVM_STACK_PUSH16(TLVM_REGISTER16(TLVM_6800_REG16_IX));

@@ -72,8 +72,18 @@ nistur@gmail.com
 #define TLVM_6800_MNEM_MOD(_mnem)	\
     TLVM_6800_MNEM(_mnem##_A);		\
     TLVM_6800_MNEM(_mnem##_B);		\
-    TLVM_6800_MNEM(_mnem##_I);		\
+    TLVM_6800_MNEM(_mnem##_X);		\
     TLVM_6800_MNEM(_mnem##_E);
+
+#define TLVM_6800_MNEM_FULL(_mnem)		\
+    TLVM_6800_MNEM(_mnem##_I_A);		\
+    TLVM_6800_MNEM(_mnem##_D_A);		\
+    TLVM_6800_MNEM(_mnem##_X_A);		\
+    TLVM_6800_MNEM(_mnem##_E_A);		\
+    TLVM_6800_MNEM(_mnem##_I_B);		\
+    TLVM_6800_MNEM(_mnem##_D_B);		\
+    TLVM_6800_MNEM(_mnem##_X_B);		\
+    TLVM_6800_MNEM(_mnem##_E_B);
 
 #define TLVM_6800_INSTRUCTION(_mnem, _cycles, _len, _inst)		\
     TLVM_6800_MNEM(_mnem)						\
@@ -146,11 +156,11 @@ TLVM_6800_MNEM(TST);
 TLVM_6800_MNEM(CLR);
 
 TLVM_6800_MNEM(SUB);
-TLVM_6800_MNEM(CMP);
+TLVM_6800_MNEM_FULL(CMP);
 TLVM_6800_MNEM(SBC);
 TLVM_6800_MNEM(AND);
 TLVM_6800_MNEM(BIT);
-TLVM_6800_MNEM(LDA);
+TLVM_6800_MNEM_FULL(LDA);
 TLVM_6800_MNEM(STA);
 TLVM_6800_MNEM(EOR);
 TLVM_6800_MNEM(ADC);

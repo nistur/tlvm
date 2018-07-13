@@ -192,8 +192,9 @@ tlvmReturn tlvmRun(tlvmContext* context)
 {
     TLVM_NULL_CHECK(context, NO_CONTEXT);
 
+    context->m_ProcessorData->m_Interrupt(context, TLVM_INTERRUPT_RESET);
     tlvmUnsetFlags(context, TLVM_FLAG_HALT | TLVM_FLAG_STALL);
-
+    
     tlvmLong cycleCount = 0;
     tlvmByte cycles = 0;
     tlvmReturn status = TLVM_SUCCESS;

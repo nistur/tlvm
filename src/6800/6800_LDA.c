@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Philipp Geyer
+Copyright (c) 2018 Philipp Geyer
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,38 +24,55 @@ nistur@gmail.com
 #ifdef  TLVM_HAS_6800
 #include "tlvm_internal.h"
 
-TLVM_6800_INSTRUCTION(DEX, 4, 1,
+TLVM_6800_INSTRUCTION(LDA_I_A, 2, 2,
 {
-    tlvmShort val = TLVM_REGISTER16(TLVM_6800_REG16_IX) - 1;
-    TLVM_REGISTER16(TLVM_6800_REG16_IX) = val;
-    TLVM_FLAG_SET_IF(val, Z, 6800);
+    TLVM_GET_OP(op1, 1);
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmShort)op1;
 })
 
-TLVM_6800_INSTRUCTION(DES, 4, 1,
+TLVM_6800_INSTRUCTION(LDA_D_A, 2, 2,
 {
-    context->m_StackPointer -= 1;
+    TLVM_GET_OP(op1, 1);
+    TLVM_GET_MEMORY(mem, op1);
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmShort)mem;
 })
 
-TLVM_6800_INSTRUCTION(DEC_A, 4, 1,
-{
-    TLVM_REGISTER(TLVM_6800_REG_A) -= 1;
-})
-
-TLVM_6800_INSTRUCTION(DEC_B, 4, 1,
-{
-    TLVM_REGISTER(TLVM_6800_REG_B) -= 1;
-})
-
-TLVM_6800_INSTRUCTION(DEC_X, 4, 2,
+TLVM_6800_INSTRUCTION(LDA_X_A, 2, 2,
 {
     TLVM_6800_GET_MEM_INDEXED(mem);
-    *mem -= 1;
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmShort)*mem;
 })
 
-TLVM_6800_INSTRUCTION(DEC_E, 4, 3,
+TLVM_6800_INSTRUCTION(LDA_E_A, 2, 2,
 {
     TLVM_6800_GET_MEM_EXTENDED(mem);
-    *mem -= 1;
+    TLVM_REGISTER(TLVM_6800_REG_A) = (tlvmShort)*mem;
 })
+
+TLVM_6800_INSTRUCTION(LDA_I_B, 2, 2,
+{
+    TLVM_GET_OP(op1, 1);
+    TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmShort)op1;
+})
+
+TLVM_6800_INSTRUCTION(LDA_D_B, 2, 2,
+{
+    TLVM_GET_OP(op1, 1);
+    TLVM_GET_MEMORY(mem, op1);
+    TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmShort)mem;
+})
+
+TLVM_6800_INSTRUCTION(LDA_X_B, 2, 2,
+{
+    TLVM_6800_GET_MEM_INDEXED(mem);
+    TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmShort)*mem;
+})
+
+TLVM_6800_INSTRUCTION(LDA_E_B, 2, 2,
+{
+    TLVM_6800_GET_MEM_EXTENDED(mem);
+    TLVM_REGISTER(TLVM_6800_REG_B) = (tlvmShort)*mem;
+})
+
 
 #endif/*TLVM_HAS_6800*/

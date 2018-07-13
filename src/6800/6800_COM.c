@@ -47,7 +47,7 @@ TLVM_6800_INSTRUCTION(COM_B, 2, 1,
     SET_FLAGS(val);
 })
 
-TLVM_6800_INSTRUCTION(COM_I, 2, 2,
+TLVM_6800_INSTRUCTION(COM_X, 2, 2,
 {
     TLVM_6800_GET_ADDR_INDEXED(addr);
     tlvmByte* mem = tlvmGetMemory(context, addr, TLVM_FLAG_READ);
