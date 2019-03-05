@@ -37,36 +37,43 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     {
     case TLVM_SBB_B:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_B:
         src = &context->m_Registers[TLVM_8080_REG_B];
     break;
     case TLVM_SBB_C:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_C:
         src = &context->m_Registers[TLVM_8080_REG_C];
     break;
     case TLVM_SBB_D:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_D:
         src = &context->m_Registers[TLVM_8080_REG_D];
     break;
     case TLVM_SBB_E:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_E:
         src = &context->m_Registers[TLVM_8080_REG_E];
     break;
     case TLVM_SBB_H:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_H:
         src = &context->m_Registers[TLVM_8080_REG_H];
     break;
     case TLVM_SBB_L:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_L:
         src = &context->m_Registers[TLVM_8080_REG_L];
     break;
     case TLVM_SBB_M:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_M:
         {
             tlvmShort addr = TLVM_GET_16BIT(TLVM_8080_REG_H, TLVM_8080_REG_L);
@@ -75,6 +82,7 @@ tlvmReturn tlvmSUB(tlvmContext* context, tlvmByte* cycles)
     break;
     case TLVM_SBB_A:
         borrow = TLVM_FLAG_ISSET(C, 8080) ? 1 : 0;
+	__attribute__((fallthrough));
     case TLVM_SUB_A:
         src = &context->m_Registers[TLVM_8080_REG_A];
     break;

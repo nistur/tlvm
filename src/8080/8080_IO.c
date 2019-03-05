@@ -37,11 +37,11 @@ tlvmReturn tlvmOUT(tlvmContext* context, tlvmByte* cycles)
     context->m_ProgramCounter += 2;
     if(cycles)
     	*cycles =10;
-
-	if(context->m_IOCallback != NULL)
-		context->m_IOCallback(context, dest);
-
-	TLVM_RETURN_CODE(SUCCESS);
+    
+    if(context->m_IOCallback != NULL)
+	context->m_IOCallback(context, dest);
+    
+    TLVM_RETURN_CODE(SUCCESS);
 }
 
 tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
@@ -58,6 +58,6 @@ tlvmReturn tlvmIN(tlvmContext* context, tlvmByte* cycles)
     if(cycles)
     	*cycles =10;
 
-	TLVM_RETURN_CODE(SUCCESS);
+    TLVM_RETURN_CODE(SUCCESS);
 }
 #endif/*TLVM_HAS_8080*/
