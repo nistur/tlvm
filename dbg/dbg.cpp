@@ -114,6 +114,7 @@ int g_inDataPort = -1;
 int g_statPort = -1;
 int g_numDataPort = -1;
 int g_numStatPort = -1;
+bool g_silent = false;
 
 enum ThreadState { None, Running, Halt };
 
@@ -297,6 +298,14 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 		}
 		HANDLE_INPUT_OPTION(quit, q)
 		{
+		        if(g_silent)
+		        {
+			        // If we're running silently, don't ask to quit
+			        g_state.quit = true;
+			        tlvmDebugHalt(context);
+				resumeStdIO(context);
+				return;
+		        }
 			cout << "Program is still running, are you sure? yes/no: ";
 			while(true)
 			{
@@ -356,6 +365,10 @@ void breakpoint(tlvmContext* context, tlvmByte message, tlvmShort addr)
 			tlvmDebugGetRegister(context, reg, &reg);
 			printf("0x%02X\n", reg);
 		}
+		HANDLE_INPUT_OPTION(silent, t)
+		{
+		    g_silent = true;
+		}
 	HANDLE_INPUT_END();
 	resumeStdIO(context);
 }
@@ -407,7 +420,10 @@ int main(int argc, char** argv)
 			{
 				setMemory(file, address, size);
 
-				printf("Loaded file %s into memory at 0x%04X - 0x%04X\n", filename.c_str(), address, address + size - 1);
+				if(!g_silent)
+				{
+				        printf("Loaded file %s into memory at 0x%04X - 0x%04X\n", filename.c_str(), address, address + size - 1);
+				}
 			}
 		}
 		HANDLE_INPUT_OPTION(run, r)
@@ -420,7 +436,10 @@ int main(int argc, char** argv)
 			{
 				break;
 			}
-			cout << "Program quit with code: " << ret << endl;
+			if(!g_silent)
+			{
+			        cout << "Program quit with code: " << ret << endl;
+			}
 			tlvmReset(context);
 		}
 		HANDLE_INPUT_OPTION(breakpoint, b)
@@ -494,8 +513,15 @@ int main(int argc, char** argv)
 			else
 			{
 				setMemory(buffer, address, size);
-				printf("Created %dB RAM at 0x%04X - 0x%04X\n", size, address, address + size - 1);
+				if(!g_silent)
+				{
+				        printf("Created %dB RAM at 0x%04X - 0x%04X\n", size, address, address + size - 1);
+				}
 			}
+		}
+		HANDLE_INPUT_OPTION(silent, t)
+		{
+		    g_silent = true;
 		}
 	HANDLE_INPUT_END();
 	if(file.is_open())
